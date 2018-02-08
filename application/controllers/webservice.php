@@ -231,7 +231,8 @@ class Webservice extends CI_Controller
     {
         
         $token = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
-        if ($token == "") {
+          $user_id        = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
+        if ($token == "" or $user_id=='') {
             die(json_encode(array(
                 "status" => 0,
                 "message" => "Input parameters are not found"
@@ -1818,7 +1819,7 @@ class Webservice extends CI_Controller
 
      /*
     -----------------------------------------------------------------------------------------------------
-    http://104.237.3.116/tap911/index.php/webservice/add_geofence?token=03ed32f30ee37fbb&user_id=77&geo_lat=22.719569&geo_long=75.857726&radius=1.33356&geofence_name=abc&in_alert=1&out_alert=1&address=indore%20ab%20road
+    http://104.237.3.116/tap911/index.php/webservice/add_geofence?token=03ed32f30ee37fbb&user_id=77&geo_lat=22.719569&geo_long=75.857726&radius=1.33356&geofence_name=abc&in_alert=1&out_alert=1&address=indore%20ab%20road&geo_type=qasd
     -----------------------------------------------------------------------------------------------------
     */
     function add_geofence()
@@ -1833,9 +1834,10 @@ class Webservice extends CI_Controller
         $in_alert = isset($_REQUEST['in_alert']) ? $_REQUEST['in_alert'] : "";
         $out_alert = isset($_REQUEST['out_alert']) ? $_REQUEST['out_alert'] : "";
         $address = isset($_REQUEST['address']) ? $_REQUEST['address'] : "";
+         $geo_type = isset($_REQUEST['geo_type']) ? $_REQUEST['geo_type'] : "";
 
         
-        if ($token == "" or $user_id == '' or $geo_lat=="" or $geo_long ==""  or $geofence_name=="" or $in_alert=="" or $out_alert=="" or $address=="" ) {
+        if ($token == "" or $user_id == '' or $geo_lat=="" or $geo_long ==""  or $geofence_name=="" or $in_alert=="" or $out_alert=="" or $address==""  or $geo_type=='') {
             die(json_encode(array(
                 "status" => 0,
                 "message" => "Input parameters are not found"
@@ -1901,7 +1903,9 @@ class Webservice extends CI_Controller
                              'out_alert' => $results->out_alert,
                              'address' => $results->address,
                              'geo_type' => $results->geo_type,
-                             'add_date' => $results->add_date
+                              'zone_address' => $results->zone_address,
+                              'distance' => $results->distance,
+                              'add_date' => $results->add_date
                             
                         );
                     }
