@@ -231,11 +231,13 @@ FROM `tbl_community` tc");
     }
     function get_user_message()
     {
+        $user_id = $_REQUEST['user_id'];
         $this->db->select('tbl_user.user_id,tbl_community_user_mapping.user_id,tbl_community_user_mapping.status,tbl_community.*');
         $this->db->from('tbl_community_user_mapping');
         $this->db->join('tbl_user', 'tbl_user.user_id = tbl_community_user_mapping.user_id', 'INNER');
         $this->db->join('tbl_community', 'tbl_community.community_id = tbl_community_user_mapping.community_id', 'INNER');
         $this->db->where('tbl_community_user_mapping.status', 1);
+         $this->db->where('tbl_community_user_mapping.user_id', $user_id);
         $query = $this->db->get();
         return $query->result();
     }
@@ -872,6 +874,10 @@ FROM `tbl_community` tc");
                          'in_alert' => $_REQUEST['in_alert'],
                          'out_alert' => $_REQUEST['out_alert'],
                          'address' => $_REQUEST['address'],
+                         'geo_type' => $_REQUEST['geo_type'],
+                         'zone_address' => $_REQUEST['zone_address'],
+                         'distance' => $_REQUEST['distance'],
+                         
                           'status' => 1
         );
 
@@ -913,7 +919,9 @@ FROM `tbl_community` tc");
                          'in_alert' => $_REQUEST['in_alert'],
                          'out_alert' => $_REQUEST['out_alert'],
                          'address' => $_REQUEST['address'],
-                         'geo_type' => $_REQUEST['geo_type']
+                         'geo_type' => $_REQUEST['geo_type'],
+                         'zone_address' => $_REQUEST['zone_address'],
+                         'distance' => $_REQUEST['distance']
                          
         );
            $this->db->where('tbl_geo_fence.geo_fence_id', $geo_fence_id);
