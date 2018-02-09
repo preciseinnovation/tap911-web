@@ -2031,6 +2031,171 @@ class Webservice extends CI_Controller
     }
 
 
+/*
+    -----------------------------------------------------------------------------------------------------
+    http://104.237.3.116/tap911/index.php/webservice/add_emergency_user?token=03ed32f30ee37fbb&user_id=77&geo_lat=22.719569&geo_long=75.857726&radius=1.33356&geofence_name=abc&in_alert=1&out_alert=1&address=indore%20ab%20road&geo_type=qasd
+    -----------------------------------------------------------------------------------------------------
+    */
+    function add_emergency_user()
+    {
+        
+        $token   = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+        $user_id = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
+        $user_lat = isset($_REQUEST['user_lat']) ? $_REQUEST['user_lat'] : "";
+        $user_long = isset($_REQUEST['user_long']) ? $_REQUEST['user_long'] : "";
+        $address = isset($_REQUEST['address']) ? $_REQUEST['address'] : "";
+        $emergency_type = isset($_REQUEST['emergency_type']) ? $_REQUEST['emergency_type'] : "";
+
+        
+        if ($token == "" or $user_id == '' or $user_lat=="" or $user_long ==""  or $address=="" or $emergency_type=="") {
+            die(json_encode(array(
+                "status" => 0,
+                "message" => "Input parameters are not found"
+            )));
+            
+        } else {
+            $token = $_REQUEST['token'];
+            $sql   = "SELECT * FROM tbl_user where token='$token'";
+            $res   = $this->db->query($sql);
+            $row   = $res->row();
+            if ($row) {
+                $json_data = $this->user_model->add_emergency_user($token);
+                $data      = json_encode($json_data);
+                print_r($data);
+            } else {
+                $returnresult = array(
+                    'status' => 0,
+                    'message' => 'Token mismatch'
+                );
+                $response     = json_encode($returnresult);
+                print_r($response);
+            }
+        }
+        
+    }
+
+
+    /*
+    -----------------------------------------------------------------------------------------
+   http://104.237.3.116/tap911/index.php/webservice/get_distance_user?token=be53d02c8766599f&latitude=21.2125123&longitude=72.8304817&distance=5
+    -----------------------------------------------------------------------------------------
+    */
+    
+    function get_distance_user()
+    {
+           $token = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+           $latitude = isset($_REQUEST['latitude']) ? $_REQUEST['latitude'] : "";
+           $longitude = isset($_REQUEST['longitude']) ? $_REQUEST['longitude'] : "";
+            $distance = isset($_REQUEST['distance']) ? $_REQUEST['distance'] : "";
+        
+        
+        
+        if ($token == "" or $latitude=='' or $longitude=='' or $distance=='') {
+            die(json_encode(array(
+                "status" => 0,
+                "message" => "Input parameters are not found"
+            )));
+            
+        } else {
+            $token = $_REQUEST['token'];
+            $sql   = "SELECT * FROM tbl_user where token='$token'";
+            $res   = $this->db->query($sql);
+            $row   = $res->row();
+            if ($row) {
+                $json_data = $this->user_model->get_distance_user($token); //user_id
+               if ($json_data) {
+                    $arr = array();
+                    foreach ($json_data as $results) {
+                        $arr[] = array(
+                            'emergency_tracking_id' => $results->emergency_tracking_id,
+                            'user_id' => $results->user_id,
+                            'address' => $results->address,
+                            'first_name' => $results->first_name,
+                            'last_name' => $results->last_name,
+                            'user_name' => $results->user_name,
+                             'phone_number_text_msg' => $results->phone_number_text_msg,
+                              'add_date' => $results->add_date
+                            
+                        );
+                    }
+                    $returnresult = array(
+                        'status' => 1,
+                        'message' => 'Record found',
+                        'user_list' => $arr
+                    );
+                    $response     = json_encode($returnresult);
+                    print_r($response);
+                }
+                
+                else {
+                    $returnresult = array(
+                        'status' => 1,
+                        'message' => 'Record  not found',
+                    );
+                    $response     = json_encode($returnresult);
+                    print_r($response);
+                }
+                
+                
+            } else {
+                $returnresult = array(
+                    'status' => 0,
+                    'message' => 'Token mismatch'
+                );
+                $response     = json_encode($returnresult);
+                print_r($response);
+            }
+        }
+    }
+
+/*
+    -----------------------------------------------------------------------------------------------------
+    http://104.237.3.116/tap911/index.php/webservice/user_emergency_request?token=03ed32f30ee37fbb&user_id=77&emergency_tracking_id=1&user_lat=75.857726&user_long=11.33356&address=Smc%20Tenement,%20Ward%20No.7,%20Vasta%20Devdi%20Rd,%20Gotalawadi,%20Tunki,%20Katargam,%20Surat,%20Gujarat%20395004,%20IndiaSuratGujaratIndia395004Smc%20Tenement&usertoken=f2bEV13XwtA:APA91bGmtUMGNXeAW48RG_o2yHxOrQiGZV6jIr4dI-inmQhpJf6LkJg9_5x9V_y-_7T5c0idOCScjV5LhtuzBPqpvPTqb6xfhKhUOYq6npPRI82mkiaNnrE5skJB8tDCieWtsI1y5tC0&type=ios&title=abc&body=test
+    -----------------------------------------------------------------------------------------------------
+    */
+    function user_emergency_request()
+    {
+        
+        $token   = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+        $emergency_tracking_id = isset($_REQUEST['emergency_tracking_id']) ? $_REQUEST['emergency_tracking_id'] : "";
+        $user_id = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
+        $user_lat = isset($_REQUEST['user_lat']) ? $_REQUEST['user_lat'] : "";
+        $user_long = isset($_REQUEST['user_long']) ? $_REQUEST['user_long'] : "";
+        $address = isset($_REQUEST['address']) ? $_REQUEST['address'] : "";
+         $usertoken = isset($_REQUEST['usertoken']) ? $_REQUEST['usertoken'] : "";
+         $type = isset($_REQUEST['type']) ? $_REQUEST['type'] : "";
+         $title = isset($_REQUEST['title']) ? $_REQUEST['title'] : "";
+         $body = isset($_REQUEST['body']) ? $_REQUEST['body'] : "";
+      
+        
+        if ($token == "" or $user_id == '' or $user_lat=="" or $user_long ==""  or $address=="" or $emergency_tracking_id=="" or $usertoken=='' or $type=='' or  $title=='' or $body=='') {
+            die(json_encode(array(
+                "status" => 0,
+                "message" => "Input parameters are not found"
+            )));
+            
+        } else {
+            $token = $_REQUEST['token'];
+            $sql   = "SELECT * FROM tbl_user where token='$token'";
+            $res   = $this->db->query($sql);
+            $row   = $res->row();
+            if ($row) {
+                $json_data = $this->user_model->user_emergency_request($token);
+                $data      = json_encode($json_data);
+                print_r($data);
+            } else {
+                $returnresult = array(
+                    'status' => 0,
+                    'message' => 'Token mismatch'
+                );
+                $response     = json_encode($returnresult);
+                print_r($response);
+            }
+        }
+        
+    }
+
+
 }
 /* End of file welcome.php */
 /* Location: ./application/controllers/welcome.php */
