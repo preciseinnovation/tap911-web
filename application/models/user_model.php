@@ -961,4 +961,102 @@ FROM `tbl_community` tc");
         return $returnresult;
     }
 
+
+     function add_emergency_user()
+    {
+       $data = array(
+                        'user_id' => $_REQUEST['user_id'],
+                        'user_lat' => $_REQUEST['user_lat'],
+                        'user_long' => $_REQUEST['user_long'],
+                        'address' => $_REQUEST['address'],
+                         'emergency_type' => $_REQUEST['emergency_type'],
+                          'status' => 1
+        );
+
+        $data = $this->db->insert('tbl_geofenece_emergency_user', $data);
+        if ($data) {
+            $returnresult = array(
+                'status' => 1,
+                'message' => 'User information successfully submit'
+            );
+        } else {
+            $returnresult = array(
+                'status' => 0,
+                'message' => 'Some data not valid'
+            );
+        }
+        
+        return $returnresult;
 }
+
+
+
+function get_distance_user(){
+
+       $latitude = $_REQUEST['latitude'];
+       $longitude = $_REQUEST['longitude'];
+       $distance = $_REQUEST['distance'];
+        $result  = $this->db->query("SELECT  tbl_emergency_tracking.*,tbl_user.*,
+            3956 * 2 * ASIN(SQRT( POWER(SIN(($latitude - tbl_emergency_tracking.latitude) * pi()/180 / 2), 2) + COS($latitude * pi()/180) * COS(tbl_emergency_tracking.latitude * pi()/180) *
+            POWER(SIN(($longitude - tbl_emergency_tracking.longitude) * pi()/180 / 2), 2) )) as
+            distance FROM tbl_emergency_tracking
+             JOIN  tbl_user on tbl_user.user_id =  tbl_emergency_tracking.user_id    
+            GROUP BY emergency_tracking_id HAVING distance <= $distance ORDER by distance ASC");
+
+        return $result->result();
+    }
+
+
+     function  user_emergency_request()
+    {
+        $usertoken =$_REQUEST['usertoken'];
+        $type =$_REQUEST['type'];
+        $title =$_REQUEST['title'];
+        $body =$_REQUEST['body'];
+
+       $data = array(
+                        'emergency_tracking_id' => $_REQUEST['emergency_tracking_id'],
+                        'user_id' => $_REQUEST['user_id'],
+                        'user_lat' => $_REQUEST['user_lat'],
+                        'user_long' => $_REQUEST['user_long'],
+                        'address' => $_REQUEST['address'],
+                        'accept_status'=>0,
+                          'status' => 1
+        );
+
+        $data = $this->db->insert('tbl_user_emergency_notification', $data);
+    $ch = curl_init("https://fcm.googleapis.com/fcm/send");
+    $notification = array('title' =>$title , 'text' => $body);
+    $arrayToSend = array('to' => $usertoken, 'notification' => $notification,'priority'=>'high');
+    $json = json_encode($arrayToSend);
+    $headers = array();
+    $headers[] = 'Content-Type: application/json';
+    if($type=='ios'){
+        $headers[] = 'Authorization: key= AIzaSyAoqpGCTIDQJ5JtNwSRRGjsR5D9LsCgLcE'; // key here
+    }else{
+        $headers[] = 'Authorization: key= AIzaSyD0tsbWK80QkBHPYGP3Re2hHRrGPrX8G1k'; // key here
+    }
+    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");                                                                     
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
+    curl_setopt($ch, CURLOPT_HTTPHEADER,$headers);       
+    $response = curl_exec($ch);
+    curl_close($ch);
+    return $response;
+        if ($data) {
+            $returnresult = array(
+                'status' => 1,
+                'message' => 'User request successfully submit'
+                
+            );
+        } else {
+            $returnresult = array(
+                'status' => 0,
+                'message' => 'Some data not valid'
+            );
+        }
+        
+        return $returnresult;
+}
+
+}
+
