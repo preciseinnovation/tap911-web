@@ -24,9 +24,11 @@ class Webservice extends CI_Controller
     {
         $login    = isset($_REQUEST['login']) ? $_REQUEST['login'] : "";
         $password = isset($_REQUEST['password']) ? $_REQUEST['password'] : "";
+         $user_token = isset($_REQUEST['user_token']) ? $_REQUEST['user_token'] : "";
+          $mobile_type = isset($_REQUEST['mobile_type']) ? $_REQUEST['mobile_type'] : "";
         
         
-        if ($login == "" or $password == "") {
+        if ($login == "" or $password == "" or $user_token=='' or $mobile_type=="") {
             die(json_encode(array(
                 "status" => 0,
                 "message" => "Input parameters are not found"
@@ -54,15 +56,18 @@ class Webservice extends CI_Controller
         $last_name                                    = isset($_REQUEST['last_name']) ? $_REQUEST['last_name'] : "";
         $user_name                                    = isset($_REQUEST['user_name']) ? $_REQUEST['user_name'] : "";
         $email                                        = isset($_REQUEST['email']) ? $_REQUEST['email'] : "";
+         $user_type_id                                        = isset($_REQUEST['user_type_id']) ? $_REQUEST['user_type_id'] : "";
         $phone_number_text_msg_country_code           = isset($_REQUEST['phone_number_text_msg_country_code']) ? $_REQUEST['phone_number_text_msg_country_code'] : "";
         $phone_number_text_msg                        = isset($_REQUEST['phone_number_text_msg']) ? $_REQUEST['phone_number_text_msg'] : "";
         $phone_number_voice_notification_country_code = isset($_REQUEST['phone_number_voice_notification_country_code']) ? $_REQUEST['phone_number_voice_notification_country_code'] : "";
         $phone_number_voice_notification              = isset($_REQUEST['phone_number_voice_notification']) ? $_REQUEST['phone_number_voice_notification'] : "";
         $phone_number_voice_notification              = isset($_REQUEST['phone_number_voice_notification']) ? $_REQUEST['phone_number_voice_notification'] : "";
         $password                                     = isset($_REQUEST['password']) ? $_REQUEST['password'] : "";
+        $user_token                                   = isset($_REQUEST['user_token']) ? $_REQUEST['user_token'] : "";
+        $mobile_type                                  = isset($_REQUEST['mobile_type']) ? $_REQUEST['mobile_type'] : "";
         // $profile_pic = isset($_REQUEST['profile_pic']) ? $_REQUEST['profile_pic'] :"";
         
-        if ($first_name == "" or $last_name == "" or $user_name = "" or $email = "" or $phone_number_text_msg_country_code = "" or $phone_number_text_msg == "" or $phone_number_voice_notification_country_code == "" or $phone_number_voice_notification == "" or $password == "") {
+        if ($first_name == "" or $last_name == "" or $user_name = "" or $email = "" or $phone_number_text_msg_country_code = "" or $phone_number_text_msg == "" or $phone_number_voice_notification_country_code == "" or $phone_number_voice_notification == "" or $password == "" or $user_token == "" or $mobile_type = "" or $user_type_id=="") {
             die(json_encode(array(
                 "status" => 0,
                 "message" => "Input parameters are not found"
@@ -230,9 +235,9 @@ class Webservice extends CI_Controller
     function get_user_message()
     {
         
-        $token = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
-          $user_id        = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
-        if ($token == "" or $user_id=='') {
+        $token   = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+        $user_id = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
+        if ($token == "" or $user_id == '') {
             die(json_encode(array(
                 "status" => 0,
                 "message" => "Input parameters are not found"
@@ -663,7 +668,7 @@ class Webservice extends CI_Controller
                         $arr[] = array(
                             'alert_id' => $results->alert_id,
                             'user_id' => $results->user_id,
-                            'alert_id' => $results->alert_id,
+                           // 'alert_id' => $results->alert_id,
                             'alert_lat' => $results->alert_lat,
                             'alert_lang' => $results->alert_lang,
                             'alert_heading' => $results->alert_heading,
@@ -705,6 +710,107 @@ class Webservice extends CI_Controller
         }
     }
     
+
+
+/*
+    ------------------------------------------------------------------------------------------------
+    http://104.237.3.116/tap911/index.php/webservice/get_user_alert?token=c53afe04a17ef62b&user_id=101&alert_type=user
+    ------------------------------------------------------------------------------------------------
+    */
+    
+    function get_user_alert()
+    {
+        $token = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+         $user_id = isset($_REQUEST['token']) ? $_REQUEST['user_id'] : "";
+        // $alert_type = isset($_REQUEST['alert_type']) ? $_REQUEST['alert_type'] : "";
+        if ($token == "" or  $user_id=="") {
+            die(json_encode(array(
+                "status" => 0,
+                "message" => "Input parameters are not found"
+            )));
+            
+        } else {
+            $token = $_REQUEST['token'];
+            $sql   = "SELECT * FROM tbl_user where token='$token'";
+            $res   = $this->db->query($sql);
+            $row   = $res->row();
+            if ($row) {
+                $response = $this->user_model->get_user_alert($token);
+                
+                if ($response) {
+                    
+                    $arr = array();
+                    foreach ($response as $results) {
+                        if (is_null($results->community_id)) {
+                           $results->community_id = "";
+                           
+                             }
+                             if (is_null($results->community_logo)) {
+                           $results->community_logo = "";
+                           
+                             }
+                             if (is_null($results->add_date)) {
+                           $results->add_date = "";
+                           
+                             }
+                            
+                        $arr[] = array(
+                            'alert_id' => $results->alert_id,
+                            'community_id' => $results->community_id,
+                            'user_id' => $results->user_id,
+                            'alert_type' => $results->alert_type,
+                            'tracking_user_id' => $results->tracking_user_id,
+                            'alert_lat' => $results->alert_lat,
+                            'alert_lang' => $results->alert_lang,
+                             'alert_address' => $results->alert_address,
+                            'request_status' => $results->request_status,
+                            'add_date' => $results->add_date,
+                            'accept_time' => $results->accept_time,
+                            'community_logo' => $results->community_logo,
+                            'alert_heading' => $results->alert_heading,
+                            'alert_descrption' => $results->alert_descrption,
+                            'is_comment' => $results->is_comment,
+                            'alert_date_time' => $results->alert_date_time,
+                            'add_date' => $results->add_date,
+                            'user_name' => $results->first_name,
+                            'profile_pic' => $results->profile_pic,
+                            'user_message' => 'i need help',
+                            'status' => $results->userstatus
+                            
+                        );
+                    }
+                    $returnresult = array(
+                        'status' => 1,
+                        'message' => 'Record found',
+                        'user_alert_list' => $arr
+                    );
+                    $response     = json_encode($returnresult);
+                    print_r($response);
+                    
+                    
+                } else {
+                    $returnresult = array(
+                        'status' => 0,
+                        'message' => 'Record  not found'
+                    );
+                    $response     = json_encode($returnresult);
+                    print_r($response);
+                }
+                
+            } else {
+                $returnresult = array(
+                    'status' => 0,
+                    'message' => 'Token mismatch'
+                );
+                $response     = json_encode($returnresult);
+                print_r($response);
+            }
+        }
+    }
+
+
+
+
     /*
     -------------------------------------------------------------------------------------------------------
     http://104.237.3.116/tap911/index.php/webservice/get_community_emergency_contact?token=f70bfae97dc8c2d5
@@ -841,7 +947,7 @@ class Webservice extends CI_Controller
         }
     }
     
-/*
+    /*
     ----------------------------------------------------------------------------------------
     http://104.237.3.116/tap911/index.php/webservice/set_notification_tone?token=f70bfae97dc8c2d5&user_id=45&notification_tone=audio
     -------------------------------------------------------------------------------------------
@@ -852,7 +958,7 @@ class Webservice extends CI_Controller
         $token             = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
         $notification_tone = isset($_REQUEST['notification_tone']) ? $_REQUEST['notification_tone'] : "";
         $user_id           = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
-        if ($token == ""  or $user_id == "" or $notification_tone=='') {
+        if ($token == "" or $user_id == "" or $notification_tone == '') {
             die(json_encode(array(
                 "status" => 0,
                 "message" => "Input parameters are not found"
@@ -877,13 +983,13 @@ class Webservice extends CI_Controller
             }
         }
     }
-
-      /*
-
-       http://104.237.3.116/tap911/index.php/webservice/get_notification_setting?token=8ff636448bae3be3&user_id=45
-
-     */
-
+    
+    /*
+    
+    http://104.237.3.116/tap911/index.php/webservice/get_notification_setting?token=8ff636448bae3be3&user_id=45
+    
+    */
+    
     function get_notification_setting()
     {
         
@@ -916,7 +1022,7 @@ class Webservice extends CI_Controller
                             'email' => $results->email,
                             'text' => $results->text,
                             'voice' => $results->voice,
-                             'notification_tone' => $results->notification_tone
+                            'notification_tone' => $results->notification_tone
                             
                             
                         );
@@ -1085,9 +1191,9 @@ class Webservice extends CI_Controller
         $user_id      = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
         $description  = isset($_REQUEST['description']) ? $_REQUEST['description'] : "";
         $phone_number = isset($_REQUEST['phone_number']) ? $_REQUEST['phone_number'] : "";
-        // $country_id = isset($_REQUEST['country_id']) ? $_REQUEST['country_id'] :"";
+        $tap911_user      = isset($_REQUEST['tap911_user']) ? $_REQUEST['tap911_user'] : "";
         $country_code = isset($_REQUEST['country_code']) ? $_REQUEST['country_code'] : "";
-        if ($token == "" or $name == "" or $user_id == "" or $description == "" or $phone_number == "" or $country_code == "") {
+        if ($token == "" or $name == "" or $user_id == "" or $description == "" or $phone_number == "" or $country_code == "" or $tap911_user=="") {
             die(json_encode(array(
                 "status" => 0,
                 "message" => "Input parameters are not found"
@@ -1127,9 +1233,9 @@ class Webservice extends CI_Controller
         // $user_id = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] :"";
         $description          = isset($_REQUEST['description']) ? $_REQUEST['description'] : "";
         $phone_number         = isset($_REQUEST['phone_number']) ? $_REQUEST['phone_number'] : "";
-        // $country_id = isset($_REQUEST['country_id']) ? $_REQUEST['country_id'] :"";
+        $tap911_user      = isset($_REQUEST['tap911_user']) ? $_REQUEST['tap911_user'] : "";
         $country_code         = isset($_REQUEST['country_code']) ? $_REQUEST['country_code'] : "";
-        if ($token == "" or $name == "" or $description == "" or $phone_number == "" or $country_code == "" or $emergency_contact_id == "") {
+        if ($token == "" or $name == "" or $description == "" or $phone_number == "" or $country_code == "" or $emergency_contact_id == "" or $tap911_user=="") {
             die(json_encode(array(
                 "status" => 0,
                 "message" => "Input parameters are not found"
@@ -1304,83 +1410,84 @@ class Webservice extends CI_Controller
     -------------------------------------------------------------------------------------------------------
     */
     
-    function get_user_profiledata()
-    {
+    // function get_user_profiledata()
+    // {
         
-        $token   = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
-        $user_id = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
+    //     $token   = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+    //     $user_id = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
         
         
         
-        if ($token == "" or $user_id == "") {
-            die(json_encode(array(
-                "status" => 0,
-                "message" => "Input parameters are not found"
-            )));
+    //     if ($token == "" or $user_id == "") {
+    //         die(json_encode(array(
+    //             "status" => 0,
+    //             "message" => "Input parameters are not found"
+    //         )));
             
-        } else {
-            $token = $_REQUEST['token'];
-            $sql   = "SELECT * FROM tbl_user where token='$token'";
-            $res   = $this->db->query($sql);
-            $row   = $res->row();
-            if ($row) {
-                $json_data = $this->user_model->get_user_profiledata($token, $user_id);
+    //     } else {
+    //         $token = $_REQUEST['token'];
+    //         $sql   = "SELECT * FROM tbl_user where token='$token'";
+    //         $res   = $this->db->query($sql);
+    //         $row   = $res->row();
+    //         if ($row) {
+    //             $json_data = $this->user_model->get_user_profiledata($token, $user_id);
                 
-                if ($json_data) {
+    //             if ($json_data) {
                     
-                    $arr = array();
-                    foreach ($json_data as $results) {
-                        $arr[] = array(
-                            'user_id' => $results->user_id,
-                            'first_name' => $results->first_name,
-                            'last_name' => $results->last_name,
-                            'user_name' => $results->user_name,
-                            'email' => $results->email,
-                            'phone_number_text_msg_country_code' => $results->phone_number_text_msg_country_code,
-                            'phone_number_text_msg' => $results->phone_number_text_msg,
-                            'phone_number_voice_notification_country_code' => $results->phone_number_voice_notification_country_code,
-                            'phone_number_voice_notification' => $results->phone_number_voice_notification,
-                            'profile_pic' => $results->profile_pic,
-                            'language' => $results->language,
-                            'medical_history' => $results->medical_history,
-                            'medication_instraction' => $results->medication_instraction,
-                            'allergies' => $results->allergies,
-                            'special_need' => $results->special_need,
-                            'user_lat' => $results->user_lat,
-                            'user_long' => $results->user_long,
-                            'user_location_date_time' => $results->user_location_date_time
+    //                 $arr = array();
+    //                 foreach ($json_data as $results) {
+    //                     $arr[] = array(
+    //                         'user_id' => $results->user_id,
+    //                         'first_name' => $results->first_name,
+    //                         'last_name' => $results->last_name,
+    //                         'user_name' => $results->user_name,
+    //                         'email' => $results->email,
+    //                         'phone_number_text_msg_country_code' => $results->phone_number_text_msg_country_code,
+    //                         'phone_number_text_msg' => $results->phone_number_text_msg,
+    //                         'phone_number_voice_notification_country_code' => $results->phone_number_voice_notification_country_code,
+    //                         'phone_number_voice_notification' => $results->phone_number_voice_notification,
+    //                         'profile_pic' => $results->profile_pic,
+    //                         'language' => $results->language,
+    //                         'medical_history' => $results->medical_history,
+    //                         'medication_instraction' => $results->medication_instraction,
+    //                         'allergies' => $results->allergies,
+    //                         'special_need' => $results->special_need,
+    //                         'user_lat' => $results->user_lat,
+    //                         'user_long' => $results->user_long,
+    //                         'user_location_date_time' => $results->user_location_date_time
                             
-                        );
-                    }
-                    $returnresult = array(
-                        'status' => 1,
-                        'message' => 'Record found',
-                        'profile_data' => $arr
-                    );
-                    $response     = json_encode($returnresult);
-                    print_r($response);
+    //                     );
+    //                 }
+    //                 $returnresult = array(
+    //                     'status' => 1,
+    //                     'message' => 'Record found',
+    //                     'profile_data' => $arr,
+
+    //                 );
+    //                 $response     = json_encode($returnresult);
+    //                 print_r($response);
                     
                     
-                } else {
-                    $returnresult = array(
-                        'status' => 0,
-                        'message' => 'Record  not found'
-                    );
-                    $response     = json_encode($returnresult);
-                    print_r($response);
-                }
+    //             } else {
+    //                 $returnresult = array(
+    //                     'status' => 0,
+    //                     'message' => 'Record  not found'
+    //                 );
+    //                 $response     = json_encode($returnresult);
+    //                 print_r($response);
+    //             }
                 
-            } else {
-                $returnresult = array(
-                    'status' => 0,
-                    'message' => 'Token mismatch'
-                );
-                $response     = json_encode($returnresult);
-                print_r($response);
-            }
-        }
+    //         } else {
+    //             $returnresult = array(
+    //                 'status' => 0,
+    //                 'message' => 'Token mismatch'
+    //             );
+    //             $response     = json_encode($returnresult);
+    //             print_r($response);
+    //         }
+    //     }
         
-    }
+    // }
     
     /*
     -------------------------------------------------------------------------------------------------
@@ -1777,7 +1884,7 @@ class Webservice extends CI_Controller
         }
         
     }
-   
+    
     /*
     -----------------------------------------------------------------------------------------------------
     http://104.237.3.116/tap911/index.php/webservice/delete_emergency_contact?token=f0f2c2386c4316f3&emergency_contact_id=16
@@ -1816,28 +1923,21 @@ class Webservice extends CI_Controller
         }
         
     }
-
-     /*
+    
+    
+    /*
     -----------------------------------------------------------------------------------------------------
-    http://104.237.3.116/tap911/index.php/webservice/add_geofence?token=03ed32f30ee37fbb&user_id=77&geo_lat=22.719569&geo_long=75.857726&radius=1.33356&geofence_name=abc&in_alert=1&out_alert=1&address=indore%20ab%20road&geo_type=qasd
+    http://104.237.3.116/tap911/index.php/webservice/list_create_emergency_byuser?token=03ed32f30ee37fbb&user_id=77
     -----------------------------------------------------------------------------------------------------
     */
-    function add_geofence()
+    
+    function list_create_emergency_byuser()
     {
         
         $token   = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
         $user_id = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
-        $geo_lat = isset($_REQUEST['geo_lat']) ? $_REQUEST['geo_lat'] : "";
-        $geo_long = isset($_REQUEST['geo_long']) ? $_REQUEST['geo_long'] : "";
-        $radius = isset($_REQUEST['radius']) ? $_REQUEST['radius'] : "";
-        $geofence_name = isset($_REQUEST['geofence_name']) ? $_REQUEST['geofence_name'] : "";
-        $in_alert = isset($_REQUEST['in_alert']) ? $_REQUEST['in_alert'] : "";
-        $out_alert = isset($_REQUEST['out_alert']) ? $_REQUEST['out_alert'] : "";
-        $address = isset($_REQUEST['address']) ? $_REQUEST['address'] : "";
-         $geo_type = isset($_REQUEST['geo_type']) ? $_REQUEST['geo_type'] : "";
-
         
-        if ($token == "" or $user_id == '' or $geo_lat=="" or $geo_long ==""  or $geofence_name=="" or $in_alert=="" or $out_alert=="" or $address==""  or $geo_type=='') {
+        if ($token == "" or $user_id == '') {
             die(json_encode(array(
                 "status" => 0,
                 "message" => "Input parameters are not found"
@@ -1849,70 +1949,27 @@ class Webservice extends CI_Controller
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
-                $json_data = $this->user_model->add_geofence($token);
-                $data      = json_encode($json_data);
-                print_r($data);
-            } else {
-                $returnresult = array(
-                    'status' => 0,
-                    'message' => 'Token mismatch'
-                );
-                $response     = json_encode($returnresult);
-                print_r($response);
-            }
-        }
-        
-    }
-
-/*
-    -----------------------------------------------------------------------------------------------------
-    http://104.237.3.116/tap911/index.php/webservice/list_geofence?token=03ed32f30ee37fbb&user_id=77
-    -----------------------------------------------------------------------------------------------------
-    */
-
-    function list_geofence()
-    {
-        
-        $token = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
-        $user_id = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
-        
-        if ($token == "" or $user_id=='') {
-            die(json_encode(array(
-                "status" => 0,
-                "message" => "Input parameters are not found"
-            )));
-            
-        } else {
-            $token = $_REQUEST['token'];
-            $sql   = "SELECT * FROM tbl_user where token='$token'";
-            $res   = $this->db->query($sql);
-            $row   = $res->row();
-            if ($row) {
-                $json_data = $this->user_model->list_geofence($token);
+                $json_data = $this->user_model->list_create_emergency_byuser($token,$user_id);
                 if ($json_data) {
                     $arr = array();
                     foreach ($json_data as $results) {
                         $arr[] = array(
-                            'geo_fence_id' => $results->geo_fence_id,
+
+                            'tracking_user_id' => $results->tracking_user_id,
                             'user_id' => $results->user_id,
-                            'geo_lat' => $results->geo_lat,
-                            'geo_long' => $results->geo_long,
-                            'radius' => $results->radius,
-                            'geofence_name' => $results->geofence_name,
-                             'in_alert' => $results->in_alert,
-                             'out_alert' => $results->out_alert,
-                             'address' => $results->address,
-                             'geo_type' => $results->geo_type,
-                              'zone_address' => $results->zone_address,
-                              'distance' => $results->distance,
-                              'add_date' => $results->add_date
+                            'user_lat' => $results->user_lat,
+                            'user_long' => $results->user_long,
+                            'address' => $results->address,
+                            'emergency_type' => $results->emergency_type,
+                            'add_date' => $results->add_date,
+                            'status' => $results->status
                             
                         );
                     }
                     $returnresult = array(
                         'status' => 1,
                         'message' => 'Record found',
-                        'geofence_list' => $arr
+                        'emergency_user_list' => $arr
                     );
                     $response     = json_encode($returnresult);
                     print_r($response);
@@ -1921,8 +1978,8 @@ class Webservice extends CI_Controller
                 else {
                     $returnresult = array(
                         'status' => 1,
-                        'message' => 'Record found',
-                        'all_city' => $arr
+                        'message' => 'Record not  found'
+                
                     );
                     $response     = json_encode($returnresult);
                     print_r($response);
@@ -1941,97 +1998,9 @@ class Webservice extends CI_Controller
         
     }
     
-    /*
-    -----------------------------------------------------------------------------------------------------
-     http://104.237.3.116/tap911/index.php/webservice/update_geofence?token=03ed32f30ee37fbb&geo_fence_id=1&user_id=77&geo_type=pqr&geo_lat=22.719569&geo_long=75.857726&radius=1.33356&geofence_name=abc&in_alert=1&out_alert=1&address=indore%20ab%20road
-    -----------------------------------------------------------------------------------------------------
-    */
-
- function update_geofence()
-    {
-        
-        $token   = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
-        $user_id = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
-        $geo_lat = isset($_REQUEST['geo_lat']) ? $_REQUEST['geo_lat'] : "";
-        $geo_long = isset($_REQUEST['geo_long']) ? $_REQUEST['geo_long'] : "";
-        $radius = isset($_REQUEST['radius']) ? $_REQUEST['radius'] : "";
-        $geofence_name = isset($_REQUEST['geofence_name']) ? $_REQUEST['geofence_name'] : "";
-        $in_alert = isset($_REQUEST['in_alert']) ? $_REQUEST['in_alert'] : "";
-        $out_alert = isset($_REQUEST['out_alert']) ? $_REQUEST['out_alert'] : "";
-        $address = isset($_REQUEST['address']) ? $_REQUEST['address'] : "";
-        $geo_type = isset($_REQUEST['geo_type']) ? $_REQUEST['geo_type'] : "";
-        $geo_fence_id = isset($_REQUEST['geo_fence_id']) ? $_REQUEST['geo_fence_id'] : "";
-        
-
-        
-        if ($token == "" or $user_id == '' or $geo_lat=="" or $geo_long ==""  or $geofence_name=="" or $in_alert=="" or $out_alert=="" or $address=="" or $geo_type=='' or $geo_fence_id=='') {
-            die(json_encode(array(
-                "status" => 0,
-                "message" => "Input parameters are not found"
-            )));
-            
-        } else {
-            $token = $_REQUEST['token'];
-            $sql   = "SELECT * FROM tbl_user where token='$token'";
-            $res   = $this->db->query($sql);
-            $row   = $res->row();
-            if ($row) {
-                $json_data = $this->user_model->update_geofence($token,$geo_fence_id);
-                $data      = json_encode($json_data);
-                print_r($data);
-            } else {
-                $returnresult = array(
-                    'status' => 0,
-                    'message' => 'Token mismatch'
-                );
-                $response     = json_encode($returnresult);
-                print_r($response);
-            }
-        }
-        
-    }
-
-    /*
-    -----------------------------------------------------------------------------------------------------
-    http://104.237.3.116/tap911/index.php/webservice/delete_geofence?token=f0f2c2386c4316f3&geo_fence_id=2
-    -----------------------------------------------------------------------------------------------------
-    */
+   
     
-    function delete_geofence()
-    {
-        
-        $token                = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
-        $geo_fence_id = isset($_REQUEST['geo_fence_id']) ? $_REQUEST['geo_fence_id'] : "";
-        
-        if ($token == "" or $geo_fence_id == '') {
-            die(json_encode(array(
-                "status" => 0,
-                "message" => "Input parameters are not found"
-            )));
-            
-        } else {
-            $token = $_REQUEST['token'];
-            $sql   = "SELECT * FROM tbl_user where token='$token'";
-            $res   = $this->db->query($sql);
-            $row   = $res->row();
-            if ($row) {
-                $json_data = $this->user_model->delete_geofence($token);
-                $data      = json_encode($json_data);
-                print_r($data);
-            } else {
-                $returnresult = array(
-                    'status' => 0,
-                    'message' => 'Token mismatch'
-                );
-                $response     = json_encode($returnresult);
-                print_r($response);
-            }
-        }
-        
-    }
-
-
-/*
+    /*
     -----------------------------------------------------------------------------------------------------
     http://104.237.3.116/tap911/index.php/webservice/add_emergency_user?token=03ed32f30ee37fbb&user_id=77&geo_lat=22.719569&geo_long=75.857726&radius=1.33356&geofence_name=abc&in_alert=1&out_alert=1&address=indore%20ab%20road&geo_type=qasd
     -----------------------------------------------------------------------------------------------------
@@ -2039,15 +2008,15 @@ class Webservice extends CI_Controller
     function add_emergency_user()
     {
         
-        $token   = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
-        $user_id = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
-        $user_lat = isset($_REQUEST['user_lat']) ? $_REQUEST['user_lat'] : "";
-        $user_long = isset($_REQUEST['user_long']) ? $_REQUEST['user_long'] : "";
-        $address = isset($_REQUEST['address']) ? $_REQUEST['address'] : "";
+        $token          = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+        $user_id        = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
+        $emergency_latitude       = isset($_REQUEST['emergency_latitude']) ? $_REQUEST['emergency_latitude'] : "";
+        $emergency_longitude      = isset($_REQUEST['emergency_longitude']) ? $_REQUEST['emergency_longitude'] : "";
+        $emergency_address        = isset($_REQUEST['emergency_address']) ? $_REQUEST['emergency_address'] : "";
         $emergency_type = isset($_REQUEST['emergency_type']) ? $_REQUEST['emergency_type'] : "";
-
         
-        if ($token == "" or $user_id == '' or $user_lat=="" or $user_long ==""  or $address=="" or $emergency_type=="") {
+        
+        if ($token == "" or $user_id == '' or $emergency_latitude == "" or $emergency_longitude == "" or $emergency_address == "" or $emergency_type == "") {
             die(json_encode(array(
                 "status" => 0,
                 "message" => "Input parameters are not found"
@@ -2075,22 +2044,21 @@ class Webservice extends CI_Controller
     }
 
 
-    /*
-    -----------------------------------------------------------------------------------------
-   http://104.237.3.116/tap911/index.php/webservice/get_distance_user?token=be53d02c8766599f&latitude=21.2125123&longitude=72.8304817&distance=5
-    -----------------------------------------------------------------------------------------
+/*
+    ------------------------------------------------------------------------------------------------------
+    http://104.237.3.116/tap911/index.php/webservice/get_user_profiledata?token=dd088bfaaaf468cb&user_id=1
+    -------------------------------------------------------------------------------------------------------
     */
     
-    function get_distance_user()
+    function get_user_profiledata()
     {
-           $token = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
-           $latitude = isset($_REQUEST['latitude']) ? $_REQUEST['latitude'] : "";
-           $longitude = isset($_REQUEST['longitude']) ? $_REQUEST['longitude'] : "";
-            $distance = isset($_REQUEST['distance']) ? $_REQUEST['distance'] : "";
+        
+        $token   = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+        $user_id = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
         
         
         
-        if ($token == "" or $latitude=='' or $longitude=='' or $distance=='') {
+        if ($token == "" or $user_id == "") {
             die(json_encode(array(
                 "status" => 0,
                 "message" => "Input parameters are not found"
@@ -2102,40 +2070,86 @@ class Webservice extends CI_Controller
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
-                $json_data = $this->user_model->get_distance_user($token); //user_id
-               if ($json_data) {
+                $json_data = $this->user_model->get_user_profiledata($token, $user_id);
+                 $json_dataemergency = $this->user_model->get_emergency_contact($token, $user_id);
+                  $json_datahomeaddress = $this->user_model->get_home_address($token, $user_id);
+                
+                if ($json_data) {
+
                     $arr = array();
                     foreach ($json_data as $results) {
+
                         $arr[] = array(
-                            'emergency_tracking_id' => $results->emergency_tracking_id,
                             'user_id' => $results->user_id,
-                            'address' => $results->address,
                             'first_name' => $results->first_name,
                             'last_name' => $results->last_name,
                             'user_name' => $results->user_name,
-                             'phone_number_text_msg' => $results->phone_number_text_msg,
-                              'add_date' => $results->add_date
+                            'email' => $results->email,
+                            'phone_number_text_msg_country_code' => $results->phone_number_text_msg_country_code,
+                            'phone_number_text_msg' => $results->phone_number_text_msg,
+                            'phone_number_voice_notification_country_code' => $results->phone_number_voice_notification_country_code,
+                            'phone_number_voice_notification' => $results->phone_number_voice_notification,
+                            'profile_pic' => $results->profile_pic,
+                            'language' => $results->language,
+                            'medical_history' => $results->medical_history,
+                            'medication_instraction' => $results->medication_instraction,
+                            'allergies' => $results->allergies,
+                            'special_need' => $results->special_need,
+                            'user_lat' => $results->user_lat,
+                            'user_long' => $results->user_long,
+                            'user_location_date_time' => $results->user_location_date_time
+                            
+                        );
+
+                    }
+                      $arr1 = array();
+                  foreach ($json_dataemergency as $results) {
+
+                        $arr1[] = array(
+                            'emergency_contact_id' => $results->emergency_contact_id,
+                            'user_id' => $results->user_id,
+                            'name' => $results->name,
+                            'description' => $results->description,
+                            'phone_number' => $results->phone_number,
+                            'country_code' => $results->country_code
                             
                         );
                     }
+                    $arr2 = array();
+                    foreach ($json_datahomeaddress as $results) {
+                        $arr2[] = array(
+                            'address_id' => $results->address_id,
+                            'user_id' => $results->user_id,
+                            'home_address_line_1' => $results->home_address_line_1,
+                            'home_address_line_2' => $results->home_address_line_2,
+                            'zip' => $results->zip,
+                            'country_name' => $results->country_name,
+                            'state_name' => $results->state_name,
+                            'city_name' => $results->city_name
+                            
+                        );
+                    }
+
                     $returnresult = array(
                         'status' => 1,
                         'message' => 'Record found',
-                        'user_list' => $arr
+                        'profile_data' => $arr,
+                         'user_home_address' => $arr2,
+                          'emergency_contect' => $arr1
+                        
                     );
                     $response     = json_encode($returnresult);
                     print_r($response);
-                }
-                
-                else {
+                    
+                    
+                } else {
                     $returnresult = array(
-                        'status' => 1,
-                        'message' => 'Record  not found',
+                        'status' => 0,
+                        'message' => 'Record  not found'
                     );
                     $response     = json_encode($returnresult);
                     print_r($response);
                 }
-                
                 
             } else {
                 $returnresult = array(
@@ -2146,29 +2160,26 @@ class Webservice extends CI_Controller
                 print_r($response);
             }
         }
-    }
+        
 
-/*
+}
+
+
+ /*
     -----------------------------------------------------------------------------------------------------
-    http://104.237.3.116/tap911/index.php/webservice/user_emergency_request?token=03ed32f30ee37fbb&user_id=77&emergency_tracking_id=1&user_lat=75.857726&user_long=11.33356&address=Smc%20Tenement,%20Ward%20No.7,%20Vasta%20Devdi%20Rd,%20Gotalawadi,%20Tunki,%20Katargam,%20Surat,%20Gujarat%20395004,%20IndiaSuratGujaratIndia395004Smc%20Tenement&usertoken=f2bEV13XwtA:APA91bGmtUMGNXeAW48RG_o2yHxOrQiGZV6jIr4dI-inmQhpJf6LkJg9_5x9V_y-_7T5c0idOCScjV5LhtuzBPqpvPTqb6xfhKhUOYq6npPRI82mkiaNnrE5skJB8tDCieWtsI1y5tC0&type=ios&title=abc&body=test
+    http://104.237.3.116/tap911/index.php/webservice/accept_emergency_request?token=03ed32f30ee37fbb&alert_id=1
     -----------------------------------------------------------------------------------------------------
     */
-    function user_emergency_request()
-    {
+    
+    function accept_emergency_request()
+    
+      {  
+        $token         = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+        $emergency_notification_id       = isset($_REQUEST['emergency_notification_id']) ? $_REQUEST['emergency_notification_id'] : "";
+       
         
-        $token   = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
-        $emergency_tracking_id = isset($_REQUEST['emergency_tracking_id']) ? $_REQUEST['emergency_tracking_id'] : "";
-        $user_id = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
-        $user_lat = isset($_REQUEST['user_lat']) ? $_REQUEST['user_lat'] : "";
-        $user_long = isset($_REQUEST['user_long']) ? $_REQUEST['user_long'] : "";
-        $address = isset($_REQUEST['address']) ? $_REQUEST['address'] : "";
-         $usertoken = isset($_REQUEST['usertoken']) ? $_REQUEST['usertoken'] : "";
-         $type = isset($_REQUEST['type']) ? $_REQUEST['type'] : "";
-         $title = isset($_REQUEST['title']) ? $_REQUEST['title'] : "";
-         $body = isset($_REQUEST['body']) ? $_REQUEST['body'] : "";
-      
         
-        if ($token == "" or $user_id == '' or $user_lat=="" or $user_long ==""  or $address=="" or $emergency_tracking_id=="" or $usertoken=='' or $type=='' or  $title=='' or $body=='') {
+        if ($token == "" or $emergency_notification_id == "" ) {
             die(json_encode(array(
                 "status" => 0,
                 "message" => "Input parameters are not found"
@@ -2180,7 +2191,7 @@ class Webservice extends CI_Controller
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
-                $json_data = $this->user_model->user_emergency_request($token);
+                $json_data = $this->user_model->accept_emergency_request($token, $emergency_notification_id);
                 $data      = json_encode($json_data);
                 print_r($data);
             } else {
@@ -2194,8 +2205,146 @@ class Webservice extends CI_Controller
         }
         
     }
+    
+ /*
+    -----------------------------------------------------------------------------------------
+    http://104.237.3.116/tap911/index.php/webservice/get_emergency_live_location?token=dd088bfaaaf468cb
+    -----------------------------------------------------------------------------------------
+    */
+    
+    function get_emergency_live_location()
+    {
+        $token = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+        
+        
+        
+        if ($token == "") {
+            die(json_encode(array(
+                "status" => 0,
+                "message" => "Input parameters are not found"
+            )));
+            
+        } else {
+            $token = $_REQUEST['token'];
+            $sql   = "SELECT * FROM tbl_user where token='$token'";
+            $res   = $this->db->query($sql);
+            $row   = $res->row();
+            if ($row) {
+                $response = $this->user_model->get_emergency_live_location($token); //user_id
+                if ($response) {
+                    
+                    $returnresult = array(
+                        'status' => 1,
+                        'message' => 'Record found',
+                        'community_list' => $response
+                    );
+                    $response     = json_encode($returnresult);
+                    print_r($response);
+                    
+                } else {
+                    $returnresult = array(
+                        'status' => 0,
+                        'message' => 'Record  not found'
+                    );
+                    $response     = json_encode($returnresult);
+                    print_r($response);
+                }
+            } else {
+                $returnresult = array(
+                    'status' => 0,
+                    'message' => 'Token mismatch'
+                );
+                $response     = json_encode($returnresult);
+                print_r($response);
+            }
+        }
+    }
 
 
+       /*
+    -----------------------------------------------------------------------------------------------------
+   http://104.237.3.116/tap911/index.php/webservice/get_user_type
+    -----------------------------------------------------------------------------------------------------
+    */
+    
+    function get_user_type()
+    {
+        
+                $json_data = $this->user_model->get_user_type();
+                if ($json_data) {
+                    $arr = array();
+                    foreach ($json_data as $results) {
+                        $arr[] = array(
+
+                            'user_type_id' => $results->user_type_id,
+                            'user_type_name' => $results->user_type_name,
+                            'add_date' => $results->add_date,
+                            'status' => $results->status
+                            
+                        );
+                    }
+                    $returnresult = array(
+                        'status' => 1,
+                        'message' => 'Record found',
+                        'user_type_list' => $arr
+                    );
+                    $response     = json_encode($returnresult);
+                    print_r($response);
+                }
+                
+                else {
+                    $returnresult = array(
+                        'status' => 1,
+                        'message' => 'Record not  found'
+                
+                    );
+                    $response     = json_encode($returnresult);
+                    print_r($response);
+                }
+                
+    }
+
+    /*
+    ----------------------------------------------------------------------------------------------------------
+    http://104.237.3.116/tap911/index.php/webservice/add_community_communitaction?token=2386f8654def0a2b&from_user_id=1&to_user_id=0&community_id=0&message_data=abnc
+    -----------------------------------------------------------------------------------------------------------
+    */
+    
+    function add_community_communitaction()
+    {
+        $token        = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+        $from_user_id         = isset($_REQUEST['from_user_id']) ? $_REQUEST['from_user_id'] : "";
+        $to_user_id      = isset($_REQUEST['to_user_id']) ? $_REQUEST['to_user_id'] : "";
+        $community_id  = isset($_REQUEST['community_id']) ? $_REQUEST['community_id'] : "";
+        $message_data = isset($_REQUEST['message_data']) ? $_REQUEST['message_data'] : "";
+
+        if ($token == "" or $from_user_id == "" or $to_user_id == "" or $community_id == "" or $message_data == "") {
+            die(json_encode(array(
+                "status" => 0,
+                "message" => "Input parameters are not found"
+            )));
+            
+        } else {
+            $token = $_REQUEST['token'];
+            $sql   = "SELECT * FROM tbl_user where token='$token'";
+            $res   = $this->db->query($sql);
+            $row   = $res->row();
+            if ($row) {
+                $response = $this->user_model->add_community_communitaction($token);
+                $response = json_encode($response);
+                print_r($response);
+            } else {
+                $returnresult = array(
+                    'status' => 0,
+                    'message' => 'Token mismatch'
+                );
+                $response     = json_encode($returnresult);
+                print_r($response);
+            }
+        }
+    }
+    
+     
 }
 /* End of file welcome.php */
 /* Location: ./application/controllers/welcome.php */
