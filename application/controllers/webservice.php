@@ -1931,7 +1931,7 @@ class Webservice extends CI_Controller
     -----------------------------------------------------------------------------------------------------
     */
     
-    function list_create_emergency_byuser()
+    function get_emergency_user()
     {
         
         $token   = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
@@ -1949,17 +1949,17 @@ class Webservice extends CI_Controller
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
-                $json_data = $this->user_model->list_create_emergency_byuser($token,$user_id);
+                $json_data = $this->user_model->get_emergency_user($token,$user_id);
                 if ($json_data) {
                     $arr = array();
                     foreach ($json_data as $results) {
                         $arr[] = array(
 
-                            'tracking_user_id' => $results->tracking_user_id,
+                            'emergency_id' => $results->emergency_id,
                             'user_id' => $results->user_id,
-                            'user_lat' => $results->user_lat,
-                            'user_long' => $results->user_long,
-                            'address' => $results->address,
+                            'emergency_latitude' => $results->emergency_latitude,
+                            'emergency_longitude' => $results->emergency_longitude,
+                            'emergency_address' => $results->emergency_address,
                             'emergency_type' => $results->emergency_type,
                             'add_date' => $results->add_date,
                             'status' => $results->status
@@ -2208,7 +2208,7 @@ class Webservice extends CI_Controller
     
  /*
     -----------------------------------------------------------------------------------------
-    http://104.237.3.116/tap911/index.php/webservice/get_emergency_live_location?token=dd088bfaaaf468cb
+    http://104.237.3.116/tap911/index.php/webservice/get_emergency_live_location?token=67a4690e03c9935e&emergency_id=506
     -----------------------------------------------------------------------------------------
     */
     
@@ -2230,13 +2230,25 @@ class Webservice extends CI_Controller
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
-                $response = $this->user_model->get_emergency_live_location($token); //user_id
-                if ($response) {
+                $json_data = $this->user_model->get_emergency_live_location($token); //user_id
+                 if ($json_data) {
+                    $arr = array();
+                    foreach ($json_data as $results) {
+                        $arr[] = array(
+
+                            'tracking_id' => $results->tracking_id,
+                            'first_name' => $results->first_name,
+                            'emergency_address' => $results->emergency_address,
+                            'add_date' => $results->add_date,
+                            'status' => $results->status
+                            
+                        );
+                    }
                     
                     $returnresult = array(
                         'status' => 1,
                         'message' => 'Record found',
-                        'community_list' => $response
+                        'live_user' => $arr
                     );
                     $response     = json_encode($returnresult);
                     print_r($response);
@@ -2306,7 +2318,7 @@ class Webservice extends CI_Controller
 
     /*
     ----------------------------------------------------------------------------------------------------------
-    http://104.237.3.116/tap911/index.php/webservice/add_community_communitaction?token=2386f8654def0a2b&from_user_id=1&to_user_id=0&community_id=0&message_data=abnc
+    http://104.237.3.116/tap911/index.php/webservice/add_user_emergency_contact?token=dd088bfaaaf468cb&from_user_id=1&name=devandra&description=anywhere%20contect%20me&phone_number=1234567&country_code=12345
     -----------------------------------------------------------------------------------------------------------
     */
     
