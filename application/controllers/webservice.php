@@ -2318,7 +2318,7 @@ class Webservice extends CI_Controller
 
     /*
     ----------------------------------------------------------------------------------------------------------
-    http://104.237.3.116/tap911/index.php/webservice/add_user_emergency_contact?token=dd088bfaaaf468cb&from_user_id=1&name=devandra&description=anywhere%20contect%20me&phone_number=1234567&country_code=12345
+    http://104.237.3.116/tap911/index.php/webservice/add_community_communitaction?token=dd088bfaaaf468cb&from_user_id=1&to_user_id=0&community_id=0&message_data=hello
     -----------------------------------------------------------------------------------------------------------
     */
     
@@ -2355,8 +2355,113 @@ class Webservice extends CI_Controller
             }
         }
     }
+
+     /*
+    ----------------------------------------------------------------------------------------------------------
+    http://104.237.3.116/tap911/index.php/webservice/add_emergency_communitaction?token=dd088bfaaaf468cb&user_id=1&emergency_id=491&message_data=anywhere%20contect%20me
+    -----------------------------------------------------------------------------------------------------------
+    */
+
+     function add_emergency_communitaction()
+    {
+        $token        = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+        $user_id      = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
+        $emergency_id  = isset($_REQUEST['emergency_id']) ? $_REQUEST['emergency_id'] : "";
+        $message_data = isset($_REQUEST['message_data']) ? $_REQUEST['message_data'] : "";
+
+        if ($token == "" or $user_id == ""  or $message_data == "" or $emergency_id=="") {
+            die(json_encode(array(
+                "status" => 0,
+                "message" => "Input parameters are not found"
+            )));
+            
+        } else {
+            $token = $_REQUEST['token'];
+            $sql   = "SELECT * FROM tbl_user where token='$token'";
+            $res   = $this->db->query($sql);
+            $row   = $res->row();
+            if ($row) {
+                $response = $this->user_model->add_emergency_communitaction($token);
+                $response = json_encode($response);
+                print_r($response);
+            } else {
+                $returnresult = array(
+                    'status' => 0,
+                    'message' => 'Token mismatch'
+                );
+                $response     = json_encode($returnresult);
+                print_r($response);
+            }
+        }
+    }
     
-     
+
+       /*
+    -----------------------------------------------------------------------------------------------------
+   http://104.237.3.116/tap911/index.php/webservice/get_emergancy_communication?token=8ff636448bae3be3&emergency_id=503
+    -----------------------------------------------------------------------------------------------------
+    */
+    
+    function get_emergancy_communication()
+    {
+        
+               $token = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+               $emergency_id = isset($_REQUEST['emergency_id']) ? $_REQUEST['emergency_id'] : "";
+        
+        
+        if ($token == "" or $emergency_id=="") {
+            die(json_encode(array(
+                "status" => 0,
+                "message" => "Input parameters are not found"
+            )));
+            
+        } else {
+            $token = $_REQUEST['token'];
+            $sql   = "SELECT * FROM tbl_user where token='$token'";
+            $res   = $this->db->query($sql);
+            $row   = $res->row();
+            if ($row) {
+                $json_data = $this->user_model->get_emergancy_communication($token); //user_id
+                 if ($json_data) {
+                    $arr = array();
+                    foreach ($json_data as $results) {
+                        $arr[] = array(
+
+                            'first_name' => $results->first_name,
+                            'emergency_id' => $results->emergency_id,
+                            'message_data' => $results->message_data,
+                            'add_date' => $results->add_date,
+                            'status' => $results->status
+                            
+                        );
+                    }
+                    
+                    $returnresult = array(
+                        'status' => 1,
+                        'message' => 'Record found',
+                        'live_user' => $arr
+                    );
+                    $response     = json_encode($returnresult);
+                    print_r($response);
+                    
+                } else {
+                    $returnresult = array(
+                        'status' => 0,
+                        'message' => 'Record  not found'
+                    );
+                    $response     = json_encode($returnresult);
+                    print_r($response);
+                }
+            } else {
+                $returnresult = array(
+                    'status' => 0,
+                    'message' => 'Token mismatch'
+                );
+                $response     = json_encode($returnresult);
+                print_r($response);
+            }
+        }
+     }
 }
 /* End of file welcome.php */
 /* Location: ./application/controllers/welcome.php */
