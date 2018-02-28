@@ -1309,6 +1309,47 @@ for($i=0; $i<$countvar; $i++)
         return $returnresult;
     }
 
+
+     function add_emergency_communitaction()
+    {
+        
+        $data = array(
+            'user_id' => $_REQUEST['user_id'],
+            'emergency_id' => $_REQUEST['emergency_id'],
+            'message_data' => $_REQUEST['message_data'],
+            'status' => 1
+        );
+        $data = $this->db->insert('tbl_emergency_communitaction', $data);
+        if ($data) {
+            $returnresult = array(
+                'status' => 1,
+                'message' => 'Message successfully submit'
+            );
+        } else {
+            $returnresult = array(
+                'status' => 0,
+                'message' => 'Some data not valid'
+            );
+        }
+        
+        return $returnresult;
+    }
+
+
+    function get_emergancy_communication()
+    {
+        $emergency_id = $_REQUEST['emergency_id'];
+        $this->db->select('tbl_emergency_communitaction.*,tbl_user.*,tbl_emergency.*');
+        $this->db->from('tbl_emergency_communitaction');
+        $this->db->join('tbl_user', 'tbl_user.user_id = tbl_emergency_communitaction.user_id', 'left');
+         $this->db->join('tbl_emergency', 'tbl_emergency.emergency_id = tbl_emergency_communitaction.emergency_id', 'left');
+        $this->db->where('tbl_emergency_communitaction.emergency_id', $emergency_id);
+        $query = $this->db->get();
+      //  echo $this->db->last_query();
+        return $query->result();
+        
+    }
+
 } 
 
 
