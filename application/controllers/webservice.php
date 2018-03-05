@@ -22,13 +22,13 @@ class Webservice extends CI_Controller
     */
     function checklogin()
     {
-        $login    = isset($_REQUEST['login']) ? $_REQUEST['login'] : "";
-        $password = isset($_REQUEST['password']) ? $_REQUEST['password'] : "";
-         $user_token = isset($_REQUEST['user_token']) ? $_REQUEST['user_token'] : "";
+          $login    = isset($_REQUEST['login']) ? $_REQUEST['login'] : "";
+          $password = isset($_REQUEST['password']) ? $_REQUEST['password'] : "";
+          $notification_device_token = isset($_REQUEST['notification_device_token']) ? $_REQUEST['notification_device_token'] : "";
           $mobile_type = isset($_REQUEST['mobile_type']) ? $_REQUEST['mobile_type'] : "";
         
         
-        if ($login == "" or $password == "" or $user_token=='' or $mobile_type=="") {
+        if ($login == "" or $password == "" or $notification_device_token=='' or $mobile_type=="") {
             die(json_encode(array(
                 "status" => 0,
                 "message" => "Input parameters are not found"
@@ -52,22 +52,22 @@ class Webservice extends CI_Controller
     */
     function user_registration()
     {
+         
         $first_name                                   = isset($_REQUEST['first_name']) ? $_REQUEST['first_name'] : "";
         $last_name                                    = isset($_REQUEST['last_name']) ? $_REQUEST['last_name'] : "";
         $user_name                                    = isset($_REQUEST['user_name']) ? $_REQUEST['user_name'] : "";
         $email                                        = isset($_REQUEST['email']) ? $_REQUEST['email'] : "";
-         $user_type_id                                        = isset($_REQUEST['user_type_id']) ? $_REQUEST['user_type_id'] : "";
+         $user_type_id                                = isset($_REQUEST['user_type_id']) ? $_REQUEST['user_type_id'] : "";
         $phone_number_text_msg_country_code           = isset($_REQUEST['phone_number_text_msg_country_code']) ? $_REQUEST['phone_number_text_msg_country_code'] : "";
         $phone_number_text_msg                        = isset($_REQUEST['phone_number_text_msg']) ? $_REQUEST['phone_number_text_msg'] : "";
         $phone_number_voice_notification_country_code = isset($_REQUEST['phone_number_voice_notification_country_code']) ? $_REQUEST['phone_number_voice_notification_country_code'] : "";
         $phone_number_voice_notification              = isset($_REQUEST['phone_number_voice_notification']) ? $_REQUEST['phone_number_voice_notification'] : "";
-        $phone_number_voice_notification              = isset($_REQUEST['phone_number_voice_notification']) ? $_REQUEST['phone_number_voice_notification'] : "";
         $password                                     = isset($_REQUEST['password']) ? $_REQUEST['password'] : "";
-        $user_token                                   = isset($_REQUEST['user_token']) ? $_REQUEST['user_token'] : "";
+        $notification_device_token                                   = isset($_REQUEST['notification_device_token']) ? $_REQUEST['notification_device_token'] : "";
         $mobile_type                                  = isset($_REQUEST['mobile_type']) ? $_REQUEST['mobile_type'] : "";
         // $profile_pic = isset($_REQUEST['profile_pic']) ? $_REQUEST['profile_pic'] :"";
         
-        if ($first_name == "" or $last_name == "" or $user_name = "" or $email = "" or $phone_number_text_msg_country_code = "" or $phone_number_text_msg == "" or $phone_number_voice_notification_country_code == "" or $phone_number_voice_notification == "" or $password == "" or $user_token == "" or $mobile_type = "" or $user_type_id=="") {
+        if ($first_name == "" or $last_name == "" or $user_name = "" or $email = "" or $phone_number_text_msg_country_code = "" or $phone_number_text_msg == "" or $phone_number_voice_notification_country_code == "" or $phone_number_voice_notification == "" or $password == "" or $notification_device_token == "" or $mobile_type = "" or $user_type_id=="") {
             die(json_encode(array(
                 "status" => 0,
                 "message" => "Input parameters are not found"
@@ -137,51 +137,7 @@ class Webservice extends CI_Controller
     }
     
     
-    function get_community_result()
-    {
-        $token = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
-        
-        
-        
-        if ($token == "") {
-            die(json_encode(array(
-                "status" => 0,
-                "message" => "Input parameters are not found"
-            )));
-            
-        } else {
-            $token = $_REQUEST['token'];
-            $sql   = "SELECT * FROM tbl_user where token='$token'";
-            $res   = $this->db->query($sql);
-            $row   = $res->row();
-            if ($row) {
-                $response      = $this->user_model->get_community_result($token);
-                $responsemap   = $this->user_model->get_community_user_map($token);
-                $com_user_data = '';
-                foreach ($responsemap as $row) {
-                    $com_user_data[$row['community_id']] = $row;
-                }
-                $data = '';
-                foreach ($response as $row) {
-                    if (isset($com_user_data[$row['community_id']])) {
-                        $data[] = array_merge($row, $com_user_data[$row['community_id']]);
-                    } else {
-                        $data[] = $row;
-                    }
-                }
-                echo json_encode($data);
-            } else {
-                $returnresult = array(
-                    'status' => 0,
-                    'message' => 'Token mismatch'
-                );
-                $response     = json_encode($returnresult);
-                print_r($response);
-            }
-        }
-    }
-    
-    
+
     
     /*
     --------------------------------------------------------------------------------------------
@@ -295,21 +251,22 @@ class Webservice extends CI_Controller
         $newpassword = isset($_REQUEST['newpassword']) ? $_REQUEST['newpassword'] : "";
         if ($token == "" or $oldpassword == "" or $newpassword == "") {
             die(json_encode(array(
-                "status" => "false",
+                "status" => 0,
                 "message" => "Input parameters are not found"
             )));
             
         } else {
-            $token = $_REQUEST['token'];
-            $sql   = "SELECT * FROM tbl_user where token='$token'";
-            $res   = $this->db->query($sql);
-            $row   = $res->row();
+          //  $token = $_REQUEST['token'];
+          //  $sql   = "SELECT * FROM tbl_user where token='$token'";
+          //  $res   = $this->db->query($sql);
+           // $row   = $res->row();
             if ($row) {
                 $oldpassword = $_REQUEST['oldpassword'];
                 $newpassword = $_REQUEST['newpassword'];
+                 $token = $_REQUEST['token'];
                 $oldpassword = md5($oldpassword);
                 if ($oldpassword != '' && $newpassword != '') {
-                    $sql    = "SELECT `user_id` FROM tbl_user WHERE password='" . $oldpassword . "'";
+                    $sql    = "SELECT `user_id` ,`token` FROM tbl_user WHERE password=$oldpassword  and token=$token";
                     $query  = mysql_query($sql);
                     $result = mysql_fetch_array($query);
                     if ($result) {
@@ -323,21 +280,10 @@ class Webservice extends CI_Controller
                         ));
                         print_r($res);
                         
-                    }
-                    
-                    else {
-                        echo json_encode(array(
-                            'status' => 0,
-                            'message' => 'Old password not exist.'
-                        ));
-                    }
-                } else {
-                    echo json_encode(array(
-                        'status' => 0,
-                        'message' => 'Your detail is not complete.'
-                    ));
+                    }   
                 }
-            } else {
+           // } 
+            else {
                 $returnresult = array(
                     'status' => 0,
                     'message' => 'Token mismatch'
@@ -346,8 +292,8 @@ class Webservice extends CI_Controller
                 print_r($response);
             }
         }
+      }
     }
-    
     /*
     ---------------------------------------------------------------------------------------------
     http://104.237.3.116/tap911/index.php/webservice/forgetpassword?email=sunil2.sbsgroup@gmail.com
@@ -512,6 +458,7 @@ class Webservice extends CI_Controller
     
     function get_comment_communitywise()
     {
+        error_reporting( error_reporting() & ~E_NOTICE );
         $token = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
         if ($token == "") {
             die(json_encode(array(
@@ -1076,7 +1023,7 @@ class Webservice extends CI_Controller
         $medication_instraction                       = isset($_REQUEST['medication_instraction']) ? $_REQUEST['medication_instraction'] : "";
         $allergies                                    = isset($_REQUEST['allergies']) ? $_REQUEST['allergies'] : "";
         $special_need                                 = isset($_REQUEST['special_need']) ? $_REQUEST['special_need'] : "";
-        $user_lat                                     = isset($_REQUEST['special_need']) ? $_REQUEST['user_lat'] : "";
+        $user_lat                                     = isset($_REQUEST['user_lat']) ? $_REQUEST['user_lat'] : "";
         $user_long                                    = isset($_REQUEST['user_long']) ? $_REQUEST['user_long'] : "";
         $phone_number_text_msg_country_code           = isset($_REQUEST['phone_number_text_msg_country_code']) ? $_REQUEST['phone_number_text_msg_country_code'] : "";
         $phone_number_text_msg                        = isset($_REQUEST['phone_number_text_msg']) ? $_REQUEST['phone_number_text_msg'] : "";
@@ -1084,7 +1031,7 @@ class Webservice extends CI_Controller
         $phone_number_voice_notification              = isset($_REQUEST['phone_number_voice_notification']) ? $_REQUEST['phone_number_voice_notification'] : "";
         if ($first_name == "" or $last_name == "" or $user_name = "" or $email = "" or $phone_number_text_msg_country_code = "" or $phone_number_text_msg == "" or $phone_number_voice_notification_country_code == "" or $phone_number_voice_notification == "" or $user_id == "" or $medical_history == "" or $medication_instraction == "" or $allergies == "" or $special_need == "" or $user_lat == "" or $user_long == "" or $user_long == "" or $token == "" or $language == "") {
             die(json_encode(array(
-                "status" => "false",
+                "status" => 0,
                 "message" => "Input parameters are not found"
             )));
             
@@ -2174,6 +2121,7 @@ class Webservice extends CI_Controller
     function accept_emergency_request()
     
       {  
+        error_reporting( error_reporting() & ~E_NOTICE );
         $token         = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
         $emergency_notification_id       = isset($_REQUEST['emergency_notification_id']) ? $_REQUEST['emergency_notification_id'] : "";
        
