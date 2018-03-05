@@ -11,7 +11,7 @@ class User_model extends CI_Model
     function checklogin($login, $password)
     {
         
-        $sql = "SELECT * FROM tbl_user where ( user_name='$login' OR email = '$login') and password = '$password' ";
+        $sql = "SELECT user_name ,user_id, password, email FROM tbl_user where ( user_name='$login' OR email = '$login') and password = '$password' ";
         $res = $this->db->query($sql);
         
         if ($res->num_rows > 0) {
@@ -19,21 +19,17 @@ class User_model extends CI_Model
             $customer_id = $row->user_id;
             $tokens      = openssl_random_pseudo_bytes(8);
             $token       = bin2hex($tokens);
-            $user_token = $_REQUEST['user_token'];
+            $notification_device_token = $_REQUEST['notification_device_token'];
             $mobile_type = $_REQUEST['mobile_type'];
-           // $user_token = isset($_REQUEST['user_token']) ? $_REQUEST['user_token'] : '0';
-            //$mobile_type = isset($_REQUEST['mobile_type']) ? $_REQUEST['mobile_type'] : '0';
-
                  $data        = array(
                 'token' => $token,
-                 'user_token' => $user_token,
+                 'notification_device_token' => $token,
                 'mobile_type' => $mobile_type
             );
             $this->db->where('user_id', $customer_id);
             $value = $this->db->update('tbl_user', $data);
             $returnarray = array(
                 'status' => 1,
-                'user_id' => $customer_id,
                 'token' => $token
             );
 
@@ -42,7 +38,7 @@ class User_model extends CI_Model
             
             $returnarray = array(
                 'status' => 0,
-                'message' => ' fail, Username or pasword is invalid'
+                'message' => 'Username or pasword is invalid'
             );
         }
         return $returnarray;
@@ -51,7 +47,7 @@ class User_model extends CI_Model
     function user_registration()
     {
         
-        $check = "SELECT * FROM tbl_user WHERE user_name ='" . $_REQUEST['user_name'] . "'";
+       $check = "SELECT * FROM tbl_user WHERE email ='" . $_REQUEST['email'] ."'";
         $rs    = mysql_query($check);
         $data  = mysql_fetch_array($rs);
         if ($data[0] > 1) {
@@ -62,7 +58,7 @@ class User_model extends CI_Model
         } else {
             
             $target      = "./uploads/";
-            $path        = "http://104.237.3.116/tap911/uploads/";
+            //$path        = "http://104.237.3.116/tap911/uploads/";
             $target      = $target . basename($_FILES['profile_pic']['name']);
             $profile_pic = ($_FILES['profile_pic']['name']);
             if (move_uploaded_file($_FILES['profile_pic']['tmp_name'], $target)) {
@@ -79,10 +75,9 @@ class User_model extends CI_Model
                     'phone_number_voice_notification_country_code' => $_REQUEST['phone_number_voice_notification_country_code'],
                     'phone_number_voice_notification' => $_REQUEST['phone_number_voice_notification'],
                     'password' => md5($_REQUEST['password']),
-                    'user_type' => 'user',
                     'user_type_id' => $_REQUEST['user_type_id'],
-                    'profile_pic' => $path . $profile_pic,
-                     'user_token' => $_REQUEST['user_token'],
+                    'profile_pic' => $profile_pic,
+                    'notification_device_token' => $_REQUEST['notification_device_token'],
                      'mobile_type' => $_REQUEST['mobile_type'],
                     'status' => 1
                 );
@@ -142,10 +137,10 @@ class User_model extends CI_Model
                     );
                 }
             }
-            return $returnresult;
+          
         }
         //}
-        
+          return $returnresult;
     }
     
     function get_community()
@@ -167,17 +162,7 @@ FROM `tbl_community` tc");
         return $query->result_array();
     }
     
-    
-    function get_community_user_map()
-    {
-        $this->db->select('*');
-        $this->db->from('tbl_community_user_mapping');
-        $this->db->where('user_id', '77');
-        $query = $this->db->get();
-        return $query->result_array();
-        
-    }
-    
+
     function user_community_request()
     {
         $sql = "SELECT * FROM tbl_community_user_mapping WHERE community_id ='" . $_REQUEST['community_id'] . "' and user_id ='" . $_REQUEST['user_id'] . "' ";
@@ -747,7 +732,7 @@ function get_user_alert()
         $this->db->select('tbl_user.*');
         $this->db->from('tbl_user');
         $this->db->where('tbl_user.user_id', $user_id);
-        $this->db->where('user_type', 'user');
+       // $this->db->where('user_type', 'user');
         $query = $this->db->get();
         return $query->result();
     }
