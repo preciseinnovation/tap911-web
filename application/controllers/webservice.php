@@ -52,22 +52,22 @@ class Webservice extends CI_Controller
     */
     function user_registration()
     {
-         
+        
         $first_name                                   = isset($_REQUEST['first_name']) ? $_REQUEST['first_name'] : "";
         $last_name                                    = isset($_REQUEST['last_name']) ? $_REQUEST['last_name'] : "";
         $user_name                                    = isset($_REQUEST['user_name']) ? $_REQUEST['user_name'] : "";
         $email                                        = isset($_REQUEST['email']) ? $_REQUEST['email'] : "";
-         $user_type_id                                = isset($_REQUEST['user_type_id']) ? $_REQUEST['user_type_id'] : "";
-        $phone_number_text_msg_country_code           = isset($_REQUEST['phone_number_text_msg_country_code']) ? $_REQUEST['phone_number_text_msg_country_code'] : "";
-        $phone_number_text_msg                        = isset($_REQUEST['phone_number_text_msg']) ? $_REQUEST['phone_number_text_msg'] : "";
-        $phone_number_voice_notification_country_code = isset($_REQUEST['phone_number_voice_notification_country_code']) ? $_REQUEST['phone_number_voice_notification_country_code'] : "";
-        $phone_number_voice_notification              = isset($_REQUEST['phone_number_voice_notification']) ? $_REQUEST['phone_number_voice_notification'] : "";
+         $user_type_id                                        = isset($_REQUEST['user_type_id']) ? $_REQUEST['user_type_id'] : "";
+        $country_id           = isset($_REQUEST['country_id']) ? $_REQUEST['country_id'] : "";
+        $phone_number                        = isset($_REQUEST['phone_number']) ? $_REQUEST['phone_number'] : "";
+        // $phone_number_voice_notification_country_code = isset($_REQUEST['phone_number_voice_notification_country_code']) ? $_REQUEST['phone_number_voice_notification_country_code'] : "";
+        // $phone_number_voice_notification              = isset($_REQUEST['phone_number_voice_notification']) ? $_REQUEST['phone_number_voice_notification'] : "";
         $password                                     = isset($_REQUEST['password']) ? $_REQUEST['password'] : "";
         $notification_device_token                                   = isset($_REQUEST['notification_device_token']) ? $_REQUEST['notification_device_token'] : "";
         $mobile_type                                  = isset($_REQUEST['mobile_type']) ? $_REQUEST['mobile_type'] : "";
         // $profile_pic = isset($_REQUEST['profile_pic']) ? $_REQUEST['profile_pic'] :"";
         
-        if ($first_name == "" or $last_name == "" or $user_name = "" or $email = "" or $phone_number_text_msg_country_code = "" or $phone_number_text_msg == "" or $phone_number_voice_notification_country_code == "" or $phone_number_voice_notification == "" or $password == "" or $notification_device_token == "" or $mobile_type = "" or $user_type_id=="") {
+        if ($first_name == "" or $last_name == "" or $user_name = "" or $email = "" or $country_id = "" or $phone_number == ""  or $password == "" or $notification_device_token == "" or $mobile_type = "" or $user_type_id=="") {
             die(json_encode(array(
                 "status" => 0,
                 "message" => "Input parameters are not found"
@@ -102,7 +102,7 @@ class Webservice extends CI_Controller
             
         } else {
             $token = $_REQUEST['token'];
-            $sql   = "SELECT * FROM tbl_user where token='$token'";
+            $sql   = "SELECT token FROM tbl_user where token='$token'";
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
@@ -128,7 +128,7 @@ class Webservice extends CI_Controller
             } else {
                 $returnresult = array(
                     'status' => 0,
-                    'message' => 'Token mismatch'
+                    'message' => 'Authentication failed'
                 );
                 $response     = json_encode($returnresult);
                 print_r($response);
@@ -137,7 +137,6 @@ class Webservice extends CI_Controller
     }
     
     
-
     
     /*
     --------------------------------------------------------------------------------------------
@@ -164,7 +163,7 @@ class Webservice extends CI_Controller
             
         } else {
             $token = $_REQUEST['token'];
-            $sql   = "SELECT * FROM tbl_user where token='$token'";
+            $sql   = "SELECT token FROM tbl_user where token='$token'";
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
@@ -174,7 +173,7 @@ class Webservice extends CI_Controller
             } else {
                 $returnresult = array(
                     'status' => 0,
-                    'message' => 'Token mismatch'
+                    'message' => 'Authentication failed'
                 );
                 $response     = json_encode($returnresult);
                 print_r($response);
@@ -188,55 +187,55 @@ class Webservice extends CI_Controller
     -------------------------------------------------------------------------------------
     */
     
-    function get_user_message()
-    {
+    // function get_user_message()
+    // {
         
-        $token   = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
-        $user_id = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
-        if ($token == "" or $user_id == '') {
-            die(json_encode(array(
-                "status" => 0,
-                "message" => "Input parameters are not found"
-            )));
+    //     $token   = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+    //     $user_id = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
+    //     if ($token == "" or $user_id == '') {
+    //         die(json_encode(array(
+    //             "status" => 0,
+    //             "message" => "Input parameters are not found"
+    //         )));
             
-        } else {
-            $token = $_REQUEST['token'];
-            $sql   = "SELECT * FROM tbl_user where token='$token'";
-            $res   = $this->db->query($sql);
-            $row   = $res->row();
-            if ($row) {
-                $response = $this->user_model->get_user_message($token);
-                if ($response) {
+    //     } else {
+    //         $token = $_REQUEST['token'];
+    //         $sql   = "SELECT token FROM tbl_user where token='$token'";
+    //         $res   = $this->db->query($sql);
+    //         $row   = $res->row();
+    //         if ($row) {
+    //             $response = $this->user_model->get_user_message($token);
+    //             if ($response) {
                     
-                    $returnresult = array(
-                        'status' => 1,
-                        'message' => 'Record found',
-                        'user_message' => $response
-                    );
-                    $response     = json_encode($returnresult);
-                    print_r($response);
+    //                 $returnresult = array(
+    //                     'status' => 1,
+    //                     'message' => 'Record found',
+    //                     'user_message' => $response
+    //                 );
+    //                 $response     = json_encode($returnresult);
+    //                 print_r($response);
                     
                     
-                } else {
+    //             } else {
                     
-                    $returnresult = array(
-                        'status' => 0,
-                        'message' => 'Record  not found'
-                    );
-                    $response     = json_encode($returnresult);
-                    print_r($response);
-                }
+    //                 $returnresult = array(
+    //                     'status' => 0,
+    //                     'message' => 'Record  not found'
+    //                 );
+    //                 $response     = json_encode($returnresult);
+    //                 print_r($response);
+    //             }
                 
-            } else {
-                $returnresult = array(
-                    'status' => 0,
-                    'message' => 'Token mismatch'
-                );
-                $response     = json_encode($returnresult);
-                print_r($response);
-            }
-        }
-    }
+    //         } else {
+    //             $returnresult = array(
+    //                 'status' => 0,
+    //                 'message' => 'Authentication failed'
+    //             );
+    //             $response     = json_encode($returnresult);
+    //             print_r($response);
+    //         }
+    //     }
+    // }
     
     /*
     -----------------------------------------------------------------------------
@@ -256,44 +255,45 @@ class Webservice extends CI_Controller
             )));
             
         } else {
-          //  $token = $_REQUEST['token'];
-          //  $sql   = "SELECT * FROM tbl_user where token='$token'";
-          //  $res   = $this->db->query($sql);
-           // $row   = $res->row();
-            if ($row) {
+            // $token = $_REQUEST['token'];
+            // $sql   = "SELECT * FROM tbl_user where token='$token'";
+            // $res   = $this->db->query($sql);
+            // $row   = $res->row();
+            // if ($row) {
                 $oldpassword = $_REQUEST['oldpassword'];
                 $newpassword = $_REQUEST['newpassword'];
                  $token = $_REQUEST['token'];
                 $oldpassword = md5($oldpassword);
                 if ($oldpassword != '' && $newpassword != '') {
-                    $sql    = "SELECT `user_id` ,`token` FROM tbl_user WHERE password=$oldpassword  and token=$token";
+                    $sql    = "SELECT `user_id` FROM tbl_user WHERE password='" . $oldpassword . "' and token='" . $token . "' ";
                     $query  = mysql_query($sql);
                     $result = mysql_fetch_array($query);
+                    if($result==""){
+                        $returnresult =  die(json_encode(array(
+                    'status' => 0,
+                    'message' => 'Authentication failed'
+                )));
+               
+                    }
                     if ($result) {
                         $id      = $result["user_id"];
                         $newPass = md5($newpassword);
                         $sql1    = mysql_query("UPDATE tbl_user SET password='" . $newPass . "' where user_id='" . $id . "'");
                         // $query1 = mysql_query($sql1);
-                        $res     = json_encode(array(
+                        $res     =  die(json_encode(array(
                             'status' => 1,
                             'message' => 'Password change successfully.'
-                        ));
-                        print_r($res);
+                        )));
+                      //  print_r($res);
                         
-                    }   
-                }
-           // } 
-            else {
-                $returnresult = array(
-                    'status' => 0,
-                    'message' => 'Token mismatch'
-                );
-                $response     = json_encode($returnresult);
-                print_r($response);
+                    }
+                  $response     = json_encode($returnresult);
+                print_r($response);   
+                
             }
         }
-      }
     }
+    
     /*
     ---------------------------------------------------------------------------------------------
     http://104.237.3.116/tap911/index.php/webservice/forgetpassword?email=sunil2.sbsgroup@gmail.com
@@ -375,7 +375,7 @@ class Webservice extends CI_Controller
         } else {
             
             $token = $_REQUEST['token'];
-            $sql   = "SELECT * FROM tbl_user where token='$token'";
+            $sql   = "SELECT token FROM tbl_user where token='$token'";
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
@@ -385,7 +385,7 @@ class Webservice extends CI_Controller
             } else {
                 $returnresult = array(
                     'status' => 0,
-                    'message' => 'Token mismatch'
+                    'message' => 'Authentication failed'
                 );
                 $response     = json_encode($returnresult);
                 print_r($response);
@@ -415,7 +415,7 @@ class Webservice extends CI_Controller
         } else {
             
             $token = $_REQUEST['token'];
-            $sql   = "SELECT * FROM tbl_user where token='$token'";
+            $sql   = "SELECT token FROM tbl_user where token='$token'";
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
@@ -442,7 +442,7 @@ class Webservice extends CI_Controller
             } else {
                 $returnresult = array(
                     'status' => 0,
-                    'message' => 'Token mismatch'
+                    'message' => 'Authentication failed'
                 );
                 $response     = json_encode($returnresult);
                 print_r($response);
@@ -458,7 +458,6 @@ class Webservice extends CI_Controller
     
     function get_comment_communitywise()
     {
-        error_reporting( error_reporting() & ~E_NOTICE );
         $token = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
         if ($token == "") {
             die(json_encode(array(
@@ -468,8 +467,9 @@ class Webservice extends CI_Controller
             
         } else {
             $token = $_REQUEST['token'];
+            $user_id = $_REQUEST['user_id'];
             $limit = $_REQUEST['limit'];
-            $sql   = "SELECT * FROM tbl_user where token='$token'";
+            $sql   = "SELECT token FROM tbl_user where token='$token' and user_id=$user_id";
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
@@ -512,7 +512,7 @@ class Webservice extends CI_Controller
             } else {
                 $returnresult = array(
                     'status' => 0,
-                    'message' => 'Token mismatch'
+                    'message' => 'Authentication failed'
                 );
                 $response     = json_encode($returnresult);
                 print_r($response);
@@ -538,8 +538,8 @@ class Webservice extends CI_Controller
             
         } else {
             $token = $_REQUEST['token'];
-            // $tmp_alert_id = $_REQUEST['alert_id'];
-            $sql   = "SELECT * FROM tbl_user where token='$token'";
+            $user_id = $_REQUEST['user_id'];
+            $sql   = "SELECT token FROM tbl_user where token='$token' and user_id=$user_id";
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
@@ -577,7 +577,7 @@ class Webservice extends CI_Controller
             } else {
                 $returnresult = array(
                     'status' => 0,
-                    'message' => 'Token mismatch'
+                    'message' => 'Authentication failed'
                 );
                 $response     = json_encode($returnresult);
                 print_r($response);
@@ -602,7 +602,8 @@ class Webservice extends CI_Controller
             
         } else {
             $token = $_REQUEST['token'];
-            $sql   = "SELECT * FROM tbl_user where token='$token'";
+             $user_id = $_REQUEST['user_id'];
+            $sql   = "SELECT token,user_id FROM tbl_user where token='$token' and user_id=$user_id ";
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
@@ -649,7 +650,7 @@ class Webservice extends CI_Controller
             } else {
                 $returnresult = array(
                     'status' => 0,
-                    'message' => 'Token mismatch'
+                    'message' => 'Authentication failed'
                 );
                 $response     = json_encode($returnresult);
                 print_r($response);
@@ -668,7 +669,7 @@ class Webservice extends CI_Controller
     function get_user_alert()
     {
         $token = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
-         $user_id = isset($_REQUEST['token']) ? $_REQUEST['user_id'] : "";
+         $user_id = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
         // $alert_type = isset($_REQUEST['alert_type']) ? $_REQUEST['alert_type'] : "";
         if ($token == "" or  $user_id=="") {
             die(json_encode(array(
@@ -677,8 +678,9 @@ class Webservice extends CI_Controller
             )));
             
         } else {
+             $user_id = $_REQUEST['user_id'];
             $token = $_REQUEST['token'];
-            $sql   = "SELECT * FROM tbl_user where token='$token'";
+             $sql   = "SELECT token,user_id FROM tbl_user where token='$token' and user_id=$user_id ";
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
@@ -713,7 +715,7 @@ class Webservice extends CI_Controller
                             'request_status' => $results->request_status,
                             'add_date' => $results->add_date,
                             'accept_time' => $results->accept_time,
-                            'community_logo' => $results->community_logo,
+                            'community_logo' =>$results->community_logo,
                             'alert_heading' => $results->alert_heading,
                             'alert_descrption' => $results->alert_descrption,
                             'is_comment' => $results->is_comment,
@@ -747,7 +749,7 @@ class Webservice extends CI_Controller
             } else {
                 $returnresult = array(
                     'status' => 0,
-                    'message' => 'Token mismatch'
+                    'message' => 'Authentication failed'
                 );
                 $response     = json_encode($returnresult);
                 print_r($response);
@@ -774,9 +776,10 @@ class Webservice extends CI_Controller
             )));
             
         } else {
-            $token = $_REQUEST['token'];
+             $token = $_REQUEST['token'];
+             $user_id = $_REQUEST['user_id'];
             //$community_id = $_REQUEST['community_id'];
-            $sql   = "SELECT * FROM tbl_user where token='$token'";
+            $sql   = "SELECT token FROM tbl_user where token='$token' and user_id=$user_id";
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
@@ -849,7 +852,7 @@ class Webservice extends CI_Controller
             else {
                 $returnresult = array(
                     'status' => 0,
-                    'message' => 'Token mismatch'
+                    'message' => 'Authentication failed'
                 );
                 $response     = json_encode($returnresult);
                 print_r($response);
@@ -876,7 +879,7 @@ class Webservice extends CI_Controller
             
         } else {
             $token = $_REQUEST['token'];
-            $sql   = "SELECT * FROM tbl_user where token='$token'";
+            $sql   = "SELECT token FROM tbl_user where token='$token'";
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
@@ -886,7 +889,7 @@ class Webservice extends CI_Controller
             } else {
                 $returnresult = array(
                     'status' => 0,
-                    'message' => 'Token mismatch'
+                    'message' => 'Authentication failed'
                 );
                 $response     = json_encode($returnresult);
                 print_r($response);
@@ -913,7 +916,7 @@ class Webservice extends CI_Controller
             
         } else {
             $token = $_REQUEST['token'];
-            $sql   = "SELECT * FROM tbl_user where token='$token'";
+            $sql   = "SELECT token FROM tbl_user where token='$token'";
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
@@ -923,7 +926,7 @@ class Webservice extends CI_Controller
             } else {
                 $returnresult = array(
                     'status' => 0,
-                    'message' => 'Token mismatch'
+                    'message' => 'Authentication failed'
                 );
                 $response     = json_encode($returnresult);
                 print_r($response);
@@ -954,7 +957,7 @@ class Webservice extends CI_Controller
         } else {
             $token = $_REQUEST['token'];
             // $user_id = $_REQUEST['user_id'];
-            $sql   = "SELECT * FROM tbl_user where token='$token'";
+            $sql   = "SELECT token FROM tbl_user where token='$token'";
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
@@ -995,7 +998,7 @@ class Webservice extends CI_Controller
             } else {
                 $returnresult = array(
                     'status' => 0,
-                    'message' => 'Token mismatch'
+                    'message' => 'Authentication failed'
                 );
                 $response     = json_encode($returnresult);
                 print_r($response);
@@ -1037,7 +1040,7 @@ class Webservice extends CI_Controller
             
         } else {
             $token = $_REQUEST['token'];
-            $sql   = "SELECT * FROM tbl_user where token='$token'";
+            $sql   = "SELECT token FROM tbl_user where token='$token'";
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
@@ -1047,41 +1050,46 @@ class Webservice extends CI_Controller
             } else {
                 $returnresult = array(
                     'status' => 0,
-                    'message' => 'Token mismatch'
+                    'message' => 'Authentication failed'
                 );
                 $response     = json_encode($returnresult);
                 print_r($response);
             }
         }
     }
-    function update_profile_picture()
-    {
-        //     $token = isset($_REQUEST['token']) ? $_REQUEST['token'] :"";
-        //      $profile_pic = isset($_REQUEST['profile_pic']) ? $_REQUEST['profile_pic'] :"";
-        //      $user_id = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] :"";
-        // if($token=="" or $profile_pic=="" or $user_id==''){
-        // die(json_encode(array("status"=>0, "message"=> "Input parameters are not found")));
+//     function update_profile_picture()
+//     {
+//        //      $token = isset($_REQUEST['token']) ? $_REQUEST['token'] :"";
+//        //       $profile_pic = isset($_REQUEST['profile_pic']) ? $_REQUEST['profile_pic'] :"";
+//        //       $user_id = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] :"";
+//        //  if($token=="" or $profile_pic=="" or $user_id==''){
+//        //   $returnresult = die(json_encode(array("status"=>0,
+//        //     "message"=> "Input parameters are not found"
+//        // )));
         
-        // }
-        //   else{
-        $token = $_REQUEST['token'];
-        $sql   = "SELECT * FROM tbl_user where token='$token'";
-        $res   = $this->db->query($sql);
-        $row   = $res->row();
-        if ($row) {
-            $response = $this->user_model->update_profile_picture($token);
-            $response = json_encode($response);
-            print_r($response);
-        } else {
-            $returnresult = array(
-                'status' => 0,
-                'message' => 'Token mismatch'
-            );
-            $response     = json_encode($returnresult);
-            print_r($response);
-        }
-        // }
-    }
+//        //  }
+//           // else{
+//         $token = $_REQUEST['token'];
+//         $user_id = $_REQUEST['user_id'];
+//         $sql   = "SELECT token FROM tbl_user where token='$token'";
+//         $res   = $this->db->query($sql);
+//         $row   = $res->row();
+//         if ($row) {
+//             $response = $this->user_model->update_profile_picture($token);
+//             $response = json_encode($response);
+//             print_r($response);
+//         } else {
+//             $returnresult = array(
+//                 'status' => 0,
+//                 'message' => 'Authentication failed'
+//             );
+//             $response     = json_encode($returnresult);
+//             print_r($response);
+//         }
+        
+//         // }
+//     }
+// }
     
     /*
     -----------------------------------------------------------------------------------------------------------
@@ -1107,7 +1115,7 @@ class Webservice extends CI_Controller
             
         } else {
             $token = $_REQUEST['token'];
-            $sql   = "SELECT * FROM tbl_user where token='$token'";
+            $sql   = "SELECT token FROM tbl_user where token='$token'";
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
@@ -1117,7 +1125,7 @@ class Webservice extends CI_Controller
             } else {
                 $returnresult = array(
                     'status' => 0,
-                    'message' => 'Token mismatch'
+                    'message' => 'Authentication failed'
                 );
                 $response     = json_encode($returnresult);
                 print_r($response);
@@ -1148,7 +1156,8 @@ class Webservice extends CI_Controller
             
         } else {
             $token = $_REQUEST['token'];
-            $sql   = "SELECT * FROM tbl_user where token='$token'";
+            $user_id = $_REQUEST['user_id'];
+            $sql   = "SELECT token FROM tbl_user where token='$token' and user_id=$user_id";
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
@@ -1158,7 +1167,7 @@ class Webservice extends CI_Controller
             } else {
                 $returnresult = array(
                     'status' => 0,
-                    'message' => 'Token mismatch'
+                    'message' => 'Authentication failed'
                 );
                 $response     = json_encode($returnresult);
                 print_r($response);
@@ -1190,7 +1199,8 @@ class Webservice extends CI_Controller
             
         } else {
             $token = $_REQUEST['token'];
-            $sql   = "SELECT * FROM tbl_user where token='$token'";
+            $user_id = $_REQUEST['user_id'];
+            $sql   = "SELECT token FROM tbl_user where token='$token' and user_id=$user_id";
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
@@ -1200,7 +1210,7 @@ class Webservice extends CI_Controller
             } else {
                 $returnresult = array(
                     'status' => 0,
-                    'message' => 'Token mismatch'
+                    'message' => 'Authentication failed'
                 );
                 $response     = json_encode($returnresult);
                 print_r($response);
@@ -1229,8 +1239,8 @@ class Webservice extends CI_Controller
             
         } else {
             $token = $_REQUEST['token'];
-            // $user_id = $_REQUEST['user_id'];
-            $sql   = "SELECT * FROM tbl_user where token='$token'";
+            $user_id = $_REQUEST['user_id'];
+            $sql   = "SELECT token FROM tbl_user where token='$token' and user_id=$user_id";
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
@@ -1271,7 +1281,7 @@ class Webservice extends CI_Controller
             } else {
                 $returnresult = array(
                     'status' => 0,
-                    'message' => 'Token mismatch'
+                    'message' => 'Authentication failed'
                 );
                 $response     = json_encode($returnresult);
                 print_r($response);
@@ -1301,8 +1311,8 @@ class Webservice extends CI_Controller
             
         } else {
             $token = $_REQUEST['token'];
-            
-            $sql = "SELECT * FROM tbl_user where token='$token'";
+            $user_id = $_REQUEST['user_id'];
+            $sql = "SELECT token FROM tbl_user where token='$token' and user_id=$user_id";
             $res = $this->db->query($sql);
             $row = $res->row();
             if ($row) {
@@ -1342,7 +1352,7 @@ class Webservice extends CI_Controller
             } else {
                 $returnresult = array(
                     'status' => 0,
-                    'message' => 'Token mismatch'
+                    'message' => 'Authentication failed'
                 );
                 $response     = json_encode($returnresult);
                 print_r($response);
@@ -1455,7 +1465,8 @@ class Webservice extends CI_Controller
             
         } else {
             $token = $_REQUEST['token'];
-            $sql   = "SELECT * FROM tbl_user where token='$token'";
+            $user_id = $_REQUEST['user_id'];
+            $sql   = "SELECT token FROM tbl_user where token='$token' and user_id=$user_id";
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
@@ -1495,7 +1506,7 @@ class Webservice extends CI_Controller
             } else {
                 $returnresult = array(
                     'status' => 0,
-                    'message' => 'Token mismatch'
+                    'message' => 'Authentication failed'
                 );
                 $response     = json_encode($returnresult);
                 print_r($response);
@@ -1569,7 +1580,8 @@ class Webservice extends CI_Controller
             
         } else {
             $token = $_REQUEST['token'];
-            $sql   = "SELECT * FROM tbl_user where token='$token'";
+             $user_id = $_REQUEST['user_id'];
+            $sql   = "SELECT token FROM tbl_user where token='$token' and user_id=$user_id";
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
@@ -1579,7 +1591,7 @@ class Webservice extends CI_Controller
             } else {
                 $returnresult = array(
                     'status' => 0,
-                    'message' => 'Token mismatch'
+                    'message' => 'Authentication failed'
                 );
                 $response     = json_encode($returnresult);
                 print_r($response);
@@ -1607,7 +1619,8 @@ class Webservice extends CI_Controller
             
         } else {
             $token = $_REQUEST['token'];
-            $sql   = "SELECT * FROM tbl_user where token='$token'";
+             $user_id = $_REQUEST['user_id'];
+            $sql   = "SELECT token FROM tbl_user where token='$token' and user_id=$user_id";
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
@@ -1650,7 +1663,7 @@ class Webservice extends CI_Controller
             } else {
                 $returnresult = array(
                     'status' => 0,
-                    'message' => 'Token mismatch'
+                    'message' => 'Authentication failed'
                 );
                 $response     = json_encode($returnresult);
                 print_r($response);
@@ -1678,7 +1691,8 @@ class Webservice extends CI_Controller
             
         } else {
             $token = $_REQUEST['token'];
-            $sql   = "SELECT * FROM tbl_user where token='$token'";
+            $user_id = $_REQUEST['user_id'];
+            $sql   = "SELECT token FROM tbl_user where token='$token' and user_id=$user_id";
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
@@ -1718,7 +1732,7 @@ class Webservice extends CI_Controller
             } else {
                 $returnresult = array(
                     'status' => 0,
-                    'message' => 'Token mismatch'
+                    'message' => 'Authentication failed'
                 );
                 $response     = json_encode($returnresult);
                 print_r($response);
@@ -1745,8 +1759,8 @@ class Webservice extends CI_Controller
             )));
             
         } else {
-            $token = $_REQUEST['token'];
-            $sql   = "SELECT * FROM tbl_user where token='$token'";
+             $user_id = $_REQUEST['user_id'];
+            $sql   = "SELECT token FROM tbl_user where token='$token' and user_id=$user_id";
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
@@ -1785,7 +1799,7 @@ class Webservice extends CI_Controller
             } else {
                 $returnresult = array(
                     'status' => 0,
-                    'message' => 'Token mismatch'
+                    'message' => 'Authentication failed'
                 );
                 $response     = json_encode($returnresult);
                 print_r($response);
@@ -1813,7 +1827,8 @@ class Webservice extends CI_Controller
             
         } else {
             $token = $_REQUEST['token'];
-            $sql   = "SELECT * FROM tbl_user where token='$token'";
+            $user_id = $_REQUEST['user_id'];
+            $sql   = "SELECT token FROM tbl_user where token='$token' and user_id=$user_id";
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
@@ -1823,7 +1838,7 @@ class Webservice extends CI_Controller
             } else {
                 $returnresult = array(
                     'status' => 0,
-                    'message' => 'Token mismatch'
+                    'message' => 'Authentication failed'
                 );
                 $response     = json_encode($returnresult);
                 print_r($response);
@@ -1852,7 +1867,8 @@ class Webservice extends CI_Controller
             
         } else {
             $token = $_REQUEST['token'];
-            $sql   = "SELECT * FROM tbl_user where token='$token'";
+             $user_id = $_REQUEST['user_id'];
+            $sql   = "SELECT token FROM tbl_user where token='$token' and user_id=$user_id";
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
@@ -1862,7 +1878,7 @@ class Webservice extends CI_Controller
             } else {
                 $returnresult = array(
                     'status' => 0,
-                    'message' => 'Token mismatch'
+                    'message' => 'Authentication failed'
                 );
                 $response     = json_encode($returnresult);
                 print_r($response);
@@ -1874,7 +1890,7 @@ class Webservice extends CI_Controller
     
     /*
     -----------------------------------------------------------------------------------------------------
-    http://104.237.3.116/tap911/index.php/webservice/list_create_emergency_byuser?token=03ed32f30ee37fbb&user_id=77
+    http://104.237.3.116/tap911/index.php/webservice/get_emergency_user?token=03ed32f30ee37fbb&user_id=77
     -----------------------------------------------------------------------------------------------------
     */
     
@@ -1892,7 +1908,8 @@ class Webservice extends CI_Controller
             
         } else {
             $token = $_REQUEST['token'];
-            $sql   = "SELECT * FROM tbl_user where token='$token'";
+            $user_id = $_REQUEST['user_id'];
+            $sql   = "SELECT token FROM tbl_user where token='$token' and user_id='$user_id'";
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
@@ -1936,7 +1953,7 @@ class Webservice extends CI_Controller
             } else {
                 $returnresult = array(
                     'status' => 0,
-                    'message' => 'Token mismatch'
+                    'message' => 'Authentication failed'
                 );
                 $response     = json_encode($returnresult);
                 print_r($response);
@@ -1971,7 +1988,8 @@ class Webservice extends CI_Controller
             
         } else {
             $token = $_REQUEST['token'];
-            $sql   = "SELECT * FROM tbl_user where token='$token'";
+             $user_id = $_REQUEST['user_id'];
+            $sql   = "SELECT token FROM tbl_user where token='$token' and user_id='$user_id'";
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
@@ -1981,7 +1999,7 @@ class Webservice extends CI_Controller
             } else {
                 $returnresult = array(
                     'status' => 0,
-                    'message' => 'Token mismatch'
+                    'message' => 'Authentication failed'
                 );
                 $response     = json_encode($returnresult);
                 print_r($response);
@@ -2013,7 +2031,8 @@ class Webservice extends CI_Controller
             
         } else {
             $token = $_REQUEST['token'];
-            $sql   = "SELECT * FROM tbl_user where token='$token'";
+             $user_id = $_REQUEST['user_id'];
+            $sql   = "SELECT token FROM tbl_user where token='$token' and user_id='$user_id'";
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
@@ -2101,7 +2120,7 @@ class Webservice extends CI_Controller
             } else {
                 $returnresult = array(
                     'status' => 0,
-                    'message' => 'Token mismatch'
+                    'message' => 'Authentication failed'
                 );
                 $response     = json_encode($returnresult);
                 print_r($response);
@@ -2135,7 +2154,8 @@ class Webservice extends CI_Controller
             
         } else {
             $token = $_REQUEST['token'];
-            $sql   = "SELECT * FROM tbl_user where token='$token'";
+            $user_id = $_REQUEST['user_id'];
+            $sql   = "SELECT token FROM tbl_user where token='$token' and user_id='$user_id'";
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
@@ -2145,7 +2165,7 @@ class Webservice extends CI_Controller
             } else {
                 $returnresult = array(
                     'status' => 0,
-                    'message' => 'Token mismatch'
+                    'message' => 'Authentication failed'
                 );
                 $response     = json_encode($returnresult);
                 print_r($response);
@@ -2163,10 +2183,11 @@ class Webservice extends CI_Controller
     function get_emergency_live_location()
     {
         $token = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+         $emergency_id = isset($_REQUEST['emergency_id']) ? $_REQUEST['emergency_id'] : "";
         
         
         
-        if ($token == "") {
+        if ($token == "" or $emergency_id=="") {
             die(json_encode(array(
                 "status" => 0,
                 "message" => "Input parameters are not found"
@@ -2174,7 +2195,8 @@ class Webservice extends CI_Controller
             
         } else {
             $token = $_REQUEST['token'];
-            $sql   = "SELECT * FROM tbl_user where token='$token'";
+            $user_id = $_REQUEST['user_id'];
+            $sql   = "SELECT token FROM tbl_user where token='$token' and user_id='$user_id'";
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
@@ -2212,7 +2234,7 @@ class Webservice extends CI_Controller
             } else {
                 $returnresult = array(
                     'status' => 0,
-                    'message' => 'Token mismatch'
+                    'message' => 'Authentication failed'
                 );
                 $response     = json_encode($returnresult);
                 print_r($response);
@@ -2286,7 +2308,8 @@ class Webservice extends CI_Controller
             
         } else {
             $token = $_REQUEST['token'];
-            $sql   = "SELECT * FROM tbl_user where token='$token'";
+             $user_id = $_REQUEST['user_id'];
+            $sql   = "SELECT token FROM tbl_user where token='$token' and user_id='$user_id'";
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
@@ -2325,7 +2348,8 @@ class Webservice extends CI_Controller
             
         } else {
             $token = $_REQUEST['token'];
-            $sql   = "SELECT * FROM tbl_user where token='$token'";
+            $user_id = $_REQUEST['user_id'];
+            $sql   = "SELECT token FROM tbl_user where token='$token' and user_id='$user_id'";
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
@@ -2365,7 +2389,8 @@ class Webservice extends CI_Controller
             
         } else {
             $token = $_REQUEST['token'];
-            $sql   = "SELECT * FROM tbl_user where token='$token'";
+            $user_id = $_REQUEST['user_id'];
+            $sql   = "SELECT token FROM tbl_user where token='$token' and user_id='$user_id'";
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
@@ -2403,7 +2428,7 @@ class Webservice extends CI_Controller
             } else {
                 $returnresult = array(
                     'status' => 0,
-                    'message' => 'Token mismatch'
+                    'message' => 'Authentication failed'
                 );
                 $response     = json_encode($returnresult);
                 print_r($response);
