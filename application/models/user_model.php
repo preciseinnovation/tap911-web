@@ -30,7 +30,8 @@ class User_model extends CI_Model
             $value       = $this->db->update('tbl_user', $data);
             $returnarray = array(
                 'status' => 1,
-                'token' => $token
+                'token' => $token,
+                'user_id' => $customer_id
             );
             
             
@@ -69,7 +70,7 @@ class User_model extends CI_Model
                     )));
                     
                 }
-                if (!preg_match('/^[0-9]{10}+$/', $_REQUEST['phone_number'])) {
+                if (!preg_match('/^[0-9]{20}+$/', $_REQUEST['phone_number'])) {
                     $returnresult = die(json_encode(array(
                         "status" => 0,
                         "message" => "Please enter valid mobile number"
@@ -155,7 +156,6 @@ ifnull((select ifnull(tcum.`request_status`,0) as request_status from `tbl_commu
 FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'");
         return $result->result();
     }
-    
     
     
     function user_community_request()
@@ -293,8 +293,8 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'");
          $user_id = $_REQUEST['user_id'];
         $this->db->select('tbl_user.*,tbl_user.user_id,tbl_comment.*');
         $this->db->from('tbl_comment');
-        $this->db->join('tbl_user', 'tbl_user.user_id = tbl_comment.comment_user_id', 'INNER');
-        $this->db->join('tbl_community', 'tbl_community.community_id = tbl_comment.community_id', 'INNER');
+        $this->db->join('tbl_user', 'tbl_user.user_id = tbl_comment.comment_user_id', 'RIGHT');
+        $this->db->join('tbl_community', 'tbl_community.community_id = tbl_comment.community_id', 'RIGHT');
         $this->db->limit($limit, $start);
         $this->db->where('tbl_comment.community_id', $community_id);
         $this->db->where('tbl_user.user_id', $user_id);
@@ -306,7 +306,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'");
     {
         $alert_id = $_REQUEST['alert_id'];
         $user_id = $_REQUEST['user_id'];
-        $this->db->select('tbl_user.*,tbl_user.user_id, tbl_comment.*');
+        $this->db->select('tbl_user.*,tbl_comment.*');
         $this->db->from('tbl_comment');
         $this->db->join('tbl_user', 'tbl_user.user_id = tbl_comment.comment_user_id', 'INNER');
         $this->db->join('tbl_alert', 'tbl_alert.alert_id = tbl_comment.alert_id', 'INNER');
@@ -596,7 +596,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'");
             $data = $this->db->update('tbl_user_address', $data);
             if ($data) {
                 $returnresult = array(
-                    'status' => 0,
+                    'status' => 1,
                     'message' => 'User address update successfully'
                 );
             }
@@ -642,7 +642,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'");
         if ($data) {
             $returnresult = array(
                 'status' => 1,
-                'message' => 'User contect successfully submit'
+                'message' => 'User contact successfully submit'
             );
         } else {
             $returnresult = array(
@@ -661,6 +661,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'");
         if ($res->num_rows > 0) {
             $row                  = $res->row();
             $emergency_contact_id = $row->emergency_contact_id;
+
             $data                 = array(
                 'emergency_contact_id' => $_REQUEST['emergency_contact_id'],
                 'name' => $_REQUEST['name'],
@@ -677,15 +678,16 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'");
                     'status' => 1,
                     'message' => 'User emergency contact update successfully'
                 );
-            } else {
+            } 
+        }else {
                 $returnresult = array(
                     'status' => 0,
-                    'message' => 'Some data not valid'
+                    'message' => 'contact not found'
                 );
             }
             
             return $returnresult;
-        }
+        
     }
     function get_home_address()
     {
@@ -1222,7 +1224,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'");
                 if ($data) {
                     $returnresult = array(
                         'status' => 1,
-                        'message' => 'You are accepted help request'
+                        'message' => 'Thank you for accepting help request'
                     );
                     
                 } else {
