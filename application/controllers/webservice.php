@@ -102,17 +102,44 @@ class Webservice extends CI_Controller
             
         } else {
             $token = $_REQUEST['token'];
-            $sql   = "SELECT token FROM tbl_user where token='$token'";
+            $user_id = $_REQUEST['user_id'];
+            $sql   = "SELECT token,user_id FROM tbl_user where token='$token' and user_id='$user_id'";
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
-                $response = $this->user_model->get_community($token); //user_id
-                if ($response) {
+                $json_data = $this->user_model->get_community($token); //user_id
+                 if ($json_data) {
+                    $arr = array();
+                    foreach ($json_data as $results) {
+                        $logo=$results->community_logo;
+                         $path = base_url().'uploads/';
+                        if($logo){
+                          
+                            $logos= $path.$logo;
+                           
+                        }
+                        else{
+                        $logos= $path.'1517561100258.png';
+                        }
+
+                        $arr[] = array(
+
+                            'community_name' => $results->community_name,
+                            'community_id' => $results->community_id,
+                            'community_description' => $results->community_description,
+                            'add_date' => $results->add_date,
+                            'community_email' => $results->community_email,
+                             'request_status' => $results->request_status,
+                              'community_logo' =>  $logos,
+                               'community_address' => $results->community_address
+                            
+                        );
+                    }
                     
                     $returnresult = array(
                         'status' => 1,
                         'message' => 'Record found',
-                        'community_list' => $response
+                        'community_list' => $arr
                     );
                     $response     = json_encode($returnresult);
                     print_r($response);
@@ -133,6 +160,8 @@ class Webservice extends CI_Controller
                 $response     = json_encode($returnresult);
                 print_r($response);
             }
+
+
         }
     }
     
@@ -163,7 +192,8 @@ class Webservice extends CI_Controller
             
         } else {
             $token = $_REQUEST['token'];
-            $sql   = "SELECT token FROM tbl_user where token='$token'";
+            $user_id = $_REQUEST['user_id'];
+            $sql   = "SELECT token,user_id FROM tbl_user where token='$token' and user_id='$user_id'";
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
@@ -255,42 +285,55 @@ class Webservice extends CI_Controller
             )));
             
         } else {
-            // $token = $_REQUEST['token'];
-            // $sql   = "SELECT * FROM tbl_user where token='$token'";
-            // $res   = $this->db->query($sql);
-            // $row   = $res->row();
-            // if ($row) {
-                $oldpassword = $_REQUEST['oldpassword'];
-                $newpassword = $_REQUEST['newpassword'];
                  $token = $_REQUEST['token'];
-                $oldpassword = md5($oldpassword);
-                if ($oldpassword != '' && $newpassword != '') {
-                    $sql    = "SELECT `user_id` FROM tbl_user WHERE password='" . $oldpassword . "' and token='" . $token . "' ";
-                    $query  = mysql_query($sql);
-                    $result = mysql_fetch_array($query);
-                    if($result==""){
+                  $oldpassword = $_REQUEST['oldpassword'];
+                  $user_id = $_REQUEST['user_id'];
+                  $newpassword = $_REQUEST['newpassword'];
+                  $newPass = md5($newpassword);
+                  $token = $_REQUEST['token'];
+                  $oldpassword = md5($oldpassword);
+                    $sql    = "SELECT * FROM tbl_user WHERE user_id='" . $user_id . "'";
+                    $res   = $this->db->query($sql);
+                     $row   = $res->row();
+                     $user_ids =$row->user_id;
+                     $tokens =$row->token;
+                     $password =$row->password;
+                    if($password!=$oldpassword){
                         $returnresult =  die(json_encode(array(
                     'status' => 0,
-                    'message' => 'Authentication failed'
+                    'message' => 'Old password doesnt match!'
                 )));
                
                     }
-                    if ($result) {
-                        $id      = $result["user_id"];
-                        $newPass = md5($newpassword);
-                        $sql1    = mysql_query("UPDATE tbl_user SET password='" . $newPass . "' where user_id='" . $id . "'");
-                        // $query1 = mysql_query($sql1);
+                     elseif($tokens!=$token){
+                        $returnresult =  die(json_encode(array(
+                    'status' => 0,
+                    'message' => 'Authentication failed!'
+                )));
+               
+                    }
+                    if($oldpassword==$newPass){
+                        $returnresult =  die(json_encode(array(
+                    'status' => 0,
+                    'message' => 'Old Password and new password cannot be same!'
+                )));
+               
+                    }
+                    else {
+                   
+                        $sql1    = mysql_query("UPDATE tbl_user SET password='" . $newPass . "' where user_id='" . $user_ids . "'");
+                     
                         $res     =  die(json_encode(array(
                             'status' => 1,
-                            'message' => 'Password change successfully.'
+                            'message' => 'Your password has been changed.'
                         )));
-                      //  print_r($res);
+                  
                         
                     }
                   $response     = json_encode($returnresult);
                 print_r($response);   
                 
-            }
+    
         }
     }
     
@@ -375,7 +418,8 @@ class Webservice extends CI_Controller
         } else {
             
             $token = $_REQUEST['token'];
-            $sql   = "SELECT token FROM tbl_user where token='$token'";
+             $comment_user_id = $_REQUEST['comment_user_id'];
+            $sql   = "SELECT token FROM tbl_user where token='$token' and user_id='$comment_user_id'";
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
@@ -405,8 +449,9 @@ class Webservice extends CI_Controller
         $community_id    = isset($_REQUEST['community_id']) ? $_REQUEST['community_id'] : "";
         $comment_text    = isset($_REQUEST['comment_text']) ? $_REQUEST['comment_text'] : "";
         $token           = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+        $comment_user_id = isset($_REQUEST['comment_user_id']) ? $_REQUEST['comment_user_id'] : "";
         
-        if ($comment_text == "" or $community_id == "" or $comment_text == "" or $token == "") {
+        if ($comment_text == "" or $community_id == "" or $comment_text == "" or $token == "" or $comment_user_id=="" ) {
             die(json_encode(array(
                 "status" => 0,
                 "message" => "Input parameters are not found"
@@ -415,30 +460,15 @@ class Webservice extends CI_Controller
         } else {
             
             $token = $_REQUEST['token'];
-            $sql   = "SELECT token FROM tbl_user where token='$token'";
+            $comment_user_id = $_REQUEST['comment_user_id'];
+            $sql   = "SELECT token FROM tbl_user where token='$token' and user_id='$comment_user_id'";
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
                 $response = $this->user_model->user_comment_communitywise($token);
-                if ($response) {
-                    $returnresult = array(
-                        'status' => 1,
-                        'message' => 'Record found',
-                        'comment_communitywise' => $response
-                    );
-                    $response     = json_encode($returnresult);
-                    print_r($response);
-                    
-                    
-                    
-                } else {
-                    $returnresult = array(
-                        'status' => 0,
-                        'message' => 'Record  not found'
-                    );
-                    $response     = json_encode($returnresult);
-                    print_r($response);
-                }
+        
+                  $response     = json_encode($response);
+                print_r($response);
             } else {
                 $returnresult = array(
                     'status' => 0,
@@ -459,6 +489,8 @@ class Webservice extends CI_Controller
     function get_comment_communitywise()
     {
         $token = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+         $user_id = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
+          $limit = isset($_REQUEST['limit']) ? $_REQUEST['limit'] : "";
         if ($token == "") {
             die(json_encode(array(
                 "status" => 0,
@@ -478,14 +510,14 @@ class Webservice extends CI_Controller
                     $arr = array();
                     foreach ($response as $results) {
                         $arr[] = array(
-                            'user_name' => $results->user_name,
+                            'user_name' => $results->first_name." ".$results->last_name,
                             'comment_id' => $results->comment_id,
                             'community_id' => $results->community_id,
                             'comment_user_id' => $results->comment_user_id,
                             'comment_text' => $results->comment_text,
                             'comment_date_time' => $results->comment_date_time,
-                            'add_date' => $results->add_date,
-                            'status' => $results->status
+                            'add_date' => $results->add_date
+                            // 'status' => $results->status
                             
                         );
                     }
@@ -548,20 +580,19 @@ class Webservice extends CI_Controller
                     $arr = array();
                     foreach ($response as $results) {
                         $arr[] = array(
-                            'user_name' => $results->user_name,
+                            'user_name' => $results->first_name." ".$results->last_name,
                             'comment_id' => $results->comment_id,
-                            'alert_id' => $results->alert_id,
                             'comment_user_id' => $results->comment_user_id,
                             'comment_text' => $results->comment_text,
                             'comment_date_time' => $results->comment_date_time,
-                            'add_date' => $results->add_date,
-                            'status' => $results->status
+                            'add_date' => $results->add_date
+                            
                             
                         );
                     }
                     $returnresult = array(
                         'status' => 1,
-                        'message' => 'Record fount',
+                        'message' => 'Record found',
                         'comment' => $arr
                     );
                     $data         = json_encode($returnresult);
@@ -569,7 +600,7 @@ class Webservice extends CI_Controller
                 } else {
                     $returnresult   = array(
                         'status' => 0,
-                        'message' => 'Record not fount'
+                        'message' => 'Record not found'
                     );
                     $responseresult = json_encode($returnresult);
                     print_r($responseresult);
@@ -694,14 +725,36 @@ class Webservice extends CI_Controller
                            $results->community_id = "";
                            
                              }
-                             if (is_null($results->community_logo)) {
-                           $results->community_logo = "";
-                           
-                             }
+
                              if (is_null($results->add_date)) {
                            $results->add_date = "";
                            
                              }
+
+                         $logo=$results->community_logo;
+                          $path = base_url().'uploads/';
+                          if($logo){
+                          
+                            $logos= $path.$logo;
+                           
+                         }
+                         else{
+                         $logos= $path.'1517561100258.png';
+                         }
+
+                        $profile_pic=$results->profile_pic;
+                          $path = base_url().'uploads/';
+                          if($profile_pic){
+                          
+                            $profile_picture= $path.$profile_pic;
+                           
+                         }
+                         else{
+                         $profile_picture= $path.'1517561100258.png';
+                         }
+
+
+
                             
                         $arr[] = array(
                             'alert_id' => $results->alert_id,
@@ -715,16 +768,16 @@ class Webservice extends CI_Controller
                             'request_status' => $results->request_status,
                             'add_date' => $results->add_date,
                             'accept_time' => $results->accept_time,
-                            'community_logo' =>$results->community_logo,
+                            'community_logo' =>$logos,
                             'alert_heading' => $results->alert_heading,
                             'alert_descrption' => $results->alert_descrption,
                             'is_comment' => $results->is_comment,
                             'alert_date_time' => $results->alert_date_time,
                             'add_date' => $results->add_date,
-                            'user_name' => $results->first_name,
-                            'profile_pic' => $results->profile_pic,
-                            'user_message' => 'i need help',
-                            'status' => $results->userstatus
+                            'user_name' => $results->first_name." ".$results->last_name,
+                            'profile_pic' => $profile_picture,
+                            'user_message' => 'i need help'
+                            
                             
                         );
                     }
@@ -817,19 +870,28 @@ class Webservice extends CI_Controller
                         
                         array_push($arra1, $arr1);
                     }
-                    
+                          $logo=$results2->community_logo;
+                          $path = base_url().'uploads/';
+                          if($logo){
+                          
+                            $logos= $path.$logo;
+                           
+                         }
+                         else{
+                         $logos= $path.'1517561100258.png';
+                         }
                     
                     $arr2[] = array(
                         'community_name' => $results2->community_name,
                         'community_id' => $results2->community_id,
                         'community_description' => $results2->community_description,
-                        'community_logo' => $results2->community_logo,
+                        'community_logo' =>  $logos,
                         'community_website' => $results2->community_website,
                         'community_email' => $results2->community_email,
                         'community_address' => $results2->community_address,
                         'add_date' => $results2->add_date,
-                        'numbers' => $arra1,
-                        'status' => $results2->status
+                        'numbers' => $arra1
+                        
                         
                     );
                     
@@ -1040,7 +1102,8 @@ class Webservice extends CI_Controller
             
         } else {
             $token = $_REQUEST['token'];
-            $sql   = "SELECT token FROM tbl_user where token='$token'";
+             $user_id = $_REQUEST['user_id'];
+            $sql   = "SELECT token,user_id FROM tbl_user where token='$token' and user_id='$user_id'";
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
@@ -1115,7 +1178,8 @@ class Webservice extends CI_Controller
             
         } else {
             $token = $_REQUEST['token'];
-            $sql   = "SELECT token FROM tbl_user where token='$token'";
+             $user_id = $_REQUEST['user_id'];
+            $sql   = "SELECT token FROM tbl_user where token='$token' and user_id='$user_id'";
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
@@ -2140,7 +2204,6 @@ class Webservice extends CI_Controller
     function accept_emergency_request()
     
       {  
-        error_reporting( error_reporting() & ~E_NOTICE );
         $token         = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
         $emergency_notification_id       = isset($_REQUEST['emergency_notification_id']) ? $_REQUEST['emergency_notification_id'] : "";
        
@@ -2196,7 +2259,7 @@ class Webservice extends CI_Controller
         } else {
             $token = $_REQUEST['token'];
             $user_id = $_REQUEST['user_id'];
-            $sql   = "SELECT token FROM tbl_user where token='$token' and user_id='$user_id'";
+            $sql   = "SELECT token,user_id FROM tbl_user where token='$token' and user_id='$user_id'";
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
@@ -2226,7 +2289,7 @@ class Webservice extends CI_Controller
                 } else {
                     $returnresult = array(
                         'status' => 0,
-                        'message' => 'Record  not found'
+                        'message' => 'Record not found'
                     );
                     $response     = json_encode($returnresult);
                     print_r($response);
