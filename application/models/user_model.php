@@ -70,10 +70,12 @@ class User_model extends CI_Model
                     )));
                     
                 }
-                if (!preg_match('/^[0-9]{20}+$/', $_REQUEST['phone_number'])) {
+               // if (!preg_match('/^[0-9]{20}+$/', $_REQUEST['phone_number']))
+                  if(!is_numeric($_REQUEST['phone_number']))
+                 {
                     $returnresult = die(json_encode(array(
                         "status" => 0,
-                        "message" => "Please enter valid mobile number"
+                        "message" => "Please Enter number only"
                     )));
                 }
                 if (ctype_alpha($_REQUEST['user_name']) === false) {
@@ -128,7 +130,7 @@ class User_model extends CI_Model
                     
                     $returnresult = array(
                         'status' => 1,
-                        'message' => 'Your registration is now confirmed - you may now sign in.'
+                        'message' => 'Your registration is now confirmed'
                     );
                 } else {
                     $returnresult = array(
@@ -329,13 +331,14 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'");
         return $query->result();
     }
     
-    function get_user_alert()
+    function get_user_alert($limit, $start = 50)
     {
         $user_id = $_REQUEST['user_id'];
         $this->db->select('tbl_user.*,tbl_user.user_id,tbl_alert.user_id,tbl_alert.*,tbl_community.*,tbl_alert.status as userstatus');
         $this->db->from('tbl_alert');
         $this->db->join('tbl_user', 'tbl_user.user_id = tbl_alert.user_id', 'left');
         $this->db->join('tbl_community', 'tbl_community.community_id = tbl_alert.community_id', 'left');
+         $this->db->limit($limit, $start);
         $this->db->where('tbl_alert.user_id', $user_id);
         $query = $this->db->get();
         return $query->result();
@@ -901,12 +904,24 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'");
     
     function get_emergency_user()
     {
-        $user_id = $_REQUEST['user_id'];
-        $this->db->select('tbl_emergency.*');
-        $this->db->from('tbl_emergency');
-        $this->db->where('user_id', $user_id);
+        // $user_id = $_REQUEST['user_id'];
+        // $this->db->select('tbl_emergency.*');
+        // $this->db->from('tbl_emergency');
+        // $this->db->where('user_id', $user_id);
+        // $query = $this->db->get();
+        // return $query->result();
+
+          // $emergency_id = $_REQUEST['emergency_id'];
+        $this->db->select('tbl_emergency.*,tbl_user.*,tbl_emergency_notification.*');
+        $this->db->from('tbl_emergency_notification');
+        $this->db->join('tbl_user', 'tbl_user.user_id = tbl_emergency_notification.notification_user_id', 'left');
+        $this->db->join('tbl_emergency', 'tbl_emergency.emergency_id = tbl_emergency_notification.emergency_id', 'left');
+        $this->db->where('tbl_user.del_date', '0000-00-00 00:00:00');
+         $this->db->where('tbl_user.status', 1);
         $query = $this->db->get();
+        //  echo $this->db->last_query();
         return $query->result();
+
     }
     
     
@@ -935,7 +950,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'");
             3956 * 2 * ASIN(SQRT( POWER(SIN(($user_lat -  tbl_user.user_lat) * pi()/180 / 2), 2) + COS($user_lat * pi()/180) * COS( tbl_user.user_lat * pi()/180) *
             POWER(SIN(($user_long - tbl_user.user_long) * pi()/180 / 2), 2) )) as
             distance FROM tbl_user
-             WHERE  tbl_user.user_id NOT IN ('" . $_REQUEST['user_id'] . "')   
+             WHERE  tbl_user.user_id NOT IN ('" . $_REQUEST['user_id'] . "') and tbl_user.del_date='0000-00-00 00:00:00' and status=1 
             GROUP BY tbl_user.user_id HAVING distance <= 5 ORDER by distance ASC");
         
         $resultdata     = $results->result_array();
@@ -950,7 +965,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'");
             $alert_lang = $resultdata[$i]['user_long'];
             $SQL        = "insert into tbl_emergency_notification(notification_user_id,emergency_id,em_lat,em_long) values('$id','$ids','$alert_lat','$alert_lang')";
             $res        = mysql_query($SQL);
-            $alert_id   = $this->db->insert_id();
+            $emergency_notification_id   = $this->db->insert_id();
             
             
             $sql = "SELECT * FROM tbl_user WHERE `user_id` IN ('$id')";
@@ -959,17 +974,17 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'");
             // print_r($row);
             // die();
             if ($row) {
-                $user_token  = $row->user_token;
+                $notification_device_token  = $row->notification_device_token;
                 $mobile_type = $row->mobile_type;
                 $ch          = curl_init("https://fcm.googleapis.com/fcm/send");
                 
-                $usertoken    = $user_token;
+                $usertoken    = $notification_device_token;
                 $title        = "tap911";
                 $body         = "This is test message from tap911.";
                 $notification = array(
                     'title' => $title,
                     'text' => $body,
-                    'emergency_notification_id' => $alert_id
+                    'emergency_notification_id' => $emergency_notification_id
                 );
                 $arrayToSend  = array(
                     'to' => $usertoken,
@@ -1015,12 +1030,12 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'");
         $year      = date("Y", $time);
         $table     = "tbl_tracking" . '_' . $month . '_' . $year;
         
-        $result = $this->db->query("SELECT   $table.*, $table.add_date as userdate,tbl_user.*,tbl_user.add_date as adate,
+        $result = $this->db->query("SELECT $table.*, $table.add_date as userdate,tbl_user.*,tbl_user.add_date as adate,
             3956 * 2 * ASIN(SQRT( POWER(SIN(($user_lat -  $table.latitude) * pi()/180 / 2), 2) + COS($user_lat * pi()/180) * COS( $table.latitude * pi()/180) *
             POWER(SIN(($user_long -  $table.longitude) * pi()/180 / 2), 2) )) as
             distance FROM $table
              JOIN  tbl_user on tbl_user.user_id =   $table.user_id
-             WHERE  $table.add_date >= NOW() - INTERVAL 10 MINUTE and  $table.user_id NOT IN ('" . $_REQUEST['user_id'] . "')   
+             WHERE  $table.add_date >= NOW() - INTERVAL 10 MINUTE and  $table.user_id NOT IN ('" . $_REQUEST['user_id'] . "') and tbl_user.del_date='0000-00-00 00:00:00' and status=1   
             GROUP BY  $table.tracking_id HAVING distance <= 5 ORDER by distance ASC");
         $data   = $result->result_array();
         
@@ -1035,7 +1050,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'");
             $alert_lang = $data[$i]['longitude'];
             $SQL        = "insert into tbl_emergency_notification(notification_user_id,emergency_id,em_lat,em_long) values('$id','$ids','$alert_lat','$alert_lang')";
             $res        = mysql_query($SQL);
-            $alert_id   = $this->db->insert_id();
+            $emergency_notification_id   = $this->db->insert_id();
             
             
             $sql = "SELECT * FROM tbl_user WHERE `user_id` IN ('$id')";
@@ -1044,17 +1059,17 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'");
             // print_r($row);
             // die();
             if ($row) {
-                $user_token  = $row->user_token;
+                $notification_device_token  = $row->notification_device_token;
                 $mobile_type = $row->mobile_type;
                 $ch          = curl_init("https://fcm.googleapis.com/fcm/send");
                 
-                $usertoken    = $user_token;
+                $usertoken    = $notification_device_token;
                 $title        = "tap911";
                 $body         = "This is test message from tap911.";
                 $notification = array(
                     'title' => $title,
                     'text' => $body,
-                    'emergency_notification_id' => $alert_id
+                    'emergency_notification_id' => $emergency_notification_id
                 );
                 $arrayToSend  = array(
                     'to' => $usertoken,
@@ -1158,7 +1173,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'");
                     $sql          = "SELECT * FROM tbl_user WHERE `user_id` IN ('$user_id')";
                     $res          = $this->db->query($sql);
                     $row          = $res->row();
-                    $user_token   = $row->user_token;
+                    $notification_device_token   = $row->notification_device_token;
                     $mobile_type  = $row->mobile_type;
                     //  print_r($row);  
                     $ch           = curl_init("https://fcm.googleapis.com/fcm/send");
@@ -1169,7 +1184,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'");
                         'text' => $body
                     );
                     $arrayToSend  = array(
-                        'to' => $user_token,
+                        'to' => $notification_device_token,
                         'notification' => $notification,
                         'priority' => 'high'
                     );
