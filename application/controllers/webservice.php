@@ -579,6 +579,7 @@ class Webservice extends CI_Controller
                 if ($response) {
                     $arr = array();
                     foreach ($response as $results) {
+
                         $arr[] = array(
                             'user_name' => $results->first_name." ".$results->last_name,
                             'comment_id' => $results->comment_id,
@@ -644,6 +645,16 @@ class Webservice extends CI_Controller
                     
                     $arr = array();
                     foreach ($response as $results) {
+                        $logo=$results->community_logo;
+                          $path = base_url().'uploads/';
+                          if($logo){
+                          
+                            $logos= $path.$logo;
+                           
+                         }
+                         else{
+                         $logos= $path.'1517561100258.png';
+                         }
                         $arr[] = array(
                             'alert_id' => $results->alert_id,
                             'user_id' => $results->user_id,
@@ -652,11 +663,11 @@ class Webservice extends CI_Controller
                             'alert_lang' => $results->alert_lang,
                             'alert_heading' => $results->alert_heading,
                             'alert_descrption' => $results->alert_descrption,
-                            'community_logo' => $results->community_logo,
+                            'community_logo' => $logos,
                             'is_comment' => $results->is_comment,
                             'alert_date_time' => $results->alert_date_time,
-                            'add_date' => $results->add_date,
-                            'status' => $results->status
+                            'add_date' => $results->add_date
+                            // 'status' => $results->status
                             
                         );
                     }
@@ -702,6 +713,7 @@ class Webservice extends CI_Controller
         $token = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
          $user_id = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
         // $alert_type = isset($_REQUEST['alert_type']) ? $_REQUEST['alert_type'] : "";
+          $limit = isset($_REQUEST['limit']) ? $_REQUEST['limit'] : "";
         if ($token == "" or  $user_id=="") {
             die(json_encode(array(
                 "status" => 0,
@@ -715,7 +727,7 @@ class Webservice extends CI_Controller
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
-                $response = $this->user_model->get_user_alert($token);
+                $response = $this->user_model->get_user_alert($token,$limit);
                 
                 if ($response) {
                     
@@ -1982,7 +1994,8 @@ class Webservice extends CI_Controller
                     $arr = array();
                     foreach ($json_data as $results) {
                         $arr[] = array(
-
+                             'user_name' => $results->first_name." ".$results->last_name,
+                            'emergency_notification_id' => $results->emergency_notification_id,
                             'emergency_id' => $results->emergency_id,
                             'user_id' => $results->user_id,
                             'emergency_latitude' => $results->emergency_latitude,
@@ -1990,7 +2003,7 @@ class Webservice extends CI_Controller
                             'emergency_address' => $results->emergency_address,
                             'emergency_type' => $results->emergency_type,
                             'add_date' => $results->add_date,
-                            'status' => $results->status
+                             'emergency_status' => $results->emergency_status
                             
                         );
                     }
@@ -2108,6 +2121,17 @@ class Webservice extends CI_Controller
 
                     $arr = array();
                     foreach ($json_data as $results) {
+        
+                           $logo=$results->profile_pic;
+                          $path = base_url().'uploads/';
+                          if($logo){
+                          
+                            $logos= $path.$logo;
+                           
+                         }
+                         else{
+                         $logos= $path.'1517561100258.png';
+                         }
 
                         $arr[] = array(
                             'user_id' => $results->user_id,
@@ -2119,7 +2143,7 @@ class Webservice extends CI_Controller
                             'phone_number_text_msg' => $results->phone_number_text_msg,
                             'phone_number_voice_notification_country_code' => $results->phone_number_voice_notification_country_code,
                             'phone_number_voice_notification' => $results->phone_number_voice_notification,
-                            'profile_pic' => $results->profile_pic,
+                            'profile_pic' => $logos,
                             'language' => $results->language,
                             'medical_history' => $results->medical_history,
                             'medication_instraction' => $results->medication_instraction,
@@ -2204,6 +2228,7 @@ class Webservice extends CI_Controller
     function accept_emergency_request()
     
       {  
+        error_reporting( error_reporting() & ~E_NOTICE );
         $token         = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
         $emergency_notification_id       = isset($_REQUEST['emergency_notification_id']) ? $_REQUEST['emergency_notification_id'] : "";
        
