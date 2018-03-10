@@ -44,6 +44,70 @@ class Webservice extends CI_Controller
         }
     }
     
+
+  /*
+    ------------------------------------------------------------------------------------------------------
+    http://104.237.3.116/tap911/index.php/webservice/facebook_login?login=sbsgroup@gmail.com&notification_device_token=123456&mobile_type=android&facebook_id&first_name=abc&last_name=assd
+    -----------------------------------------------------------------------------------------------------
+    */
+    function facebook_login()
+    {
+          $login    = isset($_REQUEST['login']) ? $_REQUEST['login'] : "";
+          $notification_device_token = isset($_REQUEST['notification_device_token']) ? $_REQUEST['notification_device_token'] : "";
+          $mobile_type = isset($_REQUEST['mobile_type']) ? $_REQUEST['mobile_type'] : "";
+          $first_name = isset($_REQUEST['first_name']) ? $_REQUEST['first_name'] : "";
+           $last_name = isset($_REQUEST['last_name']) ? $_REQUEST['last_name'] : "";
+          $facebook_id = isset($_REQUEST['facebook_id']) ? $_REQUEST['facebook_id'] : "";
+        
+        
+        if ($login == "" or $facebook_id == "" or $notification_device_token=='' or $mobile_type=="" or $last_name=="" or $last_name=="" or $facebook_id=="") {
+            die(json_encode(array(
+                "status" => 0,
+                "message" => "Input parameters are not found"
+            )));
+            
+        } else {
+            
+            $login    = $_REQUEST['login'];
+            $result   = $this->user_model->facebook_login($login);
+            $result   = json_encode($result);
+            print_r($result);
+        }
+    }
+    
+/*
+    ------------------------------------------------------------------------------------------------------
+    http://104.237.3.116/tap911/index.php/webservice/google_login?login=sbsgroup@gmail.com&notification_device_token=123456&mobile_type=android&google_id=2&first_name=abc&last_name=assd
+    -----------------------------------------------------------------------------------------------------
+    */
+    function google_login()
+    {
+          $login    = isset($_REQUEST['login']) ? $_REQUEST['login'] : "";
+          $notification_device_token = isset($_REQUEST['notification_device_token']) ? $_REQUEST['notification_device_token'] : "";
+          $mobile_type = isset($_REQUEST['mobile_type']) ? $_REQUEST['mobile_type'] : "";
+          $first_name = isset($_REQUEST['first_name']) ? $_REQUEST['first_name'] : "";
+           $last_name = isset($_REQUEST['last_name']) ? $_REQUEST['last_name'] : "";
+          $google_id = isset($_REQUEST['google_id']) ? $_REQUEST['google_id'] : "";
+        
+        
+        if ($login== "" or $google_id== "" or $notification_device_token=='' or $mobile_type=="" or $last_name=="" or $last_name=="" or $google_id=="") {
+            die(json_encode(array(
+                "status" => 0,
+                "message" => "Input parameters are not found"
+            )));
+            
+        } else {
+            
+            $login    = $_REQUEST['login'];
+            $result   = $this->user_model->google_login($login);
+            $result   = json_encode($result);
+            print_r($result);
+        }
+    }
+    
+
+
+
     
     /*
     ------------------------------------------------------------------------------------------------------------
@@ -2018,7 +2082,7 @@ class Webservice extends CI_Controller
                 
                 else {
                     $returnresult = array(
-                        'status' => 1,
+                        'status' => 0,
                         'message' => 'Record not  found'
                 
                     );
@@ -2228,7 +2292,6 @@ class Webservice extends CI_Controller
     function accept_emergency_request()
     
       {  
-        error_reporting( error_reporting() & ~E_NOTICE );
         $token         = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
         $emergency_notification_id       = isset($_REQUEST['emergency_notification_id']) ? $_REQUEST['emergency_notification_id'] : "";
        
@@ -2523,6 +2586,76 @@ class Webservice extends CI_Controller
             }
         }
      }
+
+      /*
+    -----------------------------------------------------------------------------------------------------
+    http://104.237.3.116/tap911/index.php/webservice/get_tap911_user_list?token=03ed32f30ee37fbb&user_id=77
+    -----------------------------------------------------------------------------------------------------
+    */
+    
+    function get_tap911_user_list()
+    {
+        
+        $token   = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+        $user_id = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
+        
+        if ($token == "" or $user_id == '') {
+            die(json_encode(array(
+                "status" => 0,
+                "message" => "Input parameters are not found"
+            )));
+            
+        } else {
+            $token = $_REQUEST['token'];
+            $user_id = $_REQUEST['user_id'];
+            $sql   = "SELECT token FROM tbl_user where token='$token' and user_id='$user_id'";
+            $res   = $this->db->query($sql);
+            $row   = $res->row();
+            if ($row) {
+                $json_data = $this->user_model->get_tap911_user_list($token,$user_id);
+                if ($json_data) {
+                    $arr = array();
+                    foreach ($json_data as $results) {
+                        $arr[] = array(
+                             'user_name' => $results->first_name." ".$results->last_name,
+                             'phone_number_text_msg' => $results->phone_number_text_msg
+                             // 'add_date' => $results->add_date
+                             
+                            
+                        );
+                    }
+                    $returnresult = array(
+                        'status' => 1,
+                        'message' => 'Record found',
+                        'emergency_user_list' => $arr
+                    );
+                    $response     = json_encode($returnresult);
+                    print_r($response);
+                }
+                
+                else {
+                    $returnresult = array(
+                        'status' => 1,
+                        'message' => 'Record not  found'
+                
+                    );
+                    $response     = json_encode($returnresult);
+                    print_r($response);
+                }
+                
+                
+            } else {
+                $returnresult = array(
+                    'status' => 0,
+                    'message' => 'Authentication failed'
+                );
+                $response     = json_encode($returnresult);
+                print_r($response);
+            }
+        }
+        
+    }
+    
 }
 /* End of file welcome.php */
 /* Location: ./application/controllers/welcome.php */
