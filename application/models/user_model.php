@@ -23,7 +23,7 @@ class User_model extends CI_Model
             $mobile_type               = $_REQUEST['mobile_type'];
             $data                      = array(
                 'token' => $token,
-                'notification_device_token' => $token,
+                'notification_device_token' => $notification_device_token,
                 'mobile_type' => $mobile_type
             );
             $this->db->where('user_id', $customer_id);
@@ -44,7 +44,129 @@ class User_model extends CI_Model
         }
         return $returnarray;
     }
+
+
+function facebook_login()
+    {
+         $login = $_REQUEST['login'];
+         $facebook_id = $_REQUEST['facebook_id'];
+        $sql = "SELECT user_name ,user_id, email FROM tbl_user where email = '$login' and facebook_id='$facebook_id' and status=1";
+        $res = $this->db->query($sql);
+        
+        if ($res->num_rows > 0 && $facebook_id!="") {
+            $row                       = $res->row();
+            $customer_id               = $row->user_id;
+            $tokens                    = openssl_random_pseudo_bytes(8);
+            $token                     = bin2hex($tokens);
+            $notification_device_token = $_REQUEST['notification_device_token'];
+            $mobile_type               = $_REQUEST['mobile_type'];
+            $data                      = array(
+                'token' => $token,
+                'notification_device_token' => $notification_device_token,
+                'mobile_type' => $mobile_type
+            );
+            $this->db->where('user_id', $customer_id);
+            $value       = $this->db->update('tbl_user', $data);
+            $returnarray = array(
+                'status' => 1,
+                'token' => $token,
+                'user_id' => $customer_id
+            );
+            
+            
+        } else {
+            $tokens                    = openssl_random_pseudo_bytes(8);
+             $token                     = bin2hex($tokens);
+            $notification_device_token = $_REQUEST['notification_device_token'];
+            $mobile_type               = $_REQUEST['mobile_type'];
+           $data = array(
+                    'facebook_id' =>  $facebook_id,
+                    'email' => $login,
+                    'first_name' => $_REQUEST['first_name'],
+                    'last_name' => $_REQUEST['last_name'],
+                    'token' => $token,
+                    'notification_device_token' => $_REQUEST['notification_device_token'],
+                    'mobile_type' => $_REQUEST['mobile_type'],
+                    'status' => 1
+                );
+                $data = $this->db->insert('tbl_user', $data);
+                $id   = $this->db->insert_id();
+                $sql = "SELECT token,user_id FROM tbl_user WHERE user_id ='" .  $id . "'";
+                $res = $this->db->query($sql);
+                 $row = $res->row();
+                $user_id      = $row->user_id;
+                $token = $row->token;
+                $returnarray = array(
+                'status' => 1,
+                'token' => $token,
+                'user_id' => $user_id
+            );
+        }
+        return $returnarray;
+    }
     
+    
+
+function google_login()
+    {
+         $login = $_REQUEST['login'];
+         $google_id = $_REQUEST['google_id'];
+        $sql = "SELECT user_name ,user_id, email FROM tbl_user where email = '$login' and google_id='$google_id'  and status=1";
+        $res = $this->db->query($sql);
+        
+        if ($res->num_rows > 0 &&  $google_id!="") {
+            $row                       = $res->row();
+            $customer_id               = $row->user_id;
+            $tokens                    = openssl_random_pseudo_bytes(8);
+            $token                     = bin2hex($tokens);
+            $notification_device_token = $_REQUEST['notification_device_token'];
+            $mobile_type               = $_REQUEST['mobile_type'];
+            $data                      = array(
+                'token' => $token,
+                'notification_device_token' => $notification_device_token,
+                'mobile_type' => $mobile_type
+            );
+            $this->db->where('user_id', $customer_id);
+            $value       = $this->db->update('tbl_user', $data);
+            $returnarray = array(
+                'status' => 1,
+                'token' => $token,
+                'user_id' => $customer_id
+            );
+            
+            
+        } else {
+            $tokens                    = openssl_random_pseudo_bytes(8);
+             $token                     = bin2hex($tokens);
+            $notification_device_token = $_REQUEST['notification_device_token'];
+            $mobile_type               = $_REQUEST['mobile_type'];
+           $data = array(
+                    'google_id' =>  $google_id,
+                    'email' => $login,
+                    'first_name' => $_REQUEST['first_name'],
+                    'last_name' => $_REQUEST['last_name'],
+                    'token' => $token,
+                    'notification_device_token' => $_REQUEST['notification_device_token'],
+                    'mobile_type' => $_REQUEST['mobile_type'],
+                    'status' => 1
+                );
+                $data = $this->db->insert('tbl_user', $data);
+                $id   = $this->db->insert_id();
+                $sql = "SELECT token,user_id FROM tbl_user WHERE user_id ='" .  $id . "'";
+                $res = $this->db->query($sql);
+                 $row = $res->row();
+                $user_id      = $row->user_id;
+                $token = $row->token;
+                $returnarray = array(
+                'status' => 1,
+                'token' => $token,
+                'user_id' => $user_id
+            );
+        }
+        return $returnarray;
+    }
+
+
     function user_registration()
     {
         
@@ -911,13 +1033,15 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'");
         // $query = $this->db->get();
         // return $query->result();
 
-          // $emergency_id = $_REQUEST['emergency_id'];
+        $user_id = $_REQUEST['user_id'];
         $this->db->select('tbl_emergency.*,tbl_user.*,tbl_emergency_notification.*');
         $this->db->from('tbl_emergency_notification');
         $this->db->join('tbl_user', 'tbl_user.user_id = tbl_emergency_notification.notification_user_id', 'left');
         $this->db->join('tbl_emergency', 'tbl_emergency.emergency_id = tbl_emergency_notification.emergency_id', 'left');
         $this->db->where('tbl_user.del_date', '0000-00-00 00:00:00');
+         $this->db->where('tbl_emergency_notification.emergency_status', '0');
          $this->db->where('tbl_user.status', 1);
+          $this->db->where('tbl_emergency_notification.notification_user_id',$user_id);
         $query = $this->db->get();
         //  echo $this->db->last_query();
         return $query->result();
@@ -950,7 +1074,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'");
             3956 * 2 * ASIN(SQRT( POWER(SIN(($user_lat -  tbl_user.user_lat) * pi()/180 / 2), 2) + COS($user_lat * pi()/180) * COS( tbl_user.user_lat * pi()/180) *
             POWER(SIN(($user_long - tbl_user.user_long) * pi()/180 / 2), 2) )) as
             distance FROM tbl_user
-             WHERE  tbl_user.user_id NOT IN ('" . $_REQUEST['user_id'] . "') and tbl_user.del_date='0000-00-00 00:00:00' and status=1 
+             WHERE  tbl_user.user_id NOT IN ('" . $_REQUEST['user_id'] . "')   
             GROUP BY tbl_user.user_id HAVING distance <= 5 ORDER by distance ASC");
         
         $resultdata     = $results->result_array();
@@ -1035,7 +1159,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'");
             POWER(SIN(($user_long -  $table.longitude) * pi()/180 / 2), 2) )) as
             distance FROM $table
              JOIN  tbl_user on tbl_user.user_id =   $table.user_id
-             WHERE  $table.add_date >= NOW() - INTERVAL 10 MINUTE and  $table.user_id NOT IN ('" . $_REQUEST['user_id'] . "') and tbl_user.del_date='0000-00-00 00:00:00' and status=1   
+             WHERE  $table.add_date >= NOW() - INTERVAL 10 MINUTE and  $table.user_id NOT IN ('" . $_REQUEST['user_id'] . "')   
             GROUP BY  $table.tracking_id HAVING distance <= 5 ORDER by distance ASC");
         $data   = $result->result_array();
         
@@ -1354,6 +1478,18 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'");
         //  echo $this->db->last_query();
         return $query->result();
         
+    }
+     function get_tap911_user_list()
+    {
+         $user_id = $_REQUEST['user_id'];
+        $this->db->select('tbl_user.*');
+        $this->db->from('tbl_user');
+        $this->db->where('status', 1);
+        $this->db->where('del_date', '0000-00-00 00:00:00');
+        $this->db->where_not_in('user_id', $user_id);
+        $this->db->order_by("user_id", "DESC");
+        $query = $this->db->get();
+        return $query->result();
     }
     
 }
