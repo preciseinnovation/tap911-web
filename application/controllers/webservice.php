@@ -2034,80 +2034,80 @@ class Webservice extends CI_Controller
     -----------------------------------------------------------------------------------------------------
     */
     
-    function get_emergency_user()
-    {
+    // function get_emergency_user()
+    // {
         
-        $token   = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
-        $user_id = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
+    //     $token   = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+    //     $user_id = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
         
-        if ($token == "" or $user_id == '') {
-            die(json_encode(array(
-                "status" => 0,
-                "message" => "Input parameters are not found"
-            )));
+    //     if ($token == "" or $user_id == '') {
+    //         die(json_encode(array(
+    //             "status" => 0,
+    //             "message" => "Input parameters are not found"
+    //         )));
             
-        } else {
-            $token = $_REQUEST['token'];
-            $user_id = $_REQUEST['user_id'];
-            $sql   = "SELECT token FROM tbl_user where token='$token' and user_id='$user_id'";
-            $res   = $this->db->query($sql);
-            $row   = $res->row();
-            if ($row) {
-                $json_data = $this->user_model->get_emergency_user($token,$user_id);
-                if ($json_data) {
-                    $arr = array();
-                    foreach ($json_data as $results) {
-                        $arr[] = array(
-                             'user_name' => $results->first_name." ".$results->last_name,
-                            'emergency_notification_id' => $results->emergency_notification_id,
-                            'emergency_id' => $results->emergency_id,
-                            'user_id' => $results->user_id,
-                            'emergency_latitude' => $results->emergency_latitude,
-                            'emergency_longitude' => $results->emergency_longitude,
-                            'emergency_address' => $results->emergency_address,
-                            'emergency_type' => $results->emergency_type,
-                            'add_date' => $results->add_date,
-                             'emergency_status' => $results->emergency_status
+    //     } else {
+    //         $token = $_REQUEST['token'];
+    //         $user_id = $_REQUEST['user_id'];
+    //         $sql   = "SELECT token FROM tbl_user where token='$token' and user_id='$user_id'";
+    //         $res   = $this->db->query($sql);
+    //         $row   = $res->row();
+    //         if ($row) {
+    //             $json_data = $this->user_model->get_emergency_user($token,$user_id);
+    //             if ($json_data) {
+    //                 $arr = array();
+    //                 foreach ($json_data as $results) {
+    //                     $arr[] = array(
+    //                          'user_name' => $results->first_name." ".$results->last_name,
+    //                         'emergency_notification_id' => $results->emergency_notification_id,
+    //                         'emergency_id' => $results->emergency_id,
+    //                         'user_id' => $results->user_id,
+    //                         'emergency_latitude' => $results->emergency_latitude,
+    //                         'emergency_longitude' => $results->emergency_longitude,
+    //                         'emergency_address' => $results->emergency_address,
+    //                         'emergency_type' => $results->emergency_type,
+    //                         'add_date' => $results->add_date,
+    //                          'emergency_status' => $results->emergency_status
                             
-                        );
-                    }
-                    $returnresult = array(
-                        'status' => 1,
-                        'message' => 'Record found',
-                        'emergency_user_list' => $arr
-                    );
-                    $response     = json_encode($returnresult);
-                    print_r($response);
-                }
+    //                     );
+    //                 }
+    //                 $returnresult = array(
+    //                     'status' => 1,
+    //                     'message' => 'Record found',
+    //                     'emergency_user_list' => $arr
+    //                 );
+    //                 $response     = json_encode($returnresult);
+    //                 print_r($response);
+    //             }
                 
-                else {
-                    $returnresult = array(
-                        'status' => 0,
-                        'message' => 'Record not  found'
+    //             else {
+    //                 $returnresult = array(
+    //                     'status' => 0,
+    //                     'message' => 'Record not  found'
                 
-                    );
-                    $response     = json_encode($returnresult);
-                    print_r($response);
-                }
+    //                 );
+    //                 $response     = json_encode($returnresult);
+    //                 print_r($response);
+    //             }
                 
                 
-            } else {
-                $returnresult = array(
-                    'status' => 0,
-                    'message' => 'Authentication failed'
-                );
-                $response     = json_encode($returnresult);
-                print_r($response);
-            }
-        }
+    //         } else {
+    //             $returnresult = array(
+    //                 'status' => 0,
+    //                 'message' => 'Authentication failed'
+    //             );
+    //             $response     = json_encode($returnresult);
+    //             print_r($response);
+    //         }
+    //     }
         
-    }
+    // }
     
    
     
     /*
     -----------------------------------------------------------------------------------------------------
-    http://104.237.3.116/tap911/index.php/webservice/add_emergency_user?token=03ed32f30ee37fbb&user_id=77&geo_lat=22.719569&geo_long=75.857726&radius=1.33356&geofence_name=abc&in_alert=1&out_alert=1&address=indore%20ab%20road&geo_type=qasd
+    http://104.237.3.116/tap911/index.php/webservice/add_emergency_user?token=03ed32f30ee37fbb&user_id=77&emergency_latitude=22.719569&geo_long=75.857726&emergency_longitude=1.33356&emergency_address=abc&in_alert=1&emergency_type=1
     -----------------------------------------------------------------------------------------------------
     */
     function add_emergency_user()
@@ -2655,7 +2655,109 @@ class Webservice extends CI_Controller
         }
         
     }
-    
+
+     function get_emergency_user(){
+
+    $user_id=$_REQUEST['user_id'];
+    $token=$_REQUEST['token'];
+    $token   = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+        $user_id = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
+        
+        if ($token == "" or $user_id == '') {
+            die(json_encode(array(
+                "status" => 0,
+                "message" => "Input parameters are not found"
+            )));
+            
+        }
+        else{
+
+           $sql   = "SELECT token FROM tbl_user where token='$token' and user_id='$user_id'";
+            $res   = $this->db->query($sql);
+            $row   = $res->row();
+     if ($row) {
+
+    $results = $this->db->query("SELECT * from tbl_emergency_notification where notification_user_id=$user_id and emergency_status=0");
+        
+        $resultdata     = $results->result_array();
+        $countvarresult = count($resultdata);
+       // $require        = array();
+        // $alert_type[] ='user';
+        for ($i = 0; $i < $countvarresult; $i++) {
+            //$alert_type ='user';
+            $id = $resultdata[$i]['emergency_id'];
+           $emergency_notification_id= $resultdata[$i]['emergency_notification_id'];
+             $emergency_status= $resultdata[$i]['emergency_status'];
+
+            $sql = "SELECT * FROM tbl_emergency WHERE `emergency_id` IN ('$id')";
+            $res = $this->db->query($sql);
+            $rows = $res->row();
+            $user_id = $rows->user_id;
+               $emergency_id = $rows->emergency_id;
+               $emergency_latitude = $rows->emergency_latitude;
+                $emergency_longitude = $rows->emergency_longitude;
+                $emergency_address = $rows->emergency_address;
+                $emergency_type = $rows->emergency_type;
+                $add_date = $rows->add_date;
+
+             $sql = "SELECT * FROM tbl_user WHERE `user_id` IN ('$user_id')";
+             $res = $this->db->query($sql);
+            $row = $res->row();
+            $first_name = $row->first_name;
+             $last_name = $row->last_name;
+            $user_name = $first_name." ".$last_name;
+             $returnresult1[] = array(
+                'emergency_notification_id' => $emergency_notification_id,
+                'user_name' => $user_name,
+                 'user_id' => $user_id,
+                'emergency_id' => $emergency_id,
+                'emergency_latitude' => $emergency_latitude,
+                'emergency_longitude' => $emergency_longitude,
+                'emergency_address' => $emergency_address,
+                'emergency_type' => $emergency_type,
+                'add_date' => $add_date,
+                'emergency_status' => $emergency_status
+            );
+
+
+          
+              $returnresult = array(
+                        'status' => 1,
+                        'message' => 'Record found',
+                        'emergency_user_list' => $returnresult1
+                    );
+
+           // $result = array_merge($returnresult1, $returnresult2);
+        }
+        if($returnresult1){
+   
+           $response  = json_encode($returnresult);
+           print_r($response);
+       }
+       
+         else {
+                    $returnresult = array(
+                        'status' => 1,
+                        'message' => 'Record not  found'
+                
+                    );
+                    $response     = json_encode($returnresult);
+                    print_r($response);
+              
+         }
+
+       }
+       else{
+
+         $returnresult = array(
+                    'status' => 0,
+                    'message' => 'Authentication failed'
+                );
+                $response     = json_encode($returnresult);
+                print_r($response);
+       }
+     }
+   }   
 }
 /* End of file welcome.php */
 /* Location: ./application/controllers/welcome.php */
