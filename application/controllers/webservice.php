@@ -913,14 +913,41 @@ class Webservice extends CI_Controller
             $row   = $res->row();
             if ($row) {
                 
-                $json_data2 = $this->user_model->get_community_emergency_list();
-                //$response = json_encode($response);
-                
-                
-                $arr2 = array();
-                
-                foreach ($json_data2 as $results2) {
-                    $community_id_my = $results2->community_id;
+              //  $json_data2 = $this->user_model->get_community_emergency_list();
+                 //$user_id=$_REQUEST['user_id'];
+           $results = $this->db->query("SELECT community_id from tbl_community_user_mapping where user_id=$user_id and request_status=1");
+         $resultdata     = $results->result_array();
+        $countvarresult = count($resultdata);
+       // $require        = array();
+        // $alert_type[] ='user';
+        for ($i = 0; $i < $countvarresult; $i++) {
+            //$alert_type ='user';
+            $id = $resultdata[$i]['community_id'];
+          // $result = $this->db->query("SELECT * FROM tbl_community WHERE `community_id` IN ($id)");
+          // $rows = $res->row();
+
+          // print_r($rows);
+
+
+          $sql = "SELECT * FROM tbl_community WHERE `community_id` IN ('$id')";
+            $res = $this->db->query($sql);
+            $rows = $res->row();
+           // $user_id = $rows->user_id;
+              $community_id_my = $rows->community_id;
+              $community_name = $rows->community_name;
+              $community_description = $rows->community_description;
+              $community_website = $rows->community_website;
+              $community_email = $rows->community_email;
+              $community_address = $rows->community_address;
+              $add_date = $rows->add_date;
+       //}  
+        // die();
+               // $arr2 = array();
+                //  $i=0;
+               // foreach ($rows as $results2) {
+                  //   $i++; 
+                   //// $community_id_my = $results2['community_id'];
+                    // $community_id_my = $results2->community_id;
                     // echo $community_id_my;
                     
                     $arra1 = array();
@@ -937,14 +964,14 @@ class Webservice extends CI_Controller
                     // }
                     //print_r($json_data);
                     foreach ($json_data as $results) {
-                        $arr1 = array(
-                            'community_emergency_number_id' => $results->community_emergency_number_id,
-                            
-                            'community_emergency_number' => $results->community_emergency_number,
-                            'community_emergency_number_type' => $results->community_emergency_number_type
-                        );
+                      // $arr1[] = array(
+                            $community_emergency_number_id = $results->community_emergency_number_id;
+                            // 
+                            $community_emergency_number = $results->community_emergency_number;
+                            $community_emergency_number_type = $results->community_emergency_number_type;
+                       // );
                         
-                        array_push($arra1, $arr1);
+                       // array_push($arra1, $arr1);
                     }
                           $logo=$results2->community_logo;
                           $path = base_url().'uploads/';
@@ -958,21 +985,23 @@ class Webservice extends CI_Controller
                          }
                     
                     $arr2[] = array(
-                        'community_name' => $results2->community_name,
-                        'community_id' => $results2->community_id,
-                        'community_description' => $results2->community_description,
+                        'community_name' => $community_name,
+                        'community_id' => $community_id_my,
+                        'community_description' => $community_description,
                         'community_logo' =>  $logos,
-                        'community_website' => $results2->community_website,
-                        'community_email' => $results2->community_email,
-                        'community_address' => $results2->community_address,
-                        'add_date' => $results2->add_date,
-                        'numbers' => $arra1
+                        'community_website' => $community_website,
+                        'community_email' => $community_email,
+                        'community_address' => $community_address,
+                        'add_date' => $add_date,
+                        'community_emergency_number_id' => $community_emergency_number_id,
+                        'community_emergency_number' => $community_emergency_number,
+                        'community_emergency_number_type' => $community_emergency_number_type
                         
                         
                     );
                     
                     //array_push($arr1, $arr2)
-                }
+                
                 
                 // $result = array_merge($arr1, $arr2);
                 $returnresult = array(
@@ -980,6 +1009,7 @@ class Webservice extends CI_Controller
                     'message' => 'Record found',
                     'all_record' => $arr2
                 );
+            }
                 $returnresult = json_encode($returnresult);
                 //  $returnresult2 = json_encode($arr2);
                 // $result = array_merge($returnresult, $returnresult2);
@@ -1282,13 +1312,13 @@ class Webservice extends CI_Controller
     function add_user_emergency_contact()
     {
         $token        = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
-        $name         = isset($_REQUEST['name']) ? $_REQUEST['name'] : "";
+        //$name         = isset($_REQUEST['name']) ? $_REQUEST['name'] : "";
         $user_id      = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
-        $description  = isset($_REQUEST['description']) ? $_REQUEST['description'] : "";
-        $phone_number = isset($_REQUEST['phone_number']) ? $_REQUEST['phone_number'] : "";
-        $tap911_user      = isset($_REQUEST['tap911_user']) ? $_REQUEST['tap911_user'] : "";
-        $country_code = isset($_REQUEST['country_code']) ? $_REQUEST['country_code'] : "";
-        if ($token == "" or $name == "" or $user_id == "" or $description == "" or $phone_number == "" or $country_code == "" or $tap911_user=="") {
+        //$description  = isset($_REQUEST['description']) ? $_REQUEST['description'] : "";
+       // $phone_number = isset($_REQUEST['phone_number']) ? $_REQUEST['phone_number'] : "";
+       // $tap911_user      = isset($_REQUEST['tap911_user']) ? $_REQUEST['tap911_user'] : "";
+       // $country_code = isset($_REQUEST['country_code']) ? $_REQUEST['country_code'] : "";
+        if ($token == "" or $user_id == "") {
             die(json_encode(array(
                 "status" => 0,
                 "message" => "Input parameters are not found"
@@ -2618,9 +2648,8 @@ class Webservice extends CI_Controller
                     foreach ($json_data as $results) {
                         $arr[] = array(
                              'user_name' => $results->first_name." ".$results->last_name,
-                             'phone_number_text_msg' => $results->phone_number_text_msg
-                             // 'add_date' => $results->add_date
-                             
+                             'phone_number_text_msg' => $results->phone_number_text_msg,
+                                'user_id' => $results->user_id
                             
                         );
                     }
