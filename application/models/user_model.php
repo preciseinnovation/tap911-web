@@ -470,9 +470,10 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'");
     function get_community_emergency_contact($community_ids)
     {
         $tmp_community_id = $community_ids;
+        //echo $tmp_community_id ;
         $this->db->select('tbl_community_emergency_number.*');
         $this->db->from('tbl_community_emergency_number');
-        $this->db->where('tbl_community_emergency_number.community_id', $tmp_community_id);
+        $this->db->where_in('tbl_community_emergency_number.community_id', $tmp_community_id);
 
         $query = $this->db->get();
         return $query->result();
@@ -482,11 +483,33 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'");
     function get_community_emergency_list()
     {
         
-        $this->db->select('tbl_community.*');
-        $this->db->from('tbl_community');
-        $query = $this->db->get();
-        return $query->result();
+          $user_id=$_REQUEST['user_id'];
+           $results = $this->db->query("SELECT community_id from tbl_community_user_mapping where user_id=$user_id and request_status=1");
+         $resultdata     = $results->result_array();
+        $countvarresult = count($resultdata);
+       // $require        = array();
+        // $alert_type[] ='user';
+        for ($i = 0; $i < $countvarresult; $i++) {
+            //$alert_type ='user';
+            $id = $resultdata[$i]['community_id'];
+          $result = $this->db->query("SELECT * FROM tbl_community WHERE `community_id` IN ($id)");
+      
+       }  
+
+
+       return $result->result();
+     
     }
+public function getCatDetails($id)
+{
+  //echo $id;die;  
+$result = $this->db->query("SELECT * FROM tbl_community WHERE `community_id` IN ($id)");
+  $results=$result->result();
+ $catInfo[] = count($results);
+ return $catInfo; 
+}
+
+
     function notification_setting()
     {
         $check = "SELECT * FROM  tbl_notification WHERE user_id ='" . $_REQUEST['user_id'] . "'";
@@ -753,17 +776,41 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'");
     }
     function add_user_emergency_contact()
     {
-        
+        $emergency_user_help_id=$_REQUEST['emergency_user_help_id'];
+        $values = explode(',', $emergency_user_help_id);
+
+         $check = "SELECT * FROM  tbl_user WHERE `user_id` IN ('$values')";
+        $results   = $this->db->query($check);
+           // $row  = $res->row();
+            //$first_name = $row->first_name;
+            //$last_name = $row->last_name;
+           // $name = $first_name." ".$last_name;
+
+         $resultdata     = $results->result_array();
+         $countvarresult = count($resultdata);
+       // $require        = array();
+        // $alert_type[] ='user';
+        // for ($i = 0; $i < $countvarresult; $i++) {
+        //     //$alert_type ='user';
+        //     $first_name = $resultdata[$i]['first_name'];
+        // }
+
+foreach ($values as $value)
+{
+
         $data = array(
             'user_id' => $_REQUEST['user_id'],
-            'name' => $_REQUEST['name'],
-            'description' => $_REQUEST['description'],
-            'phone_number' => $_REQUEST['phone_number'],
-            'tap911_user' => $_REQUEST['tap911_user'],
-            'country_code' => $_REQUEST['country_code'],
-            'status' => 1
+             // 'name' => $first_name,
+             'emergency_user_help_id' => $value
+            //'description' => $_REQUEST['description'],
+            //'phone_number' => $_REQUEST['phone_number'],
+            //'tap911_user' => $_REQUEST['tap911_user'],
+            //'country_code' => $_REQUEST['country_code'],
+            //'status' => 1
         );
         $data = $this->db->insert('tbl_emergency_contact', $data);
+    }
+
         if ($data) {
             $returnresult = array(
                 'status' => 1,
@@ -1096,8 +1143,8 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'");
             $sql = "SELECT * FROM tbl_user WHERE `user_id` IN ('$id')";
             $res = $this->db->query($sql);
             $row = $res->row();
-             print_r($row);
-             die();
+            // print_r($row);
+            // die();
             if ($row) {
                 $notification_device_token  =$row->notification_device_token;
                // print_r($notification_device_token);die();
@@ -1260,7 +1307,17 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'");
         for ($i = 0; $i < $countvar; $i++) {
             $value = $data[$i]['total'];
             
-        
+            
+            // if($value>=2){
+            
+            //           $returnresult = array(
+            //                'status' => 1,
+            //                'message' => 'Only two user allow accept request'
+            //                //'response'=>$require
+            //            );
+            
+            
+            //             }
             if ($value != 0 && $value >= 2) {
                 
                 
