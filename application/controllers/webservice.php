@@ -907,32 +907,24 @@ class Webservice extends CI_Controller
         } else {
              $token = $_REQUEST['token'];
              $user_id = $_REQUEST['user_id'];
-            //$community_id = $_REQUEST['community_id'];
             $sql   = "SELECT token FROM tbl_user where token='$token' and user_id=$user_id";
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
                 
-              //  $json_data2 = $this->user_model->get_community_emergency_list();
-                 //$user_id=$_REQUEST['user_id'];
+
            $results = $this->db->query("SELECT community_id from tbl_community_user_mapping where user_id=$user_id and request_status=1");
          $resultdata     = $results->result_array();
         $countvarresult = count($resultdata);
-       // $require        = array();
-        // $alert_type[] ='user';
+
+          $arr2 = array();
+          $arra1 = array();
         for ($i = 0; $i < $countvarresult; $i++) {
-            //$alert_type ='user';
+
             $id = $resultdata[$i]['community_id'];
-          // $result = $this->db->query("SELECT * FROM tbl_community WHERE `community_id` IN ($id)");
-          // $rows = $res->row();
-
-          // print_r($rows);
-
-
           $sql = "SELECT * FROM tbl_community WHERE `community_id` IN ('$id')";
             $res = $this->db->query($sql);
             $rows = $res->row();
-           // $user_id = $rows->user_id;
               $community_id_my = $rows->community_id;
               $community_name = $rows->community_name;
               $community_description = $rows->community_description;
@@ -940,38 +932,25 @@ class Webservice extends CI_Controller
               $community_email = $rows->community_email;
               $community_address = $rows->community_address;
               $add_date = $rows->add_date;
-       //}  
-        // die();
-               // $arr2 = array();
-                //  $i=0;
-               // foreach ($rows as $results2) {
-                  //   $i++; 
-                   //// $community_id_my = $results2['community_id'];
-                    // $community_id_my = $results2->community_id;
-                    // echo $community_id_my;
-                    
-                    $arra1 = array();
-                    
-                    $json_data = $this->user_model->get_community_emergency_contact($community_id_my);
+
+                      $arr1 = array();
+        
+                    $json_data = $this->user_model->get_community_emergency_contact($id);
                     if ($json_data == '') {
                         $returnresult = array(
                             'status' => 0,
                             'message' => 'No record found'
                         );
                     }
-                    // elseif($json_data){
-                    //    $returnresult = array('status' => 1, 'message' => 'Record found');
-                    // }
-                    //print_r($json_data);
                     foreach ($json_data as $results) {
-                      // $arr1[] = array(
-                            $community_emergency_number_id = $results->community_emergency_number_id;
+                      $arr1[] = array(
+                            'community_emergency_number_id' => $results->community_emergency_number_id,
                             // 
-                            $community_emergency_number = $results->community_emergency_number;
-                            $community_emergency_number_type = $results->community_emergency_number_type;
-                       // );
+                            'community_emergency_number' => $results->community_emergency_number,
+                            'community_emergency_number_type' => $results->community_emergency_number_type
+                       );
                         
-                       // array_push($arra1, $arr1);
+                        array_push($arra1, $arr1);
                     }
                           $logo=$results2->community_logo;
                           $path = base_url().'uploads/';
@@ -993,27 +972,21 @@ class Webservice extends CI_Controller
                         'community_email' => $community_email,
                         'community_address' => $community_address,
                         'add_date' => $add_date,
-                        'community_emergency_number_id' => $community_emergency_number_id,
-                        'community_emergency_number' => $community_emergency_number,
-                        'community_emergency_number_type' => $community_emergency_number_type
+                        'number' =>$arr1
                         
                         
                     );
                     
-                    //array_push($arr1, $arr2)
-                
-                
-                // $result = array_merge($arr1, $arr2);
-                $returnresult = array(
+            
+            }
+            
+
+            $returnresult = array(
                     'status' => 1,
                     'message' => 'Record found',
                     'all_record' => $arr2
                 );
-            }
                 $returnresult = json_encode($returnresult);
-                //  $returnresult2 = json_encode($arr2);
-                // $result = array_merge($returnresult, $returnresult2);
-                //  $data = json_encode($arr);
                 print_r($returnresult);
             }
             
@@ -1305,20 +1278,20 @@ class Webservice extends CI_Controller
     
     /*
     ----------------------------------------------------------------------------------------------------------
-    http://104.237.3.116/tap911/index.php/webservice/add_user_emergency_contact?token=dd088bfaaaf468cb&user_id=1&name=devandra&description=anywhere%20contect%20me&phone_number=1234567&country_code=12345
+    http://104.237.3.116/tap911/index.php/webservice/add_user_emergency_contact?token=2386f8654def0a2b&user_id=1&emergency_user_help_id=77,94&tap911_user=1
     -----------------------------------------------------------------------------------------------------------
     */
     
     function add_user_emergency_contact()
     {
         $token        = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
-        //$name         = isset($_REQUEST['name']) ? $_REQUEST['name'] : "";
+//        $name         = isset($_REQUEST['name']) ? $_REQUEST['name'] : "";
         $user_id      = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
-        //$description  = isset($_REQUEST['description']) ? $_REQUEST['description'] : "";
-       // $phone_number = isset($_REQUEST['phone_number']) ? $_REQUEST['phone_number'] : "";
-       // $tap911_user      = isset($_REQUEST['tap911_user']) ? $_REQUEST['tap911_user'] : "";
-       // $country_code = isset($_REQUEST['country_code']) ? $_REQUEST['country_code'] : "";
-        if ($token == "" or $user_id == "") {
+       $emergency_user_help_id  = isset($_REQUEST['emergency_user_help_id']) ? $_REQUEST['emergency_user_help_id'] : "";
+//        $phone_number = isset($_REQUEST['phone_number']) ? $_REQUEST['phone_number'] : "";
+       $tap911_user      = isset($_REQUEST['tap911_user']) ? $_REQUEST['tap911_user'] : "";
+//        $country_code = isset($_REQUEST['country_code']) ? $_REQUEST['country_code'] : "";
+        if ($token == "" or $user_id == "" or $tap911_user=="" or $emergency_user_help_id=="" ) {
             die(json_encode(array(
                 "status" => 0,
                 "message" => "Input parameters are not found"
@@ -1326,8 +1299,7 @@ class Webservice extends CI_Controller
             
         } else {
             $token = $_REQUEST['token'];
-            $user_id = $_REQUEST['user_id'];
-            $sql   = "SELECT token FROM tbl_user where token='$token' and user_id=$user_id";
+            $sql   = "SELECT * FROM tbl_user where token='$token'";
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
@@ -1337,14 +1309,13 @@ class Webservice extends CI_Controller
             } else {
                 $returnresult = array(
                     'status' => 0,
-                    'message' => 'Authentication failed'
+                    'message' => 'Token mismatch'
                 );
                 $response     = json_encode($returnresult);
                 print_r($response);
             }
         }
     }
-    
     /*
     -----------------------------------------------------------------------------------------------------------
     http://104.237.3.116/tap911/index.php/webservice/update_user_emergency_contact?token=dd088bfaaaf468cb&emergency_contact_id=1&name=govind&description=anywhere%20contect%20me&phone_number=1234567&country_code=12345
@@ -2786,7 +2757,78 @@ class Webservice extends CI_Controller
                 print_r($response);
        }
      }
-   }   
+   } 
+
+
+
+/*
+    
+    http://104.237.3.116/tap911/index.php/webservice/get_community_contact?token=8ff636448bae3be3&user_id=45
+    
+    */
+    
+    function get_community_contact()
+    {
+        
+        $token   = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+        $user_id = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
+        
+        
+        
+        if ($token == "" or $user_id == "") {
+            die(json_encode(array(
+                "status" => 0,
+                "message" => "Input parameters are not found"
+            )));
+            
+        } else {
+            $token = $_REQUEST['token'];
+             $user_id = $_REQUEST['user_id'];
+            $sql   = "SELECT token FROM tbl_user where token='$token' and user_id='$user_id'";
+            $res   = $this->db->query($sql);
+            $row   = $res->row();
+            if ($row) {
+                $json_data = $this->user_model->get_community_contact($token);
+                if ($json_data) {
+                    $arr = array();
+                    foreach ($json_data as $results) {
+                        $arr[] = array(
+                             
+                           'community_emergency_number_id' => $results->community_emergency_number_id,
+                           'community_emergency_number' => $results->community_emergency_number,
+                           'community_emergency_number_type' => $results->community_emergency_number_type
+                            
+                        );
+                    }
+                    $returnresult = array(
+                        'status' => 1,
+                        'message' => 'Record found',
+                        'notification' => $arr
+                    );
+                    $response     = json_encode($returnresult);
+                    print_r($response);
+                }
+                
+                else {
+                    $returnresult = array(
+                        'status' => 0,
+                        'message' => 'Record  not found'
+                    );
+                    $response     = json_encode($returnresult);
+                    print_r($response);
+                }
+                
+            } else {
+                $returnresult = array(
+                    'status' => 0,
+                    'message' => 'Authentication failed'
+                );
+                $response     = json_encode($returnresult);
+                print_r($response);
+            }
+        }
+    }
+
 }
 /* End of file welcome.php */
 /* Location: ./application/controllers/welcome.php */
