@@ -389,7 +389,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'");
     function user_comment_communitywise()
     {
         $data = array(
-            'comment_user_id' => $_REQUEST['comment_user_id'],
+            'comment_user_id' => $_REQUEST['user_id'],
             'community_id' => $_REQUEST['community_id'],
             'comment_text' => $_REQUEST['comment_text'],
             'status' => 1
@@ -467,11 +467,11 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'");
     }
     
     
-    function get_community_emergency_contact($community_ids)
+    function get_community_emergency_contact($id)
     {
-        $tmp_community_id = $community_ids;
+        $tmp_community_id = $id;
         //echo $tmp_community_id ;
-        $this->db->select('tbl_community_emergency_number.*');
+        $this->db->select('community_emergency_number_id,community_emergency_number,community_emergency_number_type');
         $this->db->from('tbl_community_emergency_number');
         $this->db->where_in('tbl_community_emergency_number.community_id', $tmp_community_id);
 
@@ -658,16 +658,16 @@ $result = $this->db->query("SELECT * FROM tbl_community WHERE `community_id` IN 
                 'last_name' => $_REQUEST['last_name'],
                 'email' => $_REQUEST['email'],
                 'language' => $_REQUEST['language'],
-                'phone_number_text_msg_country_code' => $_REQUEST['phone_number_text_msg_country_code'],
-                'phone_number_text_msg' => $_REQUEST['phone_number_text_msg'],
-                'phone_number_voice_notification_country_code' => $_REQUEST['phone_number_voice_notification_country_code'],
-                'phone_number_voice_notification' => $_REQUEST['phone_number_voice_notification'],
+                // 'phone_number_text_msg_country_code' => $_REQUEST['phone_number_text_msg_country_code'],
+                'phone_number_text_msg' => $_REQUEST['phone_number'],
+                // 'phone_number_voice_notification_country_code' => $_REQUEST['phone_number_voice_notification_country_code'],
+                // 'phone_number_voice_notification' => $_REQUEST['phone_number_voice_notification'],
                 'medical_history' => $_REQUEST['medical_history'],
                 'medication_instraction' => $_REQUEST['medication_instraction'],
                 'allergies' => $_REQUEST['allergies'],
                 'special_need' => $_REQUEST['special_need'],
-                'user_lat' => $_REQUEST['user_lat'],
-                'user_long' => $_REQUEST['user_long']
+                // 'user_lat' => $_REQUEST['user_lat'],
+                // 'user_long' => $_REQUEST['user_long']
             );
             $this->db->where('user_id', $user_id);
             $data = $this->db->update('tbl_user', $data);
@@ -686,41 +686,44 @@ $result = $this->db->query("SELECT * FROM tbl_community WHERE `community_id` IN 
             return $returnresult;
         }
     }
-    // function update_profile_picture()
-    // {
+    function update_profile_picture()
+    {
         
-    //     $check = "SELECT * FROM tbl_user WHERE user_id ='" . $_REQUEST['user_id'] . "'";
-    //     $res   = $this->db->query($check);
-    //     if ($res->num_rows > 0) {
-    //         $row         = $res->row();
-    //         $user_id         = $res->user_id;
-    //         $target      = "./uploads/";
-    //         $target      = $target . basename($_FILES['profile_pic']['name']);
-    //         $profile_pic = ($_FILES['profile_pic']['name']);
-    //         if (move_uploaded_file($_FILES['profile_pic']['tmp_name'], $target)) {
-                
-    //             $data = array(
-    //                 'user_id' => $_REQUEST['user_id'],
-    //                 'profile_pic' => $profile_pic
-    //             );
-    //             $this->db->where('user_id', $user_id);
-    //             $data = $this->db->update('tbl_user', $data);
-    //             if ($data) {
-    //                 $returnresult = array(
-    //                     'status' => 1,
-    //                     'message' => 'User profile picture update successfully'
-    //                 );
-    //             }
-    //         } else {
-    //             $returnresult = array(
-    //                 'status' => 0,
-    //                 'message' => 'Some data not valid'
-    //             );
-    //         }
-    //        return $returnresult;
-    //     }
+        $check = "SELECT * FROM tbl_user WHERE user_id ='" . $_REQUEST['user_id'] . "'";
+        $res   = $this->db->query($check);
+        if ($res->num_rows > 0) {
+            $row         = $res->row();
+            $user_id         = $row->user_id;
+          //  echo $user_id;
+            $target      = "./uploads/";
+            $target      = $target . basename($_FILES['profile_pic']['name']);
+            $profile_pic = ($_FILES['profile_pic']['name']);
 
-    // }
+           // echo  $profile_pic;
+            if (move_uploaded_file($_FILES['profile_pic']['tmp_name'], $target)) {
+               // echo  $profile_pic;
+                $data = array(
+                    // 'user_id' => $_REQUEST['user_id'],
+                    'profile_pic' => $profile_pic
+                );
+                $this->db->where('user_id', $user_id);
+                $data = $this->db->update('tbl_user', $data);
+                if ($data) {
+                    $returnresult = array(
+                        'status' => 1,
+                        'message' => 'User profile picture update successfully'
+                    );
+                }
+            } else {
+                $returnresult = array(
+                    'status' => 0,
+                    'message' => 'Some data not valid'
+                );
+            }
+           return $returnresult;
+        }
+
+    }
     function update_home_address()
     {
         
@@ -774,47 +777,49 @@ $result = $this->db->query("SELECT * FROM tbl_community WHERE `community_id` IN 
         }
         return $returnresult;
     }
-    function add_user_emergency_contact()
+    
+function add_user_emergency_contact()
     {
-        $emergency_user_help_id=$_REQUEST['emergency_user_help_id'];
-        $values = explode(',', $emergency_user_help_id);
-
-         $check = "SELECT * FROM  tbl_user WHERE `user_id` IN ('$values')";
-        $results   = $this->db->query($check);
-           // $row  = $res->row();
-            //$first_name = $row->first_name;
-            //$last_name = $row->last_name;
-           // $name = $first_name." ".$last_name;
-
-         $resultdata     = $results->result_array();
-         $countvarresult = count($resultdata);
-       // $require        = array();
-        // $alert_type[] ='user';
-        // for ($i = 0; $i < $countvarresult; $i++) {
-        //     //$alert_type ='user';
-        //     $first_name = $resultdata[$i]['first_name'];
-        // }
-
-foreach ($values as $value)
+        
+        
+        $tap911_user = $_REQUEST['tap911_user'];
+         $emergency_user_help_id = $_REQUEST['emergency_user_help_id'];
+        $user_id = $_REQUEST['user_id'];
+        
+         $values = explode(',', $emergency_user_help_id);
+        
+       foreach($values as $value){
+           
+                   $emergency_user_help_id = $value;
+       
+            $result = $this->db->query("SELECT * FROM tbl_user WHERE user_id IN ('$emergency_user_help_id')") ;
+            //$res   = $this->db->query($result);
+//            echo "SELECT * FROM  tbl_user WHERE user_id IN ('$emergency_user_help_id')";
+             $data=$result->result_array();
+             
+             $countvar = count($data);
+        
+//            $require=array();
+           // $alert_type[] ='user';
+for($i=0; $i<$countvar; $i++)
 {
-
-        $data = array(
-            'user_id' => $_REQUEST['user_id'],
-             // 'name' => $first_name,
-             'emergency_user_help_id' => $value
-            //'description' => $_REQUEST['description'],
-            //'phone_number' => $_REQUEST['phone_number'],
-            //'tap911_user' => $_REQUEST['tap911_user'],
-            //'country_code' => $_REQUEST['country_code'],
-            //'status' => 1
-        );
-        $data = $this->db->insert('tbl_emergency_contact', $data);
-    }
-
-        if ($data) {
+                   //$alert_type ='user';
+                   $firstname = $data[$i]['first_name'];
+                   $last_name = $data[$i]['last_name'];
+                   $phone_number = $data[$i]['phone_number_text_msg'];
+                   $name = $firstname." ".$last_name; 
+            // echo $user_name;die();
+        
+        $SQL ="insert into tbl_emergency_contact(user_id,emergency_user_help_id,name,phone_number,tap911_user)
+            values('$user_id','$emergency_user_help_id','$name','$phone_number','$tap911_user')";
+                   $res = mysql_query($SQL);
+          
+           }  
+       }
+        if ($res) {
             $returnresult = array(
                 'status' => 1,
-                'message' => 'User contact successfully submit'
+                'message' => 'User emergency contact successfully submit'
             );
         } else {
             $returnresult = array(
@@ -825,6 +830,7 @@ foreach ($values as $value)
         
         return $returnresult;
     }
+
     
     function update_user_emergency_contact()
     {
@@ -1210,6 +1216,7 @@ foreach ($values as $value)
              JOIN  tbl_user on tbl_user.user_id =   $table.user_id
              WHERE  $table.add_date >= NOW() - INTERVAL 10 MINUTE and  $table.user_id NOT IN ('" . $_REQUEST['user_id'] . "')   
             GROUP BY  $table.tracking_id HAVING distance <= 5 ORDER by distance ASC");
+       
         $datas   = $result->result_array();
         $countvars = count($datas);
         $require  = array();
@@ -1287,7 +1294,6 @@ foreach ($values as $value)
         
         return $returnresult;
     }
-    
     
     
     function accept_emergency_request()
@@ -1531,16 +1537,93 @@ foreach ($values as $value)
     }
      function get_tap911_user_list()
     {
-         $user_id = $_REQUEST['user_id'];
-        $this->db->select('tbl_user.*');
-        $this->db->from('tbl_user');
-        $this->db->where('status', 1);
-        $this->db->where('del_date', '0000-00-00 00:00:00');
-        $this->db->where_not_in('user_id', $user_id);
-        $this->db->order_by("user_id", "DESC");
+
+        $user_id = $_REQUEST['user_id'];
+        $result = $this->db->query("SELECT emergency_user_help_id,user_id FROM tbl_emergency_contact WHERE user_id='$user_id'") ;
+        $data=$result->result_array();
+        $countvar = count($data);
+        $arrayName = array();
+        for($i=0; $i<$countvar; $i++)
+       {
+            
+          $emergency_user_help_id = $data[$i]['emergency_user_help_id'];
+
+         $arr = array($emergency_user_help_id);
+           
+          $arr[0];
+          array_push($arrayName, $arr[0]);
+       
+      }
+          $result = implode(",", $arrayName);
+
+          if($result){
+            $query = $this->db->query("SELECT * FROM `tbl_user` WHERE user_id NOT IN($result) and user_id NOT IN($user_id)");
+           $data=$query->result();
+            }
+            else{
+             $query = $this->db->query("SELECT * FROM `tbl_user` WHERE  user_id NOT IN($user_id)");
+           $data=$query->result();
+
+            }
+        return $data;
+
+    }
+
+ function get_community_contact()
+    {
+        $community_id = $_REQUEST['community_id'];
+        $this->db->select('tbl_community_emergency_number.*');
+        $this->db->from('tbl_community_emergency_number');
+        $this->db->where('tbl_community_emergency_number.community_id', $community_id);
         $query = $this->db->get();
         return $query->result();
     }
 
+ 
+    
+ function add_other_emergency_contact()
+    {
+$check = "SELECT * FROM tbl_emergency_contact WHERE user_id ='" . $_REQUEST['user_id'] . "' and emergency_user_help_id ='0' and phone_number ='" . $_REQUEST['phone_number'] . "' ";
+        $rs    = mysql_query($check);
+        $data  = mysql_fetch_array($rs);
+        if ($data[0] > 1) {
+            $returnresult = array(
+                'status' => 0,
+                'message' => 'User contact in Exists'
+            );
+        } else {
+         if(!is_numeric($_REQUEST['phone_number']))
+                 {
+                    $returnresult = die(json_encode(array(
+                        "status" => 0,
+                        "message" => "Please Enter number only"
+                    )));
+                }
+        $data = array(
+            'user_id' => $_REQUEST['user_id'],
+            'tap911_user' => $_REQUEST['tap911_user'],
+             'emergency_user_help_id' => 0,
+              'name' => $_REQUEST['name'],
+            'description' => $_REQUEST['description'],
+            'phone_number' => $_REQUEST['phone_number'],
+            'country_code' => $_REQUEST['country_code'],
+            'status' => 1
+        );
+        $data = $this->db->insert('tbl_emergency_contact', $data);
+        if ($data) {
+            $returnresult = array(
+                'status' => 1,
+                'message' => 'User contact successfully submit'
+            );
+        } else {
+            $returnresult = array(
+                'status' => 0,
+                'message' => 'Some data not valid'
+            );
+        }
+    }
+        
+        return $returnresult;
+    }
     
 }
