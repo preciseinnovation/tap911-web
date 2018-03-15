@@ -8,6 +8,9 @@ class User_model extends CI_Model
         parent::__construct();
     }
     
+
+/*-------------------------------user login----------------------------------------------- */
+
     function checklogin($login, $password)
     {
         
@@ -45,6 +48,8 @@ class User_model extends CI_Model
         return $returnarray;
     }
 
+
+/*-------------------------------feacbook login----------------------------------------------- */
 
 function facebook_login()
     {
@@ -107,6 +112,9 @@ function facebook_login()
     
     
 
+  /*-------------------------------google login----------------------------------------------- */
+    
+
 function google_login()
     {
          $login = $_REQUEST['login'];
@@ -165,6 +173,9 @@ function google_login()
         }
         return $returnarray;
     }
+
+
+/*-------------------------------user registration----------------------------------------------- */
 
 
     function user_registration()
@@ -271,6 +282,11 @@ function google_login()
         //}
         return $returnresult;
     }
+
+
+
+/*-------------------------------get community list ----------------------------------------------- */
+
     
     function get_community()
     {
@@ -281,7 +297,11 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'");
         return $result->result();
     }
     
+
     
+/*-------------------------------request community by user ----------------------------------------------- */
+
+
     function user_community_request()
     {
         $sql = "SELECT community_id,user_id FROM tbl_community_user_mapping WHERE community_id ='" . $_REQUEST['community_id'] . "' and user_id ='" . $_REQUEST['user_id'] . "' ";
@@ -349,124 +369,115 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'");
         
         return $returnresult;
     }
-    // function get_user_message()
+  
+  /*-------------------------------change functinalty code----------------------------------------------- */
+    
+    // function user_comment_alertwise()
+    // {
+    //     $data = array(
+    //         'comment_user_id' => $_REQUEST['comment_user_id'],
+    //         'alert_id' => $_REQUEST['alert_id'],
+    //         'comment_text' => $_REQUEST['comment_text'],
+    //         'status' => 1
+    //     );
+    //     $data = $this->db->insert('tbl_comment', $data);
+    //     if ($data) {
+    //         $returnresult = array(
+    //             'status' => 1,
+    //             'message' => 'User comment successfully submit'
+    //         );
+    //     } else {
+    //         $returnresult = array(
+    //             'status' => 0,
+    //             'message' => 'Some data not valid'
+    //         );
+    //     }
+        
+    //     return $returnresult;
+    // }
+    // function user_comment_communitywise()
+    // {
+    //     $data = array(
+    //         'comment_user_id' => $_REQUEST['user_id'],
+    //         'community_id' => $_REQUEST['community_id'],
+    //         'comment_text' => $_REQUEST['comment_text'],
+    //         'status' => 1
+    //     );
+    //     $data = $this->db->insert('tbl_comment', $data);
+    //     if ($data) {
+    //         $returnresult = array(
+    //             'status' => 1,
+    //             'message' => 'User comment successfully submit'
+    //         );
+    //     } else {
+    //         $returnresult = array(
+    //             'status' => 0,
+    //             'message' => 'Some data not valid'
+    //         );
+    //     }
+        
+    //     return $returnresult;
+    // }
+    
+    
+    // function get_comment_communitywise($limit, $start = 100)
+    // {
+    //     $community_id = $_REQUEST['community_id'];
+    //      $user_id = $_REQUEST['user_id'];
+    //     $this->db->select('tbl_user.*,tbl_user.user_id,tbl_comment.*');
+    //     $this->db->from('tbl_comment');
+    //     $this->db->join('tbl_user', 'tbl_user.user_id = tbl_comment.comment_user_id', 'RIGHT');
+    //     $this->db->join('tbl_community', 'tbl_community.community_id = tbl_comment.community_id', 'RIGHT');
+    //     $this->db->limit($limit, $start);
+    //     $this->db->where('tbl_comment.community_id', $community_id);
+    //     $this->db->where('tbl_user.user_id', $user_id);
+    //     $query = $this->db->get();
+    //     return $query->result();
+    // }
+    
+    // function get_comment_alertwise()
+    // {
+    //     $alert_id = $_REQUEST['alert_id'];
+    //     $user_id = $_REQUEST['user_id'];
+    //     $this->db->select('tbl_user.*,tbl_comment.*');
+    //     $this->db->from('tbl_comment');
+    //     $this->db->join('tbl_user', 'tbl_user.user_id = tbl_comment.comment_user_id', 'INNER');
+    //     $this->db->join('tbl_alert', 'tbl_alert.alert_id = tbl_comment.alert_id', 'INNER');
+    //     $this->db->where('tbl_alert.alert_id', $alert_id);
+    //      $this->db->where('tbl_user.user_id', $user_id);
+    //     $this->db->group_by('comment_id');
+    //     $query = $this->db->get();
+    //     return $query->result();
+    // }
+    
+    // function get_alert_communitywise()
     // {
     //     $user_id = $_REQUEST['user_id'];
-    //     $this->db->select('tbl_user.user_id,tbl_community_user_mapping.user_id,tbl_community_user_mapping.status,tbl_community.*');
-    //     $this->db->from('tbl_community_user_mapping');
-    //     $this->db->join('tbl_user', 'tbl_user.user_id = tbl_community_user_mapping.user_id', 'INNER');
-    //     $this->db->join('tbl_community', 'tbl_community.community_id = tbl_community_user_mapping.community_id', 'INNER');
-    //     $this->db->where('tbl_community_user_mapping.status', 1);
-    //     $this->db->where('tbl_community_user_mapping.user_id', $user_id);
+    //     $this->db->select('tbl_user.*,tbl_user.user_id,tbl_alert.user_id,tbl_alert.*,tbl_community.*');
+    //     $this->db->from('tbl_alert');
+    //     $this->db->join('tbl_user', 'tbl_user.user_id = tbl_alert.user_id', 'INNER');
+    //     $this->db->join('tbl_community', 'tbl_community.community_id = tbl_alert.community_id', 'INNER');
+    //      $this->db->where('tbl_user.user_id', $user_id);
+    //     $query = $this->db->get();
+    //     return $query->result();
+    // }
+    
+    // function get_user_alert($limit, $start = 50)
+    // {
+    //     $user_id = $_REQUEST['user_id'];
+    //     $this->db->select('tbl_user.*,tbl_user.user_id,tbl_alert.user_id,tbl_alert.*,tbl_community.*,tbl_alert.status as userstatus');
+    //     $this->db->from('tbl_alert');
+    //     $this->db->join('tbl_user', 'tbl_user.user_id = tbl_alert.user_id', 'left');
+    //     $this->db->join('tbl_community', 'tbl_community.community_id = tbl_alert.community_id', 'left');
+    //      $this->db->limit($limit, $start);
+    //     $this->db->where('tbl_alert.user_id', $user_id);
     //     $query = $this->db->get();
     //     return $query->result();
     // }
     
     
-    function user_comment_alertwise()
-    {
-        $data = array(
-            'comment_user_id' => $_REQUEST['comment_user_id'],
-            'alert_id' => $_REQUEST['alert_id'],
-            'comment_text' => $_REQUEST['comment_text'],
-            'status' => 1
-        );
-        $data = $this->db->insert('tbl_comment', $data);
-        if ($data) {
-            $returnresult = array(
-                'status' => 1,
-                'message' => 'User comment successfully submit'
-            );
-        } else {
-            $returnresult = array(
-                'status' => 0,
-                'message' => 'Some data not valid'
-            );
-        }
-        
-        return $returnresult;
-    }
-    function user_comment_communitywise()
-    {
-        $data = array(
-            'comment_user_id' => $_REQUEST['user_id'],
-            'community_id' => $_REQUEST['community_id'],
-            'comment_text' => $_REQUEST['comment_text'],
-            'status' => 1
-        );
-        $data = $this->db->insert('tbl_comment', $data);
-        if ($data) {
-            $returnresult = array(
-                'status' => 1,
-                'message' => 'User comment successfully submit'
-            );
-        } else {
-            $returnresult = array(
-                'status' => 0,
-                'message' => 'Some data not valid'
-            );
-        }
-        
-        return $returnresult;
-    }
-    
-    
-    function get_comment_communitywise($limit, $start = 100)
-    {
-        $community_id = $_REQUEST['community_id'];
-         $user_id = $_REQUEST['user_id'];
-        $this->db->select('tbl_user.*,tbl_user.user_id,tbl_comment.*');
-        $this->db->from('tbl_comment');
-        $this->db->join('tbl_user', 'tbl_user.user_id = tbl_comment.comment_user_id', 'RIGHT');
-        $this->db->join('tbl_community', 'tbl_community.community_id = tbl_comment.community_id', 'RIGHT');
-        $this->db->limit($limit, $start);
-        $this->db->where('tbl_comment.community_id', $community_id);
-        $this->db->where('tbl_user.user_id', $user_id);
-        $query = $this->db->get();
-        return $query->result();
-    }
-    
-    function get_comment_alertwise()
-    {
-        $alert_id = $_REQUEST['alert_id'];
-        $user_id = $_REQUEST['user_id'];
-        $this->db->select('tbl_user.*,tbl_comment.*');
-        $this->db->from('tbl_comment');
-        $this->db->join('tbl_user', 'tbl_user.user_id = tbl_comment.comment_user_id', 'INNER');
-        $this->db->join('tbl_alert', 'tbl_alert.alert_id = tbl_comment.alert_id', 'INNER');
-        $this->db->where('tbl_alert.alert_id', $alert_id);
-         $this->db->where('tbl_user.user_id', $user_id);
-        $this->db->group_by('comment_id');
-        $query = $this->db->get();
-        return $query->result();
-    }
-    
-    function get_alert_communitywise()
-    {
-        $user_id = $_REQUEST['user_id'];
-        $this->db->select('tbl_user.*,tbl_user.user_id,tbl_alert.user_id,tbl_alert.*,tbl_community.*');
-        $this->db->from('tbl_alert');
-        $this->db->join('tbl_user', 'tbl_user.user_id = tbl_alert.user_id', 'INNER');
-        $this->db->join('tbl_community', 'tbl_community.community_id = tbl_alert.community_id', 'INNER');
-         $this->db->where('tbl_user.user_id', $user_id);
-        $query = $this->db->get();
-        return $query->result();
-    }
-    
-    function get_user_alert($limit, $start = 50)
-    {
-        $user_id = $_REQUEST['user_id'];
-        $this->db->select('tbl_user.*,tbl_user.user_id,tbl_alert.user_id,tbl_alert.*,tbl_community.*,tbl_alert.status as userstatus');
-        $this->db->from('tbl_alert');
-        $this->db->join('tbl_user', 'tbl_user.user_id = tbl_alert.user_id', 'left');
-        $this->db->join('tbl_community', 'tbl_community.community_id = tbl_alert.community_id', 'left');
-         $this->db->limit($limit, $start);
-        $this->db->where('tbl_alert.user_id', $user_id);
-        $query = $this->db->get();
-        return $query->result();
-    }
-    
-    
+/*-------------------------------get_community_emergency_contact list ----------------------------------------------- */
+
     function get_community_emergency_contact($id)
     {
         $tmp_community_id = $id;
@@ -480,6 +491,11 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'");
         
         
     }
+
+
+/*-------------------------------get_community_emergency_list ----------------------------------------------- */
+
+
     function get_community_emergency_list()
     {
         
@@ -500,14 +516,8 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'");
        return $result->result();
      
     }
-public function getCatDetails($id)
-{
-  //echo $id;die;  
-$result = $this->db->query("SELECT * FROM tbl_community WHERE `community_id` IN ($id)");
-  $results=$result->result();
- $catInfo[] = count($results);
- return $catInfo; 
-}
+
+/*-------------------------------notification_setting ----------------------------------------------- */
 
 
     function notification_setting()
@@ -614,6 +624,11 @@ $result = $this->db->query("SELECT * FROM tbl_community WHERE `community_id` IN 
         
         return $returnresult;
     }
+
+
+
+/*-------------------------------set_notification_tone----------------------------------------------- */
+
     
     function set_notification_tone()
     {
@@ -644,6 +659,8 @@ $result = $this->db->query("SELECT * FROM tbl_community WHERE `community_id` IN 
     }
     
     
+/*-------------------------------update_profile----------------------------------------------- */
+
     function update_profile()
     {
         $check = "SELECT * FROM  tbl_user WHERE user_id ='" . $_REQUEST['user_id'] . "'";
@@ -686,6 +703,10 @@ $result = $this->db->query("SELECT * FROM tbl_community WHERE `community_id` IN 
             return $returnresult;
         }
     }
+
+
+/*-------------------------------update_profile_picture----------------------------------------------- */
+
     function update_profile_picture()
     {
         
@@ -724,6 +745,11 @@ $result = $this->db->query("SELECT * FROM tbl_community WHERE `community_id` IN 
         }
 
     }
+
+
+/*-------------------------------update_home_address----------------------------------------------- */
+
+
     function update_home_address()
     {
         
@@ -778,6 +804,10 @@ $result = $this->db->query("SELECT * FROM tbl_community WHERE `community_id` IN 
         return $returnresult;
     }
     
+
+/*-------------------------------add_user_emergency_contact----------------------------------------------- */
+
+
 function add_user_emergency_contact()
     {
         
@@ -831,6 +861,9 @@ for($i=0; $i<$countvar; $i++)
         return $returnresult;
     }
 
+
+/*-------------------------------update_user_emergency_contact with community----------------------------------------------- */
+
     
     function update_user_emergency_contact()
     {
@@ -867,6 +900,11 @@ for($i=0; $i<$countvar; $i++)
             return $returnresult;
         
     }
+
+
+/*-------------------------------get_home_address----------------------------------------------- */
+
+
     function get_home_address()
     {
         $user_id = $_REQUEST['user_id'];
@@ -881,6 +919,12 @@ for($i=0; $i<$countvar; $i++)
         return $query->result();
         
     }
+
+
+/*-------------------------------get_emergency_contact----------------------------------------------- */
+
+
+
     function get_emergency_contact()
     {
         $user_id = $_REQUEST['user_id'];
@@ -892,6 +936,9 @@ for($i=0; $i<$countvar; $i++)
         return $query->result();
         
     }
+
+/*-------------------------------get_user_profiledata----------------------------------------------- */
+
     function get_user_profiledata()
     {
         $user_id = $_REQUEST['user_id'];
@@ -902,6 +949,8 @@ for($i=0; $i<$countvar; $i++)
         return $query->result();
     }
     
+/*-------------------------------get_notification_setting----------------------------------------------- */
+
     function get_notification_setting()
     {
         $user_id = $_REQUEST['user_id'];
@@ -912,7 +961,7 @@ for($i=0; $i<$countvar; $i++)
         return $query->result();
     }
     
-    
+ /*-------------------------------get_country_emergency_number----------------------------------------------- */
     
     function get_country_emergency_number()
     {
@@ -923,6 +972,9 @@ for($i=0; $i<$countvar; $i++)
         $query = $this->db->get();
         return $query->result();
     }
+
+ /*-------------------------------get_country_emergency_number_with_token----------------------------------------------- */
+
     function get_country_emergency_number_with_token()
     {
         $this->db->select('tbl_country.*');
@@ -932,7 +984,10 @@ for($i=0; $i<$countvar; $i++)
         $query = $this->db->get();
         return $query->result();
     }
-    
+
+     /*-------------------------------add_emergency_tracking----------------------------------------------- */
+
+
     function add_emergency_tracking()
     {
         
@@ -1005,6 +1060,10 @@ for($i=0; $i<$countvar; $i++)
         }
     }
     
+
+   /*-------------------------------get emergency tracking list----------------------------------------------- */
+
+
     function get_emergency_tracking()
     {
         $this->db->select('tbl_emergency.*');
@@ -1014,6 +1073,9 @@ for($i=0; $i<$countvar; $i++)
         $query = $this->db->get();
         return $query->result();
     }
+
+    /*-------------------------------get state list----------------------------------------------- */
+
     function get_state()
     {
         $this->db->select('tbl_state.*');
@@ -1023,6 +1085,10 @@ for($i=0; $i<$countvar; $i++)
         $query = $this->db->get();
         return $query->result();
     }
+
+
+    /*-------------------------------get city list----------------------------------------------- */
+
     function get_city()
     {
         $this->db->select('tbl_city.*');
@@ -1032,11 +1098,13 @@ for($i=0; $i<$countvar; $i++)
         $query = $this->db->get();
         return $query->result();
     }
+
+    /*-------------------------------delete user from user list----------------------------------------------- */
+
     function delete_user()
     {
         $user_id = $_REQUEST['user_id'];
-        //$this->db->where('user_id', $user_id);
-       // $data = $this->db->delete('tbl_user');
+
          $data = array(
                 
                 'status' => 0
@@ -1056,6 +1124,12 @@ for($i=0; $i<$countvar; $i++)
         }
         return $returnresult;
     }
+
+
+    
+/*-------------------------------delete emergency contact list----------------------------------------------- */
+
+
     function delete_emergency_contact()
     {
         $emergency_contact_id = $_REQUEST['emergency_contact_id'];
@@ -1077,33 +1151,8 @@ for($i=0; $i<$countvar; $i++)
     
     
     
-    // function get_emergency_user()
-    // {
-    //     // $user_id = $_REQUEST['user_id'];
-    //     // $this->db->select('tbl_emergency.*');
-    //     // $this->db->from('tbl_emergency');
-    //     // $this->db->where('user_id', $user_id);
-    //     // $query = $this->db->get();
-    //     // return $query->result();
+/*-------------------------------emergency create by user ----------------------------------------------- */
 
-    //      $user_id = $_REQUEST['user_id'];
-    //     $this->db->select('tbl_emergency.*,tbl_user.*,tbl_emergency_notification.*');
-    //     $this->db->from('tbl_emergency_notification');
-    //     $this->db->join('tbl_user', 'tbl_user.user_id = tbl_emergency_notification.notification_user_id', 'left');
-    //     $this->db->join('tbl_emergency', 'tbl_emergency.emergency_id = tbl_emergency_notification.emergency_id', 'left');
-    //     $this->db->where('tbl_user.del_date', '0000-00-00 00:00:00');
-    //     $this->db->where('tbl_emergency_notification.emergency_status', '0');
-    //      $this->db->where('tbl_user.status', 1);
-    //      $this->db->where_not_in('tbl_user.user_id', $user_id);
-    //       //$this->db->where('tbl_emergency_notification.emergency_id',$emergency_id);
-    //     $query = $this->db->get();
-    //     //  echo $this->db->last_query();
-    //     return $query->result();
-
-    // }
-    
-    
-    
     
     function add_emergency_user()
     {
@@ -1122,7 +1171,8 @@ for($i=0; $i<$countvar; $i++)
         $ids  = $this->db->insert_id();
         
         
-        // /* user notify */
+    /*-------------------------------start register user notfication ----------------------------------------------- */
+
         
         $results = $this->db->query("SELECT user_id,first_name,user_lat,user_long,
             3956 * 2 * ASIN(SQRT( POWER(SIN(($user_lat -  tbl_user.user_lat) * pi()/180 / 2), 2) + COS($user_lat * pi()/180) * COS( tbl_user.user_lat * pi()/180) *
@@ -1132,6 +1182,8 @@ for($i=0; $i<$countvar; $i++)
             GROUP BY tbl_user.user_id HAVING distance <= 5 ORDER by distance ASC");
         
         $resultdata     = $results->result_array();
+        if($resultdata){
+
         $countvarresult = count($resultdata);
         $require        = array();
         // $alert_type[] ='user';
@@ -1197,8 +1249,20 @@ for($i=0; $i<$countvar; $i++)
                 );
             }
         }
+    }else{
+
+        $address=file_get_contents("http://maps.googleapis.com/maps/api/geocode/json?latlng=$user_lat,$user_long&sensor=true");
+
+          $returnresult = array(
+            'status' => 1,
+            'data' =>  $address,
+            'message' => 'No user in range'
+            
+        );
+    }
         
-        /*  end user */
+/*-------------------------------register user notfication end start 3 miles user notification----------------------------------------------- */
+
         
         if (!ini_get('date.timezone')) {
             date_default_timezone_set('UTC');
@@ -1218,6 +1282,10 @@ for($i=0; $i<$countvar; $i++)
             GROUP BY  $table.tracking_id HAVING distance <= 5 ORDER by distance ASC");
        
         $datas   = $result->result_array();
+    
+       if($datas){
+
+
         $countvars = count($datas);
         $require  = array();
         // $alert_type[] ='user';
@@ -1284,7 +1352,24 @@ for($i=0; $i<$countvar; $i++)
                 );
             }
         }
-        
+    }
+
+
+
+    else{
+
+        $address=file_get_contents("http://maps.googleapis.com/maps/api/geocode/json?latlng=$user_lat,$user_long&sensor=true");
+
+          $returnresult = array(
+            'status' => 1,
+            'data' =>  $address,
+            'message' => 'No user in range'
+            
+        );
+    }
+     
+    /*-------------------------------end 3 miles user notification----------------------------------------------- */    
+
         $returnresult = array(
             'status' => 1,
             'data' => $require,
@@ -1296,6 +1381,10 @@ for($i=0; $i<$countvar; $i++)
     }
     
     
+
+      /*-------------------------------accept_emergency_request----------------------------------------------- */
+
+
     function accept_emergency_request()
     {
         $emergency_notification_id = $_REQUEST['emergency_notification_id'];
@@ -1436,6 +1525,9 @@ for($i=0; $i<$countvar; $i++)
         return $returnresult;
     }
     
+
+ /*-------------------------------get_emergency_live_location----------------------------------------------- */
+
     
     function get_emergency_live_location()
     {
@@ -1461,6 +1553,9 @@ for($i=0; $i<$countvar; $i++)
     }
     
     
+ /*-------------------------------get_user_type----------------------------------------------- */
+
+
     function get_user_type()
     {
         $this->db->select('*');
@@ -1468,6 +1563,10 @@ for($i=0; $i<$countvar; $i++)
         $query = $this->db->get();
         return $query->result();
     }
+
+
+ /*-------------------------------add_community_communitaction----------------------------------------------- */
+
     
     function add_community_communitaction()
     {
@@ -1477,6 +1576,8 @@ for($i=0; $i<$countvar; $i++)
             'to_user_id' => $_REQUEST['to_user_id'],
             'community_id' => $_REQUEST['community_id'],
             'message_data' => $_REQUEST['message_data'],
+            'msg_type' => $_REQUEST['msg_type'],
+            
             'status' => 1
         );
         $data = $this->db->insert('tbl_community_communitaction', $data);
@@ -1495,6 +1596,8 @@ for($i=0; $i<$countvar; $i++)
         return $returnresult;
     }
     
+
+ /*-------------------------------add_emergency_communitaction----------------------------------------------- */
     
     function add_emergency_communitaction()
     {
@@ -1521,6 +1624,8 @@ for($i=0; $i<$countvar; $i++)
         return $returnresult;
     }
     
+
+    /*-------------------------------get_emergancy_communication----------------------------------------------- */
     
     function get_emergancy_communication()
     {
@@ -1535,6 +1640,30 @@ for($i=0; $i<$countvar; $i++)
         return $query->result();
         
     }
+
+
+  /*-------------------------------get_community_communication----------------------------------------------- */
+
+
+    function get_community_communication($limit, $start = 100)
+    {
+         $from_user_id =$_REQUEST['from_user_id'];
+         $to_user_id = $_REQUEST['to_user_id'];
+         $community_id = $_REQUEST['community_id'];
+        $this->db->select('*');
+        $this->db->from('tbl_community_communitaction');
+        $this->db->limit($limit, $start);
+        $this->db->where('tbl_community_communitaction.from_user_id', $from_user_id);
+        $this->db->where('tbl_community_communitaction.to_user_id', $to_user_id);
+        $this->db->where('tbl_community_communitaction.community_id', $community_id);
+        $query = $this->db->get();
+        return $query->result();
+    }
+
+
+      /*-------------------------------get_tap911_user_list----------------------------------------------- */
+
+
      function get_tap911_user_list()
     {
 
@@ -1569,6 +1698,9 @@ for($i=0; $i<$countvar; $i++)
 
     }
 
+    /*-------------------------------get_community_contact----------------------------------------------- */
+
+
  function get_community_contact()
     {
         $community_id = $_REQUEST['community_id'];
@@ -1579,7 +1711,9 @@ for($i=0; $i<$countvar; $i++)
         return $query->result();
     }
 
- 
+
+ /*-------------------------------add_other_emergency_contact----------------------------------------------- */
+
     
  function add_other_emergency_contact()
     {
