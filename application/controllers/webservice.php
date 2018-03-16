@@ -913,7 +913,7 @@ class Webservice extends CI_Controller
             if ($row) {
                 
 
-           $results = $this->db->query("SELECT community_id from tbl_community_user_mapping where user_id=$user_id and request_status=1");
+           $results = $this->db->query("SELECT community_id from tbl_community_user_mapping where user_id=$user_id and request_status =3");
          $resultdata     = $results->result_array();
         $countvarresult = count($resultdata);
 
@@ -2520,8 +2520,7 @@ class Webservice extends CI_Controller
         
          $token = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
          $from_user_id = isset($_REQUEST['from_user_id']) ? $_REQUEST['from_user_id'] : "";
-          $limit = isset($_REQUEST['limit']) ? $_REQUEST['limit'] : "";
-        if ($token == "") {
+        if ($token == "" or $from_user_id=="") {
             die(json_encode(array(
                 "status" => 0,
                 "message" => "Input parameters are not found"
@@ -2530,12 +2529,12 @@ class Webservice extends CI_Controller
         } else {
             $token = $_REQUEST['token'];
             $from_user_id = $_REQUEST['from_user_id'];
-            $limit = $_REQUEST['limit'];
-            $sql   = "SELECT token FROM tbl_user where token='$token' and user_id=$from_user_id";
+            // $limit = $_REQUEST['limit'];
+            $sql   = "SELECT token,user_id FROM tbl_user where token='$token' and user_id='$from_user_id'";
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
-                $response = $this->user_model->get_community_communication($token, $limit);
+                $response = $this->user_model->get_community_communication($token);
                 if ($response) {
                     $arr = array();
                     foreach ($response as $results) {
@@ -2919,7 +2918,18 @@ class Webservice extends CI_Controller
              $last_name = $rows->last_name;
             $user_name = $first_name." ".$last_name;
 
-            $sql = "SELECT latitude,longitude FROM tbl_tracking WHERE `user_id` IN('$id')";
+
+            if (!ini_get('date.timezone')) {
+            date_default_timezone_set('UTC');
+             }
+        $dateValue = date("Y-m-d H:i:s");
+        $time      = strtotime($dateValue);
+        $month     = date("F", $time);
+        $year      = date("Y", $time);
+        $table     = "tbl_tracking" . '_' . $month . '_' . $year;
+
+
+            $sql = "SELECT latitude,longitude FROM  $table  WHERE `user_id` IN('$id')";
             $res = $this->db->query($sql);
             $rows = $res->row();
             $latitude = $rows->latitude;
