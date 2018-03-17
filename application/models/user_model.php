@@ -1129,13 +1129,22 @@ for($i=0; $i<$countvar; $i++)
     
     // /*-------------------------------send notification emergency contact----------------------------------------------- */
 
-function send_notification_emegrency_contact($ids)
+public function send_notification_emegrency_contact($ids,$user_lat,$user_long)
 {
             $ids = $ids;
+            $user_lat = $user_lat;
+            $user_long = $user_long;
             $sql   = "SELECT * FROM tbl_emergency where emergency_id='$ids'";
             $res   = $this->db->query($sql);
             $row   = $res->row();
            $emuserid = $row->user_id;
+           $sql = "SELECT * FROM tbl_user WHERE `user_id`='$emuserid'";
+            $resultdata = $this->db->query($sql);
+            $resultdata = $resultdata->row();
+            $first_name  =$resultdata->first_name;
+            $last_name  =$resultdata->last_name;
+            $user_names = $first_name." ". $last_name;
+               // print_r($notification_device_token);die();
 
            $results = $this->db->query("SELECT * from tbl_emergency_contact where user_id='$emuserid'");
            $remergencycontact     = $results->result_array();
@@ -1144,6 +1153,9 @@ function send_notification_emegrency_contact($ids)
         for ($j = 0; $j < $countvarresults; $j++) {
            
               $id = $remergencycontact[$j]['emergency_user_help_id'];
+
+               if($id){
+
            
             $SQL        = "insert into tbl_emergency_notification(notification_user_id,emergency_id)values('$id','$ids')";
             $res        = mysql_query($SQL);
@@ -1154,18 +1166,22 @@ function send_notification_emegrency_contact($ids)
 
          //  print_r($result);
 
-            if ($row) {
-              echo $mobile_type = $rows->mobile_type;
-              echo  $notification_device_token = $rows->notification_device_token;
-                $ch   = curl_init("https://fcm.googleapis.com/fcm/send");
+            if ($result) {
+               $notification_device_token  =$result->notification_device_token;
+                 $first_name  =$result->first_name;
+                 $last_name  =$result->last_name;
+                 $user_name = $first_name." ". $last_name;
+               // print_r($notification_device_token);die();
+                $mobile_type =$result->mobile_type;
+                $ch          = curl_init("https://fcm.googleapis.com/fcm/send");
                 
                 $usertoken    = $notification_device_token;
-                $title        = "tap911";
-                $body         = "This is test message from tap911.";
+                $title        = "hello i am"." ".$user_names;
+                $body         = $user_name." "."Please help me";
                 $notification = array(
                     'title' => $title,
-                    'text' => $body,
-                    'emergency_notification_id' => $emergency_notification_id
+                    'text' => $body
+                    // 'emergency_notification_id' => $emergency_notification_id
                 );
                 $arrayToSend  = array(
                     'to' => $usertoken,
@@ -1179,7 +1195,7 @@ function send_notification_emegrency_contact($ids)
                 if ($mobile_type == 'android') {
                     $headers[] = 'Authorization: key= AIzaSyC5Z-wS9-IFx4nVCAfMjF9v7MwBQQR_5kw'; // key here
                 } else {
-                    $headers[] = 'Authorization: key= AIzaSyC5Z-wS9-IFx4nVCAfMjF9v7MwBQQR_5kw'; // key here
+                    $headers[] = 'Authorization: key= AIzaSyAkPpQ-GiN4GVSjniMyHuSwXJVekEL7FWk'; // key here
                 }
                 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
                 curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
@@ -1191,11 +1207,9 @@ function send_notification_emegrency_contact($ids)
                 if ($mobile_type == 'android' || $mobile_type == 'ios') {
                     
                 }
-                
            }
 
-     }
-          $returnresult = array(
+           $returnresult = array(
                             'status' => 1,
                             'data' => $require,
                            'message' => 'success'
@@ -1203,13 +1217,30 @@ function send_notification_emegrency_contact($ids)
         );
         
         return $returnresult;
+       } else{
+
+$address=file_get_contents("http://maps.googleapis.com/maps/api/geocode/json?latlng=$user_lat,$user_long&sensor=true");
+
+          $returnresult = array(
+            'status' => 1,
+            'data' =>  $address,
+            'message' => 'No user in range'
+            
+        );
+
+ }
+
+     }
+
+
+          
 
 }
 
 
 
 
-function send_miles_notification($ids,$user_lat,$user_long){
+public function send_miles_notification($ids,$user_lat,$user_long){
 
     /*-------------------------------register user notfication end start 3 miles user notification----------------------------------------------- */
 
@@ -1287,7 +1318,7 @@ function send_miles_notification($ids,$user_lat,$user_long){
                 if ($mobile_type == 'android') {
                     $headers[] = 'Authorization: key= AIzaSyC5Z-wS9-IFx4nVCAfMjF9v7MwBQQR_5kw'; // key here
                 } else {
-                    $headers[] = 'Authorization: key= AIzaSyC5Z-wS9-IFx4nVCAfMjF9v7MwBQQR_5kw'; // key here
+                    $headers[] = 'Authorization: key= AIzaSyAkPpQ-GiN4GVSjniMyHuSwXJVekEL7FWk'; // key here
                 }
                 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
                 curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
@@ -1307,6 +1338,14 @@ function send_miles_notification($ids,$user_lat,$user_long){
                 );
             }
         }
+         $returnresult = array(
+                            'status' => 1,
+                            'data' => $require,
+                           'message' => 'success'
+            
+        );
+        
+        return $returnresult;
 
     }
 
@@ -1321,12 +1360,13 @@ function send_miles_notification($ids,$user_lat,$user_long){
             
         );
     }
+    
 }
 
 /*-------------------------------emergency create by user ----------------------------------------------- */
 
     
-    function add_emergency_user()
+    public function add_emergency_user()
     {
         $user_lat  = $_REQUEST['emergency_latitude'];
         $user_long = $_REQUEST['emergency_longitude'];
@@ -1342,8 +1382,11 @@ function send_miles_notification($ids,$user_lat,$user_long){
         $data = $this->db->insert('tbl_emergency', $data);
         $ids  = $this->db->insert_id();
 
-         $this->send_miles_notification($ids,$user_lat,$user_long);
-          $this->send_notification_emegrency_contact($ids);
+        $register =  $this->send_miles_notification($ids,$user_lat,$user_long);
+         $temp = $this->send_notification_emegrency_contact($ids,$user_lat,$user_long);
+
+              return  $temp;
+              return  $register;
    
        //echo  $temp; die();
 
@@ -1407,7 +1450,7 @@ function send_miles_notification($ids,$user_lat,$user_long){
                 if ($mobile_type == 'android') {
                     $headers[] = 'Authorization: key= AIzaSyC5Z-wS9-IFx4nVCAfMjF9v7MwBQQR_5kw'; // key here
                 } else {
-                    $headers[] = 'Authorization: key= AIzaSyC5Z-wS9-IFx4nVCAfMjF9v7MwBQQR_5kw'; // key here
+                    $headers[] = 'Authorization: key= AIzaSyAkPpQ-GiN4GVSjniMyHuSwXJVekEL7FWk'; // key here
                 }
                 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
                 curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
@@ -1549,7 +1592,7 @@ function send_miles_notification($ids,$user_lat,$user_long){
                     if ($mobile_type == 'android') {
                         $headers[] = 'Authorization: key= AIzaSyC5Z-wS9-IFx4nVCAfMjF9v7MwBQQR_5kw'; // key here
                     } else {
-                        $headers[] = 'Authorization: key= AIzaSyC5Z-wS9-IFx4nVCAfMjF9v7MwBQQR_5kw'; // key here
+                        $headers[] = 'Authorization: key= AIzaSyAkPpQ-GiN4GVSjniMyHuSwXJVekEL7FWk'; // key here
                     }
                     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
                     curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
