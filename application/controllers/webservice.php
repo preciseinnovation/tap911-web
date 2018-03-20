@@ -22,13 +22,13 @@ class Webservice extends CI_Controller
     */
     function checklogin()
     {
-          $login    = isset($_REQUEST['login']) ? $_REQUEST['login'] : "";
-          $password = isset($_REQUEST['password']) ? $_REQUEST['password'] : "";
-          $notification_device_token = isset($_REQUEST['notification_device_token']) ? $_REQUEST['notification_device_token'] : "";
-          $mobile_type = isset($_REQUEST['mobile_type']) ? $_REQUEST['mobile_type'] : "";
+        $login                     = isset($_REQUEST['login']) ? $_REQUEST['login'] : "";
+        $password                  = isset($_REQUEST['password']) ? $_REQUEST['password'] : "";
+        $notification_device_token = isset($_REQUEST['notification_device_token']) ? $_REQUEST['notification_device_token'] : "";
+        $mobile_type               = isset($_REQUEST['mobile_type']) ? $_REQUEST['mobile_type'] : "";
         
         
-        if ($login == "" or $password == "" or $notification_device_token=='' or $mobile_type=="") {
+        if ($login == "" or $password == "" or $notification_device_token == '' or $mobile_type == "") {
             die(json_encode(array(
                 "status" => 0,
                 "message" => "Input parameters are not found"
@@ -44,23 +44,23 @@ class Webservice extends CI_Controller
         }
     }
     
-
-  /*
+    
+    /*
     ------------------------------------------------------------------------------------------------------
     http://104.237.3.116/tap911/index.php/webservice/facebook_login?login=sbsgroup@gmail.com&notification_device_token=123456&mobile_type=android&facebook_id&first_name=abc&last_name=assd
     -----------------------------------------------------------------------------------------------------
     */
     function facebook_login()
     {
-          $login    = isset($_REQUEST['login']) ? $_REQUEST['login'] : "";
-          $notification_device_token = isset($_REQUEST['notification_device_token']) ? $_REQUEST['notification_device_token'] : "";
-          $mobile_type = isset($_REQUEST['mobile_type']) ? $_REQUEST['mobile_type'] : "";
-          $first_name = isset($_REQUEST['first_name']) ? $_REQUEST['first_name'] : "";
-           $last_name = isset($_REQUEST['last_name']) ? $_REQUEST['last_name'] : "";
-          $facebook_id = isset($_REQUEST['facebook_id']) ? $_REQUEST['facebook_id'] : "";
+        $login                     = isset($_REQUEST['login']) ? $_REQUEST['login'] : "";
+        $notification_device_token = isset($_REQUEST['notification_device_token']) ? $_REQUEST['notification_device_token'] : "";
+        $mobile_type               = isset($_REQUEST['mobile_type']) ? $_REQUEST['mobile_type'] : "";
+        $first_name                = isset($_REQUEST['first_name']) ? $_REQUEST['first_name'] : "";
+        $last_name                 = isset($_REQUEST['last_name']) ? $_REQUEST['last_name'] : "";
+        $facebook_id               = isset($_REQUEST['facebook_id']) ? $_REQUEST['facebook_id'] : "";
         
         
-        if ($login == "" or $facebook_id == "" or $notification_device_token=='' or $mobile_type=="" or $last_name=="" or $last_name=="" or $facebook_id=="") {
+        if ($login == "" or $facebook_id == "" or $notification_device_token == '' or $mobile_type == "" or $last_name == "" or $last_name == "" or $facebook_id == "") {
             die(json_encode(array(
                 "status" => 0,
                 "message" => "Input parameters are not found"
@@ -68,29 +68,29 @@ class Webservice extends CI_Controller
             
         } else {
             
-            $login    = $_REQUEST['login'];
-            $result   = $this->user_model->facebook_login($login);
-            $result   = json_encode($result);
+            $login  = $_REQUEST['login'];
+            $result = $this->user_model->facebook_login($login);
+            $result = json_encode($result);
             print_r($result);
         }
     }
     
-/*
+    /*
     ------------------------------------------------------------------------------------------------------
     http://104.237.3.116/tap911/index.php/webservice/google_login?login=sbsgroup@gmail.com&notification_device_token=123456&mobile_type=android&google_id=2&first_name=abc&last_name=assd
     -----------------------------------------------------------------------------------------------------
     */
     function google_login()
     {
-          $login    = isset($_REQUEST['login']) ? $_REQUEST['login'] : "";
-          $notification_device_token = isset($_REQUEST['notification_device_token']) ? $_REQUEST['notification_device_token'] : "";
-          $mobile_type = isset($_REQUEST['mobile_type']) ? $_REQUEST['mobile_type'] : "";
-          $first_name = isset($_REQUEST['first_name']) ? $_REQUEST['first_name'] : "";
-           $last_name = isset($_REQUEST['last_name']) ? $_REQUEST['last_name'] : "";
-          $google_id = isset($_REQUEST['google_id']) ? $_REQUEST['google_id'] : "";
+        $login                     = isset($_REQUEST['login']) ? $_REQUEST['login'] : "";
+        $notification_device_token = isset($_REQUEST['notification_device_token']) ? $_REQUEST['notification_device_token'] : "";
+        $mobile_type               = isset($_REQUEST['mobile_type']) ? $_REQUEST['mobile_type'] : "";
+        $first_name                = isset($_REQUEST['first_name']) ? $_REQUEST['first_name'] : "";
+        $last_name                 = isset($_REQUEST['last_name']) ? $_REQUEST['last_name'] : "";
+        $google_id                 = isset($_REQUEST['google_id']) ? $_REQUEST['google_id'] : "";
         
         
-        if ($login== "" or $google_id== "" or $notification_device_token=='' or $mobile_type=="" or $last_name=="" or $last_name=="" or $google_id=="") {
+        if ($login == "" or $google_id == "" or $notification_device_token == '' or $mobile_type == "" or $last_name == "" or $last_name == "" or $google_id == "") {
             die(json_encode(array(
                 "status" => 0,
                 "message" => "Input parameters are not found"
@@ -98,16 +98,16 @@ class Webservice extends CI_Controller
             
         } else {
             
-            $login    = $_REQUEST['login'];
-            $result   = $this->user_model->google_login($login);
-            $result   = json_encode($result);
+            $login  = $_REQUEST['login'];
+            $result = $this->user_model->google_login($login);
+            $result = json_encode($result);
             print_r($result);
         }
     }
     
-
-
-
+    
+    
+    
     
     /*
     ------------------------------------------------------------------------------------------------------------
@@ -117,21 +117,21 @@ class Webservice extends CI_Controller
     function user_registration()
     {
         
-        $first_name                                   = isset($_REQUEST['first_name']) ? $_REQUEST['first_name'] : "";
-        $last_name                                    = isset($_REQUEST['last_name']) ? $_REQUEST['last_name'] : "";
-        $user_name                                    = isset($_REQUEST['user_name']) ? $_REQUEST['user_name'] : "";
-        $email                                        = isset($_REQUEST['email']) ? $_REQUEST['email'] : "";
-         $user_type_id                                        = isset($_REQUEST['user_type_id']) ? $_REQUEST['user_type_id'] : "";
-        $country_id           = isset($_REQUEST['country_id']) ? $_REQUEST['country_id'] : "";
-        $phone_number                        = isset($_REQUEST['phone_number']) ? $_REQUEST['phone_number'] : "";
+        $first_name                = isset($_REQUEST['first_name']) ? $_REQUEST['first_name'] : "";
+        $last_name                 = isset($_REQUEST['last_name']) ? $_REQUEST['last_name'] : "";
+        $user_name                 = isset($_REQUEST['user_name']) ? $_REQUEST['user_name'] : "";
+        $email                     = isset($_REQUEST['email']) ? $_REQUEST['email'] : "";
+        $user_type_id              = isset($_REQUEST['user_type_id']) ? $_REQUEST['user_type_id'] : "";
+        $country_id                = isset($_REQUEST['country_id']) ? $_REQUEST['country_id'] : "";
+        $phone_number              = isset($_REQUEST['phone_number']) ? $_REQUEST['phone_number'] : "";
         // $phone_number_voice_notification_country_code = isset($_REQUEST['phone_number_voice_notification_country_code']) ? $_REQUEST['phone_number_voice_notification_country_code'] : "";
         // $phone_number_voice_notification              = isset($_REQUEST['phone_number_voice_notification']) ? $_REQUEST['phone_number_voice_notification'] : "";
-        $password                                     = isset($_REQUEST['password']) ? $_REQUEST['password'] : "";
-        $notification_device_token                                   = isset($_REQUEST['notification_device_token']) ? $_REQUEST['notification_device_token'] : "";
-        $mobile_type                                  = isset($_REQUEST['mobile_type']) ? $_REQUEST['mobile_type'] : "";
+        $password                  = isset($_REQUEST['password']) ? $_REQUEST['password'] : "";
+        $notification_device_token = isset($_REQUEST['notification_device_token']) ? $_REQUEST['notification_device_token'] : "";
+        $mobile_type               = isset($_REQUEST['mobile_type']) ? $_REQUEST['mobile_type'] : "";
         // $profile_pic = isset($_REQUEST['profile_pic']) ? $_REQUEST['profile_pic'] :"";
         
-        if ($first_name == "" or $last_name == "" or $user_name = "" or $email = "" or $country_id = "" or $phone_number == ""  or $password == "" or $notification_device_token == "" or $mobile_type = "" or $user_type_id=="") {
+        if ($first_name == "" or $last_name == "" or $user_name = "" or $email = "" or $country_id = "" or $phone_number == "" or $password == "" or $notification_device_token == "" or $mobile_type = "" or $user_type_id == "") {
             die(json_encode(array(
                 "status" => 0,
                 "message" => "Input parameters are not found"
@@ -165,37 +165,36 @@ class Webservice extends CI_Controller
             )));
             
         } else {
-            $token = $_REQUEST['token'];
+            $token   = $_REQUEST['token'];
             $user_id = $_REQUEST['user_id'];
-            $sql   = "SELECT token,user_id FROM tbl_user where token='$token' and user_id='$user_id'";
-            $res   = $this->db->query($sql);
-            $row   = $res->row();
+            $sql     = "SELECT token,user_id FROM tbl_user where token='$token' and user_id='$user_id'";
+            $res     = $this->db->query($sql);
+            $row     = $res->row();
             if ($row) {
                 $json_data = $this->user_model->get_community($token); //user_id
-                 if ($json_data) {
+                if ($json_data) {
                     $arr = array();
                     foreach ($json_data as $results) {
-                        $logo=$results->community_logo;
-                         $path = base_url().'uploads/';
-                        if($logo){
-                          
-                            $logos= $path.$logo;
-                           
+                        $logo = $results->community_logo;
+                        $path = base_url() . 'uploads/';
+                        if ($logo) {
+                            
+                            $logos = $path . $logo;
+                            
+                        } else {
+                            $logos = $path . '1517561100258.png';
                         }
-                        else{
-                        $logos= $path.'1517561100258.png';
-                        }
-
+                        
                         $arr[] = array(
-
+                            
                             'community_name' => $results->community_name,
                             'community_id' => $results->community_id,
                             'community_description' => $results->community_description,
                             'add_date' => $results->add_date,
                             'community_email' => $results->community_email,
-                             'request_status' => $results->request_status,
-                              'community_logo' =>  $logos,
-                               'community_address' => $results->community_address
+                            'request_status' => $results->request_status,
+                            'community_logo' => $logos,
+                            'community_address' => $results->community_address
                             
                         );
                     }
@@ -224,8 +223,8 @@ class Webservice extends CI_Controller
                 $response     = json_encode($returnresult);
                 print_r($response);
             }
-
-
+            
+            
         }
     }
     
@@ -255,11 +254,11 @@ class Webservice extends CI_Controller
             )));
             
         } else {
-            $token = $_REQUEST['token'];
+            $token   = $_REQUEST['token'];
             $user_id = $_REQUEST['user_id'];
-            $sql   = "SELECT token,user_id FROM tbl_user where token='$token' and user_id='$user_id'";
-            $res   = $this->db->query($sql);
-            $row   = $res->row();
+            $sql     = "SELECT token,user_id FROM tbl_user where token='$token' and user_id='$user_id'";
+            $res     = $this->db->query($sql);
+            $row     = $res->row();
             if ($row) {
                 $response = $this->user_model->user_community_request($token);
                 $response = json_encode($response);
@@ -283,7 +282,7 @@ class Webservice extends CI_Controller
     
     // function get_user_message()
     // {
-        
+    
     //     $token   = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
     //     $user_id = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
     //     if ($token == "" or $user_id == '') {
@@ -291,7 +290,7 @@ class Webservice extends CI_Controller
     //             "status" => 0,
     //             "message" => "Input parameters are not found"
     //         )));
-            
+    
     //     } else {
     //         $token = $_REQUEST['token'];
     //         $sql   = "SELECT token FROM tbl_user where token='$token'";
@@ -300,7 +299,7 @@ class Webservice extends CI_Controller
     //         if ($row) {
     //             $response = $this->user_model->get_user_message($token);
     //             if ($response) {
-                    
+    
     //                 $returnresult = array(
     //                     'status' => 1,
     //                     'message' => 'Record found',
@@ -308,10 +307,10 @@ class Webservice extends CI_Controller
     //                 );
     //                 $response     = json_encode($returnresult);
     //                 print_r($response);
-                    
-                    
+    
+    
     //             } else {
-                    
+    
     //                 $returnresult = array(
     //                     'status' => 0,
     //                     'message' => 'Record  not found'
@@ -319,7 +318,7 @@ class Webservice extends CI_Controller
     //                 $response     = json_encode($returnresult);
     //                 print_r($response);
     //             }
-                
+    
     //         } else {
     //             $returnresult = array(
     //                 'status' => 0,
@@ -349,55 +348,53 @@ class Webservice extends CI_Controller
             )));
             
         } else {
-                 $token = $_REQUEST['token'];
-                  $oldpassword = $_REQUEST['oldpassword'];
-                  $user_id = $_REQUEST['user_id'];
-                  $newpassword = $_REQUEST['newpassword'];
-                  $newPass = md5($newpassword);
-                  $token = $_REQUEST['token'];
-                  $oldpassword = md5($oldpassword);
-                    $sql    = "SELECT * FROM tbl_user WHERE user_id='" . $user_id . "'";
-                    $res   = $this->db->query($sql);
-                     $row   = $res->row();
-                     $user_ids =$row->user_id;
-                     $tokens =$row->token;
-                     $password =$row->password;
-                    if($password!=$oldpassword){
-                        $returnresult =  die(json_encode(array(
+            $token       = $_REQUEST['token'];
+            $oldpassword = $_REQUEST['oldpassword'];
+            $user_id     = $_REQUEST['user_id'];
+            $newpassword = $_REQUEST['newpassword'];
+            $newPass     = md5($newpassword);
+            $token       = $_REQUEST['token'];
+            $oldpassword = md5($oldpassword);
+            $sql         = "SELECT * FROM tbl_user WHERE user_id='" . $user_id . "'";
+            $res         = $this->db->query($sql);
+            $row         = $res->row();
+            $user_ids    = $row->user_id;
+            $tokens      = $row->token;
+            $password    = $row->password;
+            if ($password != $oldpassword) {
+                $returnresult = die(json_encode(array(
                     'status' => 0,
                     'message' => 'Old password doesnt match!'
                 )));
-               
-                    }
-                     elseif($tokens!=$token){
-                        $returnresult =  die(json_encode(array(
+                
+            } elseif ($tokens != $token) {
+                $returnresult = die(json_encode(array(
                     'status' => 0,
                     'message' => 'Authentication failed!'
                 )));
-               
-                    }
-                    if($oldpassword==$newPass){
-                        $returnresult =  die(json_encode(array(
+                
+            }
+            if ($oldpassword == $newPass) {
+                $returnresult = die(json_encode(array(
                     'status' => 0,
                     'message' => 'Old Password and new password cannot be same!'
                 )));
-               
-                    }
-                    else {
-                   
-                        $sql1    = mysql_query("UPDATE tbl_user SET password='" . $newPass . "' where user_id='" . $user_ids . "'");
-                     
-                        $res     =  die(json_encode(array(
-                            'status' => 1,
-                            'message' => 'Your password has been changed.'
-                        )));
-                  
-                        
-                    }
-                  $response     = json_encode($returnresult);
-                print_r($response);   
                 
-    
+            } else {
+                
+                $sql1 = mysql_query("UPDATE tbl_user SET password='" . $newPass . "' where user_id='" . $user_ids . "'");
+                
+                $res = die(json_encode(array(
+                    'status' => 1,
+                    'message' => 'Your password has been changed.'
+                )));
+                
+                
+            }
+            $response = json_encode($returnresult);
+            print_r($response);
+            
+            
         }
     }
     
@@ -472,15 +469,15 @@ class Webservice extends CI_Controller
     //     $alert_id        = isset($_REQUEST['alert_id']) ? $_REQUEST['alert_id'] : "";
     //     $comment_text    = isset($_REQUEST['comment_text']) ? $_REQUEST['comment_text'] : "";
     //     $token           = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
-        
+    
     //     if ($comment_text == "" or $alert_id == "" or $comment_text == "" or $token == "") {
     //         die(json_encode(array(
     //             "status" => 0,
     //             "message" => "Input parameters are not found"
     //         )));
-            
+    
     //     } else {
-            
+    
     //         $token = $_REQUEST['token'];
     //          $comment_user_id = $_REQUEST['comment_user_id'];
     //         $sql   = "SELECT token FROM tbl_user where token='$token' and user_id='$comment_user_id'";
@@ -514,15 +511,15 @@ class Webservice extends CI_Controller
     //     $comment_text    = isset($_REQUEST['comment_text']) ? $_REQUEST['comment_text'] : "";
     //     $token           = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
     //     $comment_user_id = isset($_REQUEST['comment_user_id']) ? $_REQUEST['comment_user_id'] : "";
-        
+    
     //     if ($comment_text == "" or $community_id == "" or $comment_text == "" or $token == "" or $user_id=="" ) {
     //         die(json_encode(array(
     //             "status" => 0,
     //             "message" => "Input parameters are not found"
     //         )));
-            
+    
     //     } else {
-            
+    
     //         $token = $_REQUEST['token'];
     //         $user_id = $_REQUEST['user_id'];
     //         $sql   = "SELECT token FROM tbl_user where token='$token' and user_id='$user_id'";
@@ -530,7 +527,7 @@ class Webservice extends CI_Controller
     //         $row   = $res->row();
     //         if ($row) {
     //             $response = $this->user_model->user_comment_communitywise($token);
-        
+    
     //               $response     = json_encode($response);
     //             print_r($response);
     //         } else {
@@ -560,7 +557,7 @@ class Webservice extends CI_Controller
     //             "status" => 0,
     //             "message" => "Input parameters are not found"
     //         )));
-            
+    
     //     } else {
     //         $token = $_REQUEST['token'];
     //         $user_id = $_REQUEST['user_id'];
@@ -582,7 +579,7 @@ class Webservice extends CI_Controller
     //                         'comment_date_time' => $results->comment_date_time,
     //                         'add_date' => $results->add_date
     //                         // 'status' => $results->status
-                            
+    
     //                     );
     //                 }
     //                 $returnresult = array(
@@ -592,8 +589,8 @@ class Webservice extends CI_Controller
     //                 );
     //                 $data         = json_encode($returnresult);
     //                 print_r($data);
-                    
-                    
+    
+    
     //             } else {
     //                 $returnresult = array(
     //                     'status' => 0,
@@ -602,9 +599,9 @@ class Webservice extends CI_Controller
     //                 $data         = json_encode($returnresult);
     //                 print_r($data);
     //             }
-                
-                
-                
+    
+    
+    
     //         } else {
     //             $returnresult = array(
     //                 'status' => 0,
@@ -631,7 +628,7 @@ class Webservice extends CI_Controller
     //             "status" => 0,
     //             "message" => "Input parameters are not found"
     //         )));
-            
+    
     //     } else {
     //         $token = $_REQUEST['token'];
     //         $user_id = $_REQUEST['user_id'];
@@ -643,7 +640,7 @@ class Webservice extends CI_Controller
     //             if ($response) {
     //                 $arr = array();
     //                 foreach ($response as $results) {
-
+    
     //                     $arr[] = array(
     //                         'user_name' => $results->first_name." ".$results->last_name,
     //                         'comment_id' => $results->comment_id,
@@ -651,8 +648,8 @@ class Webservice extends CI_Controller
     //                         'comment_text' => $results->comment_text,
     //                         'comment_date_time' => $results->comment_date_time,
     //                         'add_date' => $results->add_date
-                            
-                            
+    
+    
     //                     );
     //                 }
     //                 $returnresult = array(
@@ -695,7 +692,7 @@ class Webservice extends CI_Controller
     //             "status" => 0,
     //             "message" => "Input parameters are not found"
     //         )));
-            
+    
     //     } else {
     //         $token = $_REQUEST['token'];
     //          $user_id = $_REQUEST['user_id'];
@@ -704,17 +701,17 @@ class Webservice extends CI_Controller
     //         $row   = $res->row();
     //         if ($row) {
     //             $response = $this->user_model->get_alert_communitywise($token);
-                
+    
     //             if ($response) {
-                    
+    
     //                 $arr = array();
     //                 foreach ($response as $results) {
     //                     $logo=$results->community_logo;
     //                       $path = base_url().'uploads/';
     //                       if($logo){
-                          
+    
     //                         $logos= $path.$logo;
-                           
+    
     //                      }
     //                      else{
     //                      $logos= $path.'1517561100258.png';
@@ -732,7 +729,7 @@ class Webservice extends CI_Controller
     //                         'alert_date_time' => $results->alert_date_time,
     //                         'add_date' => $results->add_date
     //                         // 'status' => $results->status
-                            
+    
     //                     );
     //                 }
     //                 $returnresult = array(
@@ -742,8 +739,8 @@ class Webservice extends CI_Controller
     //                 );
     //                 $response     = json_encode($returnresult);
     //                 print_r($response);
-                    
-                    
+    
+    
     //             } else {
     //                 $returnresult = array(
     //                     'status' => 0,
@@ -752,7 +749,7 @@ class Webservice extends CI_Controller
     //                 $response     = json_encode($returnresult);
     //                 print_r($response);
     //             }
-                
+    
     //         } else {
     //             $returnresult = array(
     //                 'status' => 0,
@@ -764,9 +761,9 @@ class Webservice extends CI_Controller
     //     }
     // }
     
-
-
-/*
+    
+    
+    /*
     ------------------------------------------------------------------------------------------------
     http://104.237.3.116/tap911/index.php/webservice/get_user_alert?token=c53afe04a17ef62b&user_id=101&alert_type=user
     ------------------------------------------------------------------------------------------------
@@ -783,7 +780,7 @@ class Webservice extends CI_Controller
     //             "status" => 0,
     //             "message" => "Input parameters are not found"
     //         )));
-            
+    
     //     } else {
     //          $user_id = $_REQUEST['user_id'];
     //         $token = $_REQUEST['token'];
@@ -792,46 +789,46 @@ class Webservice extends CI_Controller
     //         $row   = $res->row();
     //         if ($row) {
     //             $response = $this->user_model->get_user_alert($token,$limit);
-                
+    
     //             if ($response) {
-                    
+    
     //                 $arr = array();
     //                 foreach ($response as $results) {
     //                     if (is_null($results->community_id)) {
     //                        $results->community_id = "";
-                           
+    
     //                          }
-
+    
     //                          if (is_null($results->add_date)) {
     //                        $results->add_date = "";
-                           
+    
     //                          }
-
+    
     //                      $logo=$results->community_logo;
     //                       $path = base_url().'uploads/';
     //                       if($logo){
-                          
+    
     //                         $logos= $path.$logo;
-                           
+    
     //                      }
     //                      else{
     //                      $logos= $path.'1517561100258.png';
     //                      }
-
+    
     //                     $profile_pic=$results->profile_pic;
     //                       $path = base_url().'uploads/';
     //                       if($profile_pic){
-                          
+    
     //                         $profile_picture= $path.$profile_pic;
-                           
+    
     //                      }
     //                      else{
     //                      $profile_picture= $path.'1517561100258.png';
     //                      }
-
-
-
-                            
+    
+    
+    
+    
     //                     $arr[] = array(
     //                         'alert_id' => $results->alert_id,
     //                         'community_id' => $results->community_id,
@@ -853,8 +850,8 @@ class Webservice extends CI_Controller
     //                         'user_name' => $results->first_name." ".$results->last_name,
     //                         'profile_pic' => $profile_picture,
     //                         'user_message' => 'i need help'
-                            
-                            
+    
+    
     //                     );
     //                 }
     //                 $returnresult = array(
@@ -864,8 +861,8 @@ class Webservice extends CI_Controller
     //                 );
     //                 $response     = json_encode($returnresult);
     //                 print_r($response);
-                    
-                    
+    
+    
     //             } else {
     //                 $returnresult = array(
     //                     'status' => 0,
@@ -874,7 +871,7 @@ class Webservice extends CI_Controller
     //                 $response     = json_encode($returnresult);
     //                 print_r($response);
     //             }
-                
+    
     //         } else {
     //             $returnresult = array(
     //                 'status' => 0,
@@ -885,10 +882,10 @@ class Webservice extends CI_Controller
     //         }
     //     }
     // }
-
-
-
-
+    
+    
+    
+    
     /*
     -------------------------------------------------------------------------------------------------------
     http://104.237.3.116/tap911/index.php/webservice/get_community_emergency_contact?token=f70bfae97dc8c2d5
@@ -905,36 +902,36 @@ class Webservice extends CI_Controller
             )));
             
         } else {
-             $token = $_REQUEST['token'];
-             $user_id = $_REQUEST['user_id'];
-            $sql   = "SELECT token FROM tbl_user where token='$token' and user_id=$user_id";
-            $res   = $this->db->query($sql);
-            $row   = $res->row();
+            $token   = $_REQUEST['token'];
+            $user_id = $_REQUEST['user_id'];
+            $sql     = "SELECT token FROM tbl_user where token='$token' and user_id=$user_id";
+            $res     = $this->db->query($sql);
+            $row     = $res->row();
             if ($row) {
                 
-
-           $results = $this->db->query("SELECT community_id from tbl_community_user_mapping where user_id=$user_id and request_status =3");
-         $resultdata     = $results->result_array();
-        $countvarresult = count($resultdata);
-
-          $arr2 = array();
-          $arra1 = array();
-        for ($i = 0; $i < $countvarresult; $i++) {
-
-            $id = $resultdata[$i]['community_id'];
-          $sql = "SELECT * FROM tbl_community WHERE `community_id` IN ('$id')";
-            $res = $this->db->query($sql);
-            $rows = $res->row();
-              $community_id_my = $rows->community_id;
-              $community_name = $rows->community_name;
-              $community_description = $rows->community_description;
-              $community_website = $rows->community_website;
-              $community_email = $rows->community_email;
-              $community_address = $rows->community_address;
-              $add_date = $rows->add_date;
-
-                      $arr1 = array();
-        
+                
+                $results        = $this->db->query("SELECT community_id from tbl_community_user_mapping where user_id=$user_id and request_status =3");
+                $resultdata     = $results->result_array();
+                $countvarresult = count($resultdata);
+                
+                $arr2  = array();
+                $arra1 = array();
+                for ($i = 0; $i < $countvarresult; $i++) {
+                    
+                    $id                    = $resultdata[$i]['community_id'];
+                    $sql                   = "SELECT * FROM tbl_community WHERE `community_id` IN ('$id')";
+                    $res                   = $this->db->query($sql);
+                    $rows                  = $res->row();
+                    $community_id_my       = $rows->community_id;
+                    $community_name        = $rows->community_name;
+                    $community_description = $rows->community_description;
+                    $community_website     = $rows->community_website;
+                    $community_email       = $rows->community_email;
+                    $community_address     = $rows->community_address;
+                    $add_date              = $rows->add_date;
+                    
+                    $arr1 = array();
+                    
                     $json_data = $this->user_model->get_community_emergency_contact($id);
                     if ($json_data == '') {
                         $returnresult = array(
@@ -943,45 +940,44 @@ class Webservice extends CI_Controller
                         );
                     }
                     foreach ($json_data as $results) {
-                      $arr1[] = array(
+                        $arr1[] = array(
                             'community_emergency_number_id' => $results->community_emergency_number_id,
                             // 
                             'community_emergency_number' => $results->community_emergency_number,
                             'community_emergency_number_type' => $results->community_emergency_number_type
-                       );
+                        );
                         
                         array_push($arra1, $arr1);
                     }
-                          $logo=$results2->community_logo;
-                          $path = base_url().'uploads/';
-                          if($logo){
-                          
-                            $logos= $path.$logo;
-                           
-                         }
-                         else{
-                         $logos= $path.'1517561100258.png';
-                         }
+                    $logo = $results2->community_logo;
+                    $path = base_url() . 'uploads/';
+                    if ($logo) {
+                        
+                        $logos = $path . $logo;
+                        
+                    } else {
+                        $logos = $path . '1517561100258.png';
+                    }
                     
                     $arr2[] = array(
                         'community_name' => $community_name,
                         'community_id' => $community_id_my,
                         'community_description' => $community_description,
-                        'community_logo' =>  $logos,
+                        'community_logo' => $logos,
                         'community_website' => $community_website,
                         'community_email' => $community_email,
                         'community_address' => $community_address,
                         'add_date' => $add_date,
-                        'number' =>$arr1
+                        'number' => $arr1
                         
                         
                     );
                     
-            
-            }
-            
-
-            $returnresult = array(
+                    
+                }
+                
+                
+                $returnresult = array(
                     'status' => 1,
                     'message' => 'Record found',
                     'all_record' => $arr2
@@ -1130,7 +1126,7 @@ class Webservice extends CI_Controller
                 else {
                     $returnresult = array(
                         'status' => 0,
-                        'message' => 'Record  not found'
+                        'message' => 'Record not found'
                     );
                     $response     = json_encode($returnresult);
                     print_r($response);
@@ -1157,34 +1153,34 @@ class Webservice extends CI_Controller
     function update_profile()
     {
         
-        $token                                        = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
-        $user_id                                      = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
-        $first_name                                   = isset($_REQUEST['first_name']) ? $_REQUEST['first_name'] : "";
-        $last_name                                    = isset($_REQUEST['last_name']) ? $_REQUEST['last_name'] : "";
-        $email                                        = isset($_REQUEST['email']) ? $_REQUEST['email'] : "";
-        $language                                     = isset($_REQUEST['language']) ? $_REQUEST['language'] : "";
-        $medical_history                              = isset($_REQUEST['medical_history']) ? $_REQUEST['medical_history'] : "";
-        $medication_instraction                       = isset($_REQUEST['medication_instraction']) ? $_REQUEST['medication_instraction'] : "";
-        $allergies                                    = isset($_REQUEST['allergies']) ? $_REQUEST['allergies'] : "";
-        $special_need                                 = isset($_REQUEST['special_need']) ? $_REQUEST['special_need'] : "";
+        $token                  = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+        $user_id                = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
+        $first_name             = isset($_REQUEST['first_name']) ? $_REQUEST['first_name'] : "";
+        $last_name              = isset($_REQUEST['last_name']) ? $_REQUEST['last_name'] : "";
+        $email                  = isset($_REQUEST['email']) ? $_REQUEST['email'] : "";
+        $language               = isset($_REQUEST['language']) ? $_REQUEST['language'] : "";
+        $medical_history        = isset($_REQUEST['medical_history']) ? $_REQUEST['medical_history'] : "";
+        $medication_instraction = isset($_REQUEST['medication_instraction']) ? $_REQUEST['medication_instraction'] : "";
+        $allergies              = isset($_REQUEST['allergies']) ? $_REQUEST['allergies'] : "";
+        $special_need           = isset($_REQUEST['special_need']) ? $_REQUEST['special_need'] : "";
         // $user_lat                                     = isset($_REQUEST['user_lat']) ? $_REQUEST['user_lat'] : "";
         // $user_long                                    = isset($_REQUEST['user_long']) ? $_REQUEST['user_long'] : "";
         // $phone_number_text_msg_country_code           = isset($_REQUEST['phone_number_text_msg_country_code']) ? $_REQUEST['phone_number_text_msg_country_code'] : "";
-        $phone_number                        = isset($_REQUEST['phone_number']) ? $_REQUEST['phone_number'] : "";
+        $phone_number           = isset($_REQUEST['phone_number']) ? $_REQUEST['phone_number'] : "";
         // $phone_number_voice_notification_country_code = isset($_REQUEST['phone_number_voice_notification_country_code']) ? $_REQUEST['phone_number_voice_notification_country_code'] : "";
         // $phone_number_voice_notification              = isset($_REQUEST['phone_number_voice_notification']) ? $_REQUEST['phone_number_voice_notification'] : "";
-        if ($first_name == "" or $last_name == "" or $user_name = "" or $email = "" or $phone_number== "" or $user_id == "" or $medical_history == "" or $medication_instraction == "" or $allergies == "" or $special_need == "" or $token == "" or  $language == "") {
+        if ($first_name == "" or $last_name == "" or $user_name = "" or $email = "" or $phone_number == "" or $user_id == "" or $medical_history == "" or $medication_instraction == "" or $allergies == "" or $special_need == "" or $token == "" or $language == "") {
             die(json_encode(array(
                 "status" => 0,
                 "message" => "Input parameters are not found"
             )));
             
         } else {
-            $token = $_REQUEST['token'];
-             $user_id = $_REQUEST['user_id'];
-            $sql   = "SELECT token,user_id FROM tbl_user where token='$token' and user_id='$user_id'";
-            $res   = $this->db->query($sql);
-            $row   = $res->row();
+            $token   = $_REQUEST['token'];
+            $user_id = $_REQUEST['user_id'];
+            $sql     = "SELECT token,user_id FROM tbl_user where token='$token' and user_id='$user_id'";
+            $res     = $this->db->query($sql);
+            $row     = $res->row();
             if ($row) {
                 $response = $this->user_model->update_profile($token);
                 $response = json_encode($response);
@@ -1201,21 +1197,21 @@ class Webservice extends CI_Controller
     }
     function update_profile_picture()
     {
-       //      $token = isset($_REQUEST['token']) ? $_REQUEST['token'] :"";
-       //       $profile_pic = isset($_REQUEST['profile_pic']) ? $_REQUEST['profile_pic'] :"";
-       //       $user_id = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] :"";
-       //  if($token=="" or $profile_pic=="" or $user_id==''){
-       //   $returnresult = die(json_encode(array("status"=>0,
-       //     "message"=> "Input parameters are not found"
-       // )));
+        //      $token = isset($_REQUEST['token']) ? $_REQUEST['token'] :"";
+        //       $profile_pic = isset($_REQUEST['profile_pic']) ? $_REQUEST['profile_pic'] :"";
+        //       $user_id = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] :"";
+        //  if($token=="" or $profile_pic=="" or $user_id==''){
+        //   $returnresult = die(json_encode(array("status"=>0,
+        //     "message"=> "Input parameters are not found"
+        // )));
         
-       //  }
-          // else{
-        $token = $_REQUEST['token'];
+        //  }
+        // else{
+        $token   = $_REQUEST['token'];
         $user_id = $_REQUEST['user_id'];
-        $sql   = "SELECT token FROM tbl_user where token='$token' and user_id='$user_id'";
-        $res   = $this->db->query($sql);
-        $row   = $res->row();
+        $sql     = "SELECT token FROM tbl_user where token='$token' and user_id='$user_id'";
+        $res     = $this->db->query($sql);
+        $row     = $res->row();
         if ($row) {
             $response = $this->user_model->update_profile_picture($token);
             $response = json_encode($response);
@@ -1230,8 +1226,8 @@ class Webservice extends CI_Controller
         }
         
         // }
-    //}
-}
+        //}
+    }
     
     /*
     -----------------------------------------------------------------------------------------------------------
@@ -1256,11 +1252,11 @@ class Webservice extends CI_Controller
             )));
             
         } else {
-            $token = $_REQUEST['token'];
-             $user_id = $_REQUEST['user_id'];
-            $sql   = "SELECT token FROM tbl_user where token='$token' and user_id='$user_id'";
-            $res   = $this->db->query($sql);
-            $row   = $res->row();
+            $token   = $_REQUEST['token'];
+            $user_id = $_REQUEST['user_id'];
+            $sql     = "SELECT token FROM tbl_user where token='$token' and user_id='$user_id'";
+            $res     = $this->db->query($sql);
+            $row     = $res->row();
             if ($row) {
                 $response = $this->user_model->update_home_address($token);
                 $response = json_encode($response);
@@ -1284,14 +1280,14 @@ class Webservice extends CI_Controller
     
     function add_user_emergency_contact()
     {
-        $token        = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
-//        $name         = isset($_REQUEST['name']) ? $_REQUEST['name'] : "";
-        $user_id      = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
-       $emergency_user_help_id  = isset($_REQUEST['emergency_user_help_id']) ? $_REQUEST['emergency_user_help_id'] : "";
-//        $phone_number = isset($_REQUEST['phone_number']) ? $_REQUEST['phone_number'] : "";
-       $tap911_user      = isset($_REQUEST['tap911_user']) ? $_REQUEST['tap911_user'] : "";
-//        $country_code = isset($_REQUEST['country_code']) ? $_REQUEST['country_code'] : "";
-        if ($token == "" or $user_id == "" or $tap911_user=="" or $emergency_user_help_id=="" ) {
+        $token                  = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+        //        $name         = isset($_REQUEST['name']) ? $_REQUEST['name'] : "";
+        $user_id                = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
+        $emergency_user_help_id = isset($_REQUEST['emergency_user_help_id']) ? $_REQUEST['emergency_user_help_id'] : "";
+        //        $phone_number = isset($_REQUEST['phone_number']) ? $_REQUEST['phone_number'] : "";
+        $tap911_user            = isset($_REQUEST['tap911_user']) ? $_REQUEST['tap911_user'] : "";
+        //        $country_code = isset($_REQUEST['country_code']) ? $_REQUEST['country_code'] : "";
+        if ($token == "" or $user_id == "" or $tap911_user == "" or $emergency_user_help_id == "") {
             die(json_encode(array(
                 "status" => 0,
                 "message" => "Input parameters are not found"
@@ -1330,20 +1326,20 @@ class Webservice extends CI_Controller
         // $user_id = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] :"";
         $description          = isset($_REQUEST['description']) ? $_REQUEST['description'] : "";
         $phone_number         = isset($_REQUEST['phone_number']) ? $_REQUEST['phone_number'] : "";
-        $tap911_user      = isset($_REQUEST['tap911_user']) ? $_REQUEST['tap911_user'] : "";
+        $tap911_user          = isset($_REQUEST['tap911_user']) ? $_REQUEST['tap911_user'] : "";
         $country_code         = isset($_REQUEST['country_code']) ? $_REQUEST['country_code'] : "";
-        if ($token == "" or $name == "" or $description == "" or $phone_number == "" or $country_code == "" or $emergency_contact_id == "" or $tap911_user=="") {
+        if ($token == "" or $name == "" or $description == "" or $phone_number == "" or $country_code == "" or $emergency_contact_id == "" or $tap911_user == "") {
             die(json_encode(array(
                 "status" => 0,
                 "message" => "Input parameters are not found"
             )));
             
         } else {
-            $token = $_REQUEST['token'];
+            $token   = $_REQUEST['token'];
             $user_id = $_REQUEST['user_id'];
-            $sql   = "SELECT token FROM tbl_user where token='$token' and user_id=$user_id";
-            $res   = $this->db->query($sql);
-            $row   = $res->row();
+            $sql     = "SELECT token FROM tbl_user where token='$token' and user_id=$user_id";
+            $res     = $this->db->query($sql);
+            $row     = $res->row();
             if ($row) {
                 $response = $this->user_model->update_user_emergency_contact($token);
                 $response = json_encode($response);
@@ -1379,11 +1375,11 @@ class Webservice extends CI_Controller
             )));
             
         } else {
-            $token = $_REQUEST['token'];
+            $token   = $_REQUEST['token'];
             $user_id = $_REQUEST['user_id'];
-            $sql   = "SELECT token FROM tbl_user where token='$token' and user_id=$user_id";
-            $res   = $this->db->query($sql);
-            $row   = $res->row();
+            $sql     = "SELECT token FROM tbl_user where token='$token' and user_id=$user_id";
+            $res     = $this->db->query($sql);
+            $row     = $res->row();
             if ($row) {
                 $json_data = $this->user_model->get_home_address($token, $user_id);
                 if ($json_data) {
@@ -1451,11 +1447,11 @@ class Webservice extends CI_Controller
             )));
             
         } else {
-            $token = $_REQUEST['token'];
+            $token   = $_REQUEST['token'];
             $user_id = $_REQUEST['user_id'];
-            $sql = "SELECT token FROM tbl_user where token='$token' and user_id=$user_id";
-            $res = $this->db->query($sql);
-            $row = $res->row();
+            $sql     = "SELECT token FROM tbl_user where token='$token' and user_id=$user_id";
+            $res     = $this->db->query($sql);
+            $row     = $res->row();
             if ($row) {
                 $json_data = $this->user_model->get_emergency_contact($token, $user_id);
                 
@@ -1469,7 +1465,7 @@ class Webservice extends CI_Controller
                             'description' => $results->description,
                             'phone_number' => $results->phone_number,
                             'country_code' => $results->country_code,
-                             'tap911_user' => $results->tap911_user,
+                            'tap911_user' => $results->tap911_user
                             
                         );
                     }
@@ -1503,7 +1499,7 @@ class Webservice extends CI_Controller
         
     }
     
-      
+    
     /*
     -------------------------------------------------------------------------------------------------
     http://104.237.3.116/tap911/index.php/webservice/get_country_emergency_number_with_token?token=dd088bfaaaf468cb
@@ -1522,11 +1518,11 @@ class Webservice extends CI_Controller
             )));
             
         } else {
-            $token = $_REQUEST['token'];
+            $token   = $_REQUEST['token'];
             $user_id = $_REQUEST['user_id'];
-            $sql   = "SELECT token FROM tbl_user where token='$token' and user_id=$user_id";
-            $res   = $this->db->query($sql);
-            $row   = $res->row();
+            $sql     = "SELECT token FROM tbl_user where token='$token' and user_id=$user_id";
+            $res     = $this->db->query($sql);
+            $row     = $res->row();
             if ($row) {
                 $json_data = $this->user_model->get_country_emergency_number_with_token($token);
                 if ($json_data) {
@@ -1637,11 +1633,11 @@ class Webservice extends CI_Controller
             )));
             
         } else {
-            $token = $_REQUEST['token'];
-             $user_id = $_REQUEST['user_id'];
-            $sql   = "SELECT token FROM tbl_user where token='$token' and user_id=$user_id";
-            $res   = $this->db->query($sql);
-            $row   = $res->row();
+            $token   = $_REQUEST['token'];
+            $user_id = $_REQUEST['user_id'];
+            $sql     = "SELECT token FROM tbl_user where token='$token' and user_id=$user_id";
+            $res     = $this->db->query($sql);
+            $row     = $res->row();
             if ($row) {
                 $response = $this->user_model->add_emergency_tracking($token);
                 $response = json_encode($response);
@@ -1676,11 +1672,11 @@ class Webservice extends CI_Controller
             )));
             
         } else {
-            $token = $_REQUEST['token'];
-             $user_id = $_REQUEST['user_id'];
-            $sql   = "SELECT token FROM tbl_user where token='$token' and user_id=$user_id";
-            $res   = $this->db->query($sql);
-            $row   = $res->row();
+            $token   = $_REQUEST['token'];
+            $user_id = $_REQUEST['user_id'];
+            $sql     = "SELECT token FROM tbl_user where token='$token' and user_id=$user_id";
+            $res     = $this->db->query($sql);
+            $row     = $res->row();
             if ($row) {
                 $json_data = $this->user_model->get_emergency_tracking($token);
                 
@@ -1748,11 +1744,11 @@ class Webservice extends CI_Controller
             )));
             
         } else {
-            $token = $_REQUEST['token'];
+            $token   = $_REQUEST['token'];
             $user_id = $_REQUEST['user_id'];
-            $sql   = "SELECT token FROM tbl_user where token='$token' and user_id=$user_id";
-            $res   = $this->db->query($sql);
-            $row   = $res->row();
+            $sql     = "SELECT token FROM tbl_user where token='$token' and user_id=$user_id";
+            $res     = $this->db->query($sql);
+            $row     = $res->row();
             if ($row) {
                 $json_data = $this->user_model->get_state($token);
                 
@@ -1817,11 +1813,11 @@ class Webservice extends CI_Controller
             )));
             
         } else {
-             $user_id = $_REQUEST['user_id'];
-              $token = $_REQUEST['token'];
-            $sql   = "SELECT token FROM tbl_user where token='$token' and user_id=$user_id";
-            $res   = $this->db->query($sql);
-            $row   = $res->row();
+            $user_id = $_REQUEST['user_id'];
+            $token   = $_REQUEST['token'];
+            $sql     = "SELECT token FROM tbl_user where token='$token' and user_id=$user_id";
+            $res     = $this->db->query($sql);
+            $row     = $res->row();
             if ($row) {
                 $json_data = $this->user_model->get_city($token);
                 if ($json_data) {
@@ -1847,7 +1843,7 @@ class Webservice extends CI_Controller
                 else {
                     $returnresult = array(
                         'status' => 1,
-                        'message' => 'Record not found',
+                        'message' => 'Record not found'
                         // 'all_city' => $arr
                     );
                     $response     = json_encode($returnresult);
@@ -1885,11 +1881,11 @@ class Webservice extends CI_Controller
             )));
             
         } else {
-            $token = $_REQUEST['token'];
+            $token   = $_REQUEST['token'];
             $user_id = $_REQUEST['user_id'];
-            $sql   = "SELECT token FROM tbl_user where token='$token' and user_id=$user_id";
-            $res   = $this->db->query($sql);
-            $row   = $res->row();
+            $sql     = "SELECT token FROM tbl_user where token='$token' and user_id=$user_id";
+            $res     = $this->db->query($sql);
+            $row     = $res->row();
             if ($row) {
                 $json_data = $this->user_model->delete_user($token);
                 $data      = json_encode($json_data);
@@ -1925,11 +1921,11 @@ class Webservice extends CI_Controller
             )));
             
         } else {
-            $token = $_REQUEST['token'];
-             $user_id = $_REQUEST['user_id'];
-            $sql   = "SELECT token FROM tbl_user where token='$token' and user_id=$user_id";
-            $res   = $this->db->query($sql);
-            $row   = $res->row();
+            $token   = $_REQUEST['token'];
+            $user_id = $_REQUEST['user_id'];
+            $sql     = "SELECT token FROM tbl_user where token='$token' and user_id=$user_id";
+            $res     = $this->db->query($sql);
+            $row     = $res->row();
             if ($row) {
                 $json_data = $this->user_model->delete_emergency_contact($token);
                 $data      = json_encode($json_data);
@@ -1955,16 +1951,16 @@ class Webservice extends CI_Controller
     
     // function get_emergency_user()
     // {
-        
+    
     //     $token   = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
     //     $user_id = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
-        
+    
     //     if ($token == "" or $user_id == '') {
     //         die(json_encode(array(
     //             "status" => 0,
     //             "message" => "Input parameters are not found"
     //         )));
-            
+    
     //     } else {
     //         $token = $_REQUEST['token'];
     //         $user_id = $_REQUEST['user_id'];
@@ -1987,7 +1983,7 @@ class Webservice extends CI_Controller
     //                         'emergency_type' => $results->emergency_type,
     //                         'add_date' => $results->add_date,
     //                          'emergency_status' => $results->emergency_status
-                            
+    
     //                     );
     //                 }
     //                 $returnresult = array(
@@ -1998,18 +1994,18 @@ class Webservice extends CI_Controller
     //                 $response     = json_encode($returnresult);
     //                 print_r($response);
     //             }
-                
+    
     //             else {
     //                 $returnresult = array(
     //                     'status' => 0,
     //                     'message' => 'Record not  found'
-                
+    
     //                 );
     //                 $response     = json_encode($returnresult);
     //                 print_r($response);
     //             }
-                
-                
+    
+    
     //         } else {
     //             $returnresult = array(
     //                 'status' => 0,
@@ -2019,10 +2015,10 @@ class Webservice extends CI_Controller
     //             print_r($response);
     //         }
     //     }
-        
+    
     // }
     
-   
+    
     
     /*
     -----------------------------------------------------------------------------------------------------
@@ -2032,12 +2028,12 @@ class Webservice extends CI_Controller
     function add_emergency_user()
     {
         
-        $token          = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
-        $user_id        = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
-        $emergency_latitude       = isset($_REQUEST['emergency_latitude']) ? $_REQUEST['emergency_latitude'] : "";
-        $emergency_longitude      = isset($_REQUEST['emergency_longitude']) ? $_REQUEST['emergency_longitude'] : "";
-        $emergency_address        = isset($_REQUEST['emergency_address']) ? $_REQUEST['emergency_address'] : "";
-        $emergency_type = isset($_REQUEST['emergency_type']) ? $_REQUEST['emergency_type'] : "";
+        $token               = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+        $user_id             = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
+        $emergency_latitude  = isset($_REQUEST['emergency_latitude']) ? $_REQUEST['emergency_latitude'] : "";
+        $emergency_longitude = isset($_REQUEST['emergency_longitude']) ? $_REQUEST['emergency_longitude'] : "";
+        $emergency_address   = isset($_REQUEST['emergency_address']) ? $_REQUEST['emergency_address'] : "";
+        $emergency_type      = isset($_REQUEST['emergency_type']) ? $_REQUEST['emergency_type'] : "";
         
         
         if ($token == "" or $user_id == '' or $emergency_latitude == "" or $emergency_longitude == "" or $emergency_address == "" or $emergency_type == "") {
@@ -2047,11 +2043,11 @@ class Webservice extends CI_Controller
             )));
             
         } else {
-            $token = $_REQUEST['token'];
-             $user_id = $_REQUEST['user_id'];
-            $sql   = "SELECT token FROM tbl_user where token='$token' and user_id='$user_id'";
-            $res   = $this->db->query($sql);
-            $row   = $res->row();
+            $token   = $_REQUEST['token'];
+            $user_id = $_REQUEST['user_id'];
+            $sql     = "SELECT token FROM tbl_user where token='$token' and user_id='$user_id'";
+            $res     = $this->db->query($sql);
+            $row     = $res->row();
             if ($row) {
                 $json_data = $this->user_model->add_emergency_user($token);
                 $data      = json_encode($json_data);
@@ -2067,9 +2063,9 @@ class Webservice extends CI_Controller
         }
         
     }
-
-
-/*
+    
+    
+    /*
     ------------------------------------------------------------------------------------------------------
     http://104.237.3.116/tap911/index.php/webservice/get_user_profiledata?token=dd088bfaaaf468cb&user_id=1
     -------------------------------------------------------------------------------------------------------
@@ -2090,32 +2086,31 @@ class Webservice extends CI_Controller
             )));
             
         } else {
-            $token = $_REQUEST['token'];
-             $user_id = $_REQUEST['user_id'];
-            $sql   = "SELECT token FROM tbl_user where token='$token' and user_id='$user_id'";
-            $res   = $this->db->query($sql);
-            $row   = $res->row();
+            $token   = $_REQUEST['token'];
+            $user_id = $_REQUEST['user_id'];
+            $sql     = "SELECT token FROM tbl_user where token='$token' and user_id='$user_id'";
+            $res     = $this->db->query($sql);
+            $row     = $res->row();
             if ($row) {
-                $json_data = $this->user_model->get_user_profiledata($token, $user_id);
-                 $json_dataemergency = $this->user_model->get_emergency_contact($token, $user_id);
-                  $json_datahomeaddress = $this->user_model->get_home_address($token, $user_id);
+                $json_data            = $this->user_model->get_user_profiledata($token, $user_id);
+                $json_dataemergency   = $this->user_model->get_emergency_contact($token, $user_id);
+                $json_datahomeaddress = $this->user_model->get_home_address($token, $user_id);
                 
                 if ($json_data) {
-
+                    
                     $arr = array();
                     foreach ($json_data as $results) {
-        
-                           $logo=$results->profile_pic;
-                          $path = base_url().'uploads/';
-                          if($logo){
-                          
-                            $logos= $path.$logo;
-                           
-                         }
-                         else{
-                         $logos= $path.'1517561100258.png';
-                         }
-
+                        
+                        $logo = $results->profile_pic;
+                        $path = base_url() . 'uploads/';
+                        if ($logo) {
+                            
+                            $logos = $path . $logo;
+                            
+                        } else {
+                            $logos = $path . '1517561100258.png';
+                        }
+                        
                         $arr[] = array(
                             'user_id' => $results->user_id,
                             'first_name' => $results->first_name,
@@ -2137,11 +2132,11 @@ class Webservice extends CI_Controller
                             'user_location_date_time' => $results->user_location_date_time
                             
                         );
-
+                        
                     }
-                      $arr1 = array();
-                  foreach ($json_dataemergency as $results) {
-
+                    $arr1 = array();
+                    foreach ($json_dataemergency as $results) {
+                        
                         $arr1[] = array(
                             'emergency_contact_id' => $results->emergency_contact_id,
                             'user_id' => $results->user_id,
@@ -2166,13 +2161,13 @@ class Webservice extends CI_Controller
                             
                         );
                     }
-
+                    
                     $returnresult = array(
                         'status' => 1,
                         'message' => 'Record found',
                         'profile_data' => $arr,
-                         'user_home_address' => $arr2,
-                          'emergency_contect' => $arr1
+                        'user_home_address' => $arr2,
+                        'emergency_contect' => $arr1
                         
                     );
                     $response     = json_encode($returnresult);
@@ -2198,36 +2193,35 @@ class Webservice extends CI_Controller
             }
         }
         
-
-}
-
-
- /*
+        
+    }
+    
+    
+    /*
     -----------------------------------------------------------------------------------------------------
     http://104.237.3.116/tap911/index.php/webservice/accept_emergency_request?token=03ed32f30ee37fbb&alert_id=1
     -----------------------------------------------------------------------------------------------------
     */
     
     function accept_emergency_request()
-    
-      {  
-        $token         = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
-        $emergency_notification_id       = isset($_REQUEST['emergency_notification_id']) ? $_REQUEST['emergency_notification_id'] : "";
-       
+    {
+        $token                     = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+        $emergency_notification_id = isset($_REQUEST['emergency_notification_id']) ? $_REQUEST['emergency_notification_id'] : "";
         
         
-        if ($token == "" or $emergency_notification_id == "" ) {
+        
+        if ($token == "" or $emergency_notification_id == "") {
             die(json_encode(array(
                 "status" => 0,
                 "message" => "Input parameters are not found"
             )));
             
         } else {
-            $token = $_REQUEST['token'];
+            $token   = $_REQUEST['token'];
             $user_id = $_REQUEST['user_id'];
-            $sql   = "SELECT token FROM tbl_user where token='$token' and user_id='$user_id'";
-            $res   = $this->db->query($sql);
-            $row   = $res->row();
+            $sql     = "SELECT token,user_id FROM tbl_user where token='$token' and user_id='$user_id'";
+            $res     = $this->db->query($sql);
+            $row     = $res->row();
             if ($row) {
                 $json_data = $this->user_model->accept_emergency_request($token, $emergency_notification_id);
                 $data      = json_encode($json_data);
@@ -2244,7 +2238,7 @@ class Webservice extends CI_Controller
         
     }
     
- /*
+    /*
     -----------------------------------------------------------------------------------------
     http://104.237.3.116/tap911/index.php/webservice/get_emergency_live_location?token=67a4690e03c9935e&emergency_id=506
     -----------------------------------------------------------------------------------------
@@ -2252,30 +2246,30 @@ class Webservice extends CI_Controller
     
     function get_emergency_live_location()
     {
-        $token = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
-         $emergency_id = isset($_REQUEST['emergency_id']) ? $_REQUEST['emergency_id'] : "";
+        $token        = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+        $emergency_id = isset($_REQUEST['emergency_id']) ? $_REQUEST['emergency_id'] : "";
         
         
         
-        if ($token == "" or $emergency_id=="") {
+        if ($token == "" or $emergency_id == "") {
             die(json_encode(array(
                 "status" => 0,
                 "message" => "Input parameters are not found"
             )));
             
         } else {
-            $token = $_REQUEST['token'];
+            $token   = $_REQUEST['token'];
             $user_id = $_REQUEST['user_id'];
-            $sql   = "SELECT token,user_id FROM tbl_user where token='$token' and user_id='$user_id'";
-            $res   = $this->db->query($sql);
-            $row   = $res->row();
+            $sql     = "SELECT token,user_id FROM tbl_user where token='$token' and user_id='$user_id'";
+            $res     = $this->db->query($sql);
+            $row     = $res->row();
             if ($row) {
                 $json_data = $this->user_model->get_emergency_live_location($token); //user_id
-                 if ($json_data) {
+                if ($json_data) {
                     $arr = array();
                     foreach ($json_data as $results) {
                         $arr[] = array(
-
+                            
                             'tracking_id' => $results->tracking_id,
                             'first_name' => $results->first_name,
                             'emergency_address' => $results->emergency_address,
@@ -2311,51 +2305,51 @@ class Webservice extends CI_Controller
             }
         }
     }
-
-
-       /*
+    
+    
+    /*
     -----------------------------------------------------------------------------------------------------
-   http://104.237.3.116/tap911/index.php/webservice/get_user_type
+    http://104.237.3.116/tap911/index.php/webservice/get_user_type
     -----------------------------------------------------------------------------------------------------
     */
     
     function get_user_type()
     {
         
-                $json_data = $this->user_model->get_user_type();
-                if ($json_data) {
-                    $arr = array();
-                    foreach ($json_data as $results) {
-                        $arr[] = array(
-
-                            'user_type_id' => $results->user_type_id,
-                            'user_type_name' => $results->user_type_name,
-                            'add_date' => $results->add_date,
-                            'status' => $results->status
-                            
-                        );
-                    }
-                    $returnresult = array(
-                        'status' => 1,
-                        'message' => 'Record found',
-                        'user_type_list' => $arr
-                    );
-                    $response     = json_encode($returnresult);
-                    print_r($response);
-                }
+        $json_data = $this->user_model->get_user_type();
+        if ($json_data) {
+            $arr = array();
+            foreach ($json_data as $results) {
+                $arr[] = array(
+                    
+                    'user_type_id' => $results->user_type_id,
+                    'user_type_name' => $results->user_type_name,
+                    'add_date' => $results->add_date,
+                    'status' => $results->status
+                    
+                );
+            }
+            $returnresult = array(
+                'status' => 1,
+                'message' => 'Record found',
+                'user_type_list' => $arr
+            );
+            $response     = json_encode($returnresult);
+            print_r($response);
+        }
+        
+        else {
+            $returnresult = array(
+                'status' => 1,
+                'message' => 'Record not found'
                 
-                else {
-                    $returnresult = array(
-                        'status' => 1,
-                        'message' => 'Record not found'
-                
-                    );
-                    $response     = json_encode($returnresult);
-                    print_r($response);
-                }
-                
+            );
+            $response     = json_encode($returnresult);
+            print_r($response);
+        }
+        
     }
-
+    
     /*
     ----------------------------------------------------------------------------------------------------------
     http://104.237.3.116/tap911/index.php/webservice/add_community_communitaction?token=dd088bfaaaf468cb&from_user_id=1&to_user_id=0&community_id=0&message_data=hello
@@ -2365,24 +2359,24 @@ class Webservice extends CI_Controller
     function add_community_communitaction()
     {
         $token        = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
-        $from_user_id         = isset($_REQUEST['from_user_id']) ? $_REQUEST['from_user_id'] : "";
-        $to_user_id      = isset($_REQUEST['to_user_id']) ? $_REQUEST['to_user_id'] : "";
-        $community_id  = isset($_REQUEST['community_id']) ? $_REQUEST['community_id'] : "";
+        $from_user_id = isset($_REQUEST['from_user_id']) ? $_REQUEST['from_user_id'] : "";
+        $to_user_id   = isset($_REQUEST['to_user_id']) ? $_REQUEST['to_user_id'] : "";
+        $community_id = isset($_REQUEST['community_id']) ? $_REQUEST['community_id'] : "";
         $message_data = isset($_REQUEST['message_data']) ? $_REQUEST['message_data'] : "";
-        $msg_type = isset($_REQUEST['msg_type']) ? $_REQUEST['msg_type'] : "";
-
-        if ($token == "" or $from_user_id == "" or $to_user_id == "" or $community_id == "" or $message_data == "" or $msg_type=="") {
+        $msg_type     = isset($_REQUEST['msg_type']) ? $_REQUEST['msg_type'] : "";
+        
+        if ($token == "" or $from_user_id == "" or $to_user_id == "" or $community_id == "" or $message_data == "" or $msg_type == "") {
             die(json_encode(array(
                 "status" => 0,
                 "message" => "Input parameters are not found"
             )));
             
         } else {
-            $token = $_REQUEST['token'];
-             $from_user_id = $_REQUEST['from_user_id'];
-            $sql   = "SELECT token FROM tbl_user where token='$token' and user_id='$from_user_id'";
-            $res   = $this->db->query($sql);
-            $row   = $res->row();
+            $token        = $_REQUEST['token'];
+            $from_user_id = $_REQUEST['from_user_id'];
+            $sql          = "SELECT token FROM tbl_user where token='$token' and user_id='$from_user_id'";
+            $res          = $this->db->query($sql);
+            $row          = $res->row();
             if ($row) {
                 $response = $this->user_model->add_community_communitaction($token);
                 $response = json_encode($response);
@@ -2397,32 +2391,32 @@ class Webservice extends CI_Controller
             }
         }
     }
-
-     /*
+    
+    /*
     ----------------------------------------------------------------------------------------------------------
     http://104.237.3.116/tap911/index.php/webservice/add_emergency_communitaction?token=dd088bfaaaf468cb&user_id=1&emergency_id=491&message_data=anywhere%20contect%20me
     -----------------------------------------------------------------------------------------------------------
     */
-
-     function add_emergency_communitaction()
+    
+    function add_emergency_communitaction()
     {
         $token        = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
         $user_id      = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
-        $emergency_id  = isset($_REQUEST['emergency_id']) ? $_REQUEST['emergency_id'] : "";
+        $emergency_id = isset($_REQUEST['emergency_id']) ? $_REQUEST['emergency_id'] : "";
         $message_data = isset($_REQUEST['message_data']) ? $_REQUEST['message_data'] : "";
-
-        if ($token == "" or $user_id == ""  or $message_data == "" or $emergency_id=="") {
+        
+        if ($token == "" or $user_id == "" or $message_data == "" or $emergency_id == "") {
             die(json_encode(array(
                 "status" => 0,
                 "message" => "Input parameters are not found"
             )));
             
         } else {
-            $token = $_REQUEST['token'];
+            $token   = $_REQUEST['token'];
             $user_id = $_REQUEST['user_id'];
-            $sql   = "SELECT token FROM tbl_user where token='$token' and user_id='$user_id'";
-            $res   = $this->db->query($sql);
-            $row   = $res->row();
+            $sql     = "SELECT token FROM tbl_user where token='$token' and user_id='$user_id'";
+            $res     = $this->db->query($sql);
+            $row     = $res->row();
             if ($row) {
                 $response = $this->user_model->add_emergency_communitaction($token);
                 $response = json_encode($response);
@@ -2438,39 +2432,39 @@ class Webservice extends CI_Controller
         }
     }
     
-
-       /*
+    
+    /*
     -----------------------------------------------------------------------------------------------------
-   http://104.237.3.116/tap911/index.php/webservice/get_emergancy_communication?token=8ff636448bae3be3&emergency_id=503
+    http://104.237.3.116/tap911/index.php/webservice/get_emergancy_communication?token=8ff636448bae3be3&emergency_id=503
     -----------------------------------------------------------------------------------------------------
     */
     
     function get_emergancy_communication()
     {
         
-               $token = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
-               $emergency_id = isset($_REQUEST['emergency_id']) ? $_REQUEST['emergency_id'] : "";
+        $token        = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+        $emergency_id = isset($_REQUEST['emergency_id']) ? $_REQUEST['emergency_id'] : "";
         
         
-        if ($token == "" or $emergency_id=="") {
+        if ($token == "" or $emergency_id == "") {
             die(json_encode(array(
                 "status" => 0,
                 "message" => "Input parameters are not found"
             )));
             
         } else {
-            $token = $_REQUEST['token'];
+            $token   = $_REQUEST['token'];
             $user_id = $_REQUEST['user_id'];
-            $sql   = "SELECT token FROM tbl_user where token='$token' and user_id='$user_id'";
-            $res   = $this->db->query($sql);
-            $row   = $res->row();
+            $sql     = "SELECT token FROM tbl_user where token='$token' and user_id='$user_id'";
+            $res     = $this->db->query($sql);
+            $row     = $res->row();
             if ($row) {
                 $json_data = $this->user_model->get_emergancy_communication($token); //user_id
-                 if ($json_data) {
+                if ($json_data) {
                     $arr = array();
                     foreach ($json_data as $results) {
                         $arr[] = array(
-
+                            
                             'first_name' => $results->first_name,
                             'emergency_id' => $results->emergency_id,
                             'message_data' => $results->message_data,
@@ -2505,34 +2499,34 @@ class Webservice extends CI_Controller
                 print_r($response);
             }
         }
-     }
-
-
-
-   /*
+    }
+    
+    
+    
+    /*
     -----------------------------------------------------------------------------------------------------
-   http://104.237.3.116/tap911/index.php/webservice/get_emergancy_communication?token=8ff636448bae3be3&emergency_id=503
+    http://104.237.3.116/tap911/index.php/webservice/get_emergancy_communication?token=8ff636448bae3be3&emergency_id=503
     -----------------------------------------------------------------------------------------------------
     */
     
     function get_community_communication()
     {
         
-         $token = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
-         $from_user_id = isset($_REQUEST['from_user_id']) ? $_REQUEST['from_user_id'] : "";
-        if ($token == "" or $from_user_id=="") {
+        $token        = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+        $from_user_id = isset($_REQUEST['from_user_id']) ? $_REQUEST['from_user_id'] : "";
+        if ($token == "" or $from_user_id == "") {
             die(json_encode(array(
                 "status" => 0,
                 "message" => "Input parameters are not found"
             )));
             
         } else {
-            $token = $_REQUEST['token'];
+            $token        = $_REQUEST['token'];
             $from_user_id = $_REQUEST['from_user_id'];
             // $limit = $_REQUEST['limit'];
-            $sql   = "SELECT token,user_id FROM tbl_user where token='$token' and user_id='$from_user_id'";
-            $res   = $this->db->query($sql);
-            $row   = $res->row();
+            $sql          = "SELECT token,user_id FROM tbl_user where token='$token' and user_id='$from_user_id'";
+            $res          = $this->db->query($sql);
+            $row          = $res->row();
             if ($row) {
                 $response = $this->user_model->get_community_communication($token);
                 if ($response) {
@@ -2546,7 +2540,7 @@ class Webservice extends CI_Controller
                             'message_data' => $results->message_data,
                             'add_date' => $results->add_date,
                             'msg_type' => $results->msg_type
-                           
+                            
                             
                         );
                     }
@@ -2580,10 +2574,10 @@ class Webservice extends CI_Controller
             }
         }
     }
-
-
-
-      /*
+    
+    
+    
+    /*
     -----------------------------------------------------------------------------------------------------
     http://104.237.3.116/tap911/index.php/webservice/get_tap911_user_list?token=03ed32f30ee37fbb&user_id=77
     -----------------------------------------------------------------------------------------------------
@@ -2602,20 +2596,20 @@ class Webservice extends CI_Controller
             )));
             
         } else {
-            $token = $_REQUEST['token'];
+            $token   = $_REQUEST['token'];
             $user_id = $_REQUEST['user_id'];
-            $sql   = "SELECT token FROM tbl_user where token='$token' and user_id='$user_id'";
-            $res   = $this->db->query($sql);
-            $row   = $res->row();
+            $sql     = "SELECT token FROM tbl_user where token='$token' and user_id='$user_id'";
+            $res     = $this->db->query($sql);
+            $row     = $res->row();
             if ($row) {
-                $json_data = $this->user_model->get_tap911_user_list($token,$user_id);
+                $json_data = $this->user_model->get_tap911_user_list($token, $user_id);
                 if ($json_data) {
                     $arr = array();
                     foreach ($json_data as $results) {
                         $arr[] = array(
-                             'user_name' => $results->first_name." ".$results->last_name,
-                             'phone_number_text_msg' => $results->phone_number_text_msg,
-                                 'user_id' => $results->user_id
+                            'user_name' => $results->first_name . " " . $results->last_name,
+                            'phone_number_text_msg' => $results->phone_number_text_msg,
+                            'user_id' => $results->user_id
                             
                         );
                     }
@@ -2632,7 +2626,7 @@ class Webservice extends CI_Controller
                     $returnresult = array(
                         'status' => 1,
                         'message' => 'Record not found'
-                
+                        
                     );
                     $response     = json_encode($returnresult);
                     print_r($response);
@@ -2650,15 +2644,16 @@ class Webservice extends CI_Controller
         }
         
     }
-
-
-/* alert segment */
-
-     function get_emergency_user(){
-
-    $user_id=$_REQUEST['user_id'];
-    $token=$_REQUEST['token'];
-    $token   = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+    
+    
+    /* alert segment */
+    
+    function get_emergency_user()
+    {
+        
+        $user_id = $_REQUEST['user_id'];
+        $token   = $_REQUEST['token'];
+        $token   = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
         $user_id = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
         
         if ($token == "" or $user_id == '') {
@@ -2667,99 +2662,97 @@ class Webservice extends CI_Controller
                 "message" => "Input parameters are not found"
             )));
             
-        }
-        else{
-
-           $sql   = "SELECT token FROM tbl_user where token='$token' and user_id='$user_id'";
-            $res   = $this->db->query($sql);
-            $row   = $res->row();
-     if ($row) {
-
-    $results = $this->db->query("SELECT * from tbl_emergency_notification where notification_user_id=$user_id and emergency_status!=2");
-        
-        $resultdata     = $results->result_array();
-        $countvarresult = count($resultdata);
-       // $require        = array();
-        // $alert_type[] ='user';
-        for ($i = 0; $i < $countvarresult; $i++) {
-            //$alert_type ='user';
-                $id = $resultdata[$i]['emergency_id'];
-                $emergency_notification_id= $resultdata[$i]['emergency_notification_id'];
-                $emergency_status= $resultdata[$i]['emergency_status'];
-
-                $sql = "SELECT * FROM tbl_emergency WHERE `emergency_id` IN ('$id')";
-                $res = $this->db->query($sql);
-                $rows = $res->row();
-                $user_id = $rows->user_id;
-                $emergency_id = $rows->emergency_id;
-                $emergency_latitude = $rows->emergency_latitude;
-                $emergency_longitude = $rows->emergency_longitude;
-                $emergency_address = $rows->emergency_address;
-                $emergency_type = $rows->emergency_type;
-                $add_date = $rows->add_date;
-
-             $sql = "SELECT * FROM tbl_user WHERE `user_id` IN ('$user_id')";
-             $res = $this->db->query($sql);
+        } else {
+            
+            $sql = "SELECT token,user_id FROM tbl_user where token='$token' and user_id='$user_id'";
+            $res = $this->db->query($sql);
             $row = $res->row();
-            $first_name = $row->first_name;
-             $last_name = $row->last_name;
-            $user_name = $first_name." ".$last_name;
-             $returnresult1[] = array(
-                'emergency_notification_id' => $emergency_notification_id,
-                'user_name' => $user_name,
-                 'user_id' => $user_id,
-                'emergency_id' => $emergency_id,
-                'emergency_latitude' => $emergency_latitude,
-                'emergency_longitude' => $emergency_longitude,
-                'emergency_address' => $emergency_address,
-                'emergency_type' => $emergency_type,
-                'add_date' => $add_date,
-                'emergency_status' => $emergency_status
-            );
-
-
-          
-              $returnresult = array(
+            if ($row) {
+                
+                $results = $this->db->query("SELECT emergency_id,emergency_notification_id,emergency_status from tbl_emergency_notification where notification_user_id=$user_id and emergency_status!=2");
+                
+                $resultdata     = $results->result_array();
+                $countvarresult = count($resultdata);
+                // $require        = array();
+                // $alert_type[] ='user';
+                for ($i = 0; $i < $countvarresult; $i++) {
+                    //$alert_type ='user';
+                    $id                        = $resultdata[$i]['emergency_id'];
+                    $emergency_notification_id = $resultdata[$i]['emergency_notification_id'];
+                    $emergency_status          = $resultdata[$i]['emergency_status'];
+                    
+                    $sql                 = "SELECT user_id,emergency_id,emergency_latitude,emergency_longitude,emergency_address,emergency_type,add_date FROM tbl_emergency WHERE `emergency_id` IN ('$id')";
+                    $res                 = $this->db->query($sql);
+                    $rows                = $res->row();
+                    $user_id             = $rows->user_id;
+                    $emergency_id        = $rows->emergency_id;
+                    $emergency_latitude  = $rows->emergency_latitude;
+                    $emergency_longitude = $rows->emergency_longitude;
+                    $emergency_address   = $rows->emergency_address;
+                    $emergency_type      = $rows->emergency_type;
+                    $add_date            = $rows->add_date;
+                    
+                    $sql             = "SELECT first_name,last_name,user_id FROM tbl_user WHERE `user_id` IN ('$user_id')";
+                    $res             = $this->db->query($sql);
+                    $row             = $res->row();
+                    $first_name      = $row->first_name;
+                    $last_name       = $row->last_name;
+                    $user_name       = $first_name . " " . $last_name;
+                    $returnresult1[] = array(
+                        'emergency_notification_id' => $emergency_notification_id,
+                        'user_name' => $user_name,
+                        'user_id' => $user_id,
+                        'emergency_id' => $emergency_id,
+                        'emergency_latitude' => $emergency_latitude,
+                        'emergency_longitude' => $emergency_longitude,
+                        'emergency_address' => $emergency_address,
+                        'emergency_type' => $emergency_type,
+                        'add_date' => $add_date,
+                        'emergency_status' => $emergency_status
+                    );
+                    
+                    
+                    
+                    $returnresult = array(
                         'status' => 1,
                         'message' => 'Record found',
                         'emergency_user_list' => $returnresult1
                     );
-
-           // $result = array_merge($returnresult1, $returnresult2);
-        }
-        if($returnresult1){
-   
-           $response  = json_encode($returnresult);
-           print_r($response);
-       }
-       
-         else {
-                    $returnresult = array(
-                        'status' => 1,
-                        'message' => 'Record not found'
+                    
+                    // $result = array_merge($returnresult1, $returnresult2);
+                }
+                if ($returnresult1) {
+                    
+                    $response = json_encode($returnresult);
+                    print_r($response);
+                }
                 
+                else {
+                    $returnresult = array(
+                        'status' => 0,
+                        'message' => 'Record not found'
+                        
                     );
                     $response     = json_encode($returnresult);
                     print_r($response);
-              
-         }
-
-       }
-       else{
-
-         $returnresult = array(
+                    
+                }
+                
+            } else {
+                
+                $returnresult = array(
                     'status' => 0,
                     'message' => 'Authentication failed'
                 );
                 $response     = json_encode($returnresult);
                 print_r($response);
-       }
-     }
-   } 
-
-
-
-/*
+            }
+        }
+    }
+    
+    
+    
+    /*
     
     http://104.237.3.116/tap911/index.php/webservice/get_community_contact?token=8ff636448bae3be3&user_id=45
     
@@ -2780,21 +2773,21 @@ class Webservice extends CI_Controller
             )));
             
         } else {
-            $token = $_REQUEST['token'];
-             $user_id = $_REQUEST['user_id'];
-            $sql   = "SELECT token FROM tbl_user where token='$token' and user_id='$user_id'";
-            $res   = $this->db->query($sql);
-            $row   = $res->row();
+            $token   = $_REQUEST['token'];
+            $user_id = $_REQUEST['user_id'];
+            $sql     = "SELECT token FROM tbl_user where token='$token' and user_id='$user_id'";
+            $res     = $this->db->query($sql);
+            $row     = $res->row();
             if ($row) {
                 $json_data = $this->user_model->get_community_contact($token);
                 if ($json_data) {
                     $arr = array();
                     foreach ($json_data as $results) {
                         $arr[] = array(
-                             
-                           'community_emergency_number_id' => $results->community_emergency_number_id,
-                           'community_emergency_number' => $results->community_emergency_number,
-                           'community_emergency_number_type' => $results->community_emergency_number_type
+                            
+                            'community_emergency_number_id' => $results->community_emergency_number_id,
+                            'community_emergency_number' => $results->community_emergency_number,
+                            'community_emergency_number_type' => $results->community_emergency_number_type
                             
                         );
                     }
@@ -2826,10 +2819,10 @@ class Webservice extends CI_Controller
             }
         }
     }
-
-
-
- /*
+    
+    
+    
+    /*
     ----------------------------------------------------------------------------------------------------------
     http://104.237.3.116/tap911/index.php/webservice/add_user_emergency_contact?token=dd088bfaaaf468cb&user_id=1&name=devandra&description=anywhere%20contect%20me&phone_number=1234567&country_code=12345
     -----------------------------------------------------------------------------------------------------------
@@ -2842,20 +2835,20 @@ class Webservice extends CI_Controller
         $user_id      = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
         $description  = isset($_REQUEST['description']) ? $_REQUEST['description'] : "";
         $phone_number = isset($_REQUEST['phone_number']) ? $_REQUEST['phone_number'] : "";
-        $tap911_user      = isset($_REQUEST['tap911_user']) ? $_REQUEST['tap911_user'] : "";
+        $tap911_user  = isset($_REQUEST['tap911_user']) ? $_REQUEST['tap911_user'] : "";
         $country_code = isset($_REQUEST['country_code']) ? $_REQUEST['country_code'] : "";
-        if ($token == "" or $name == "" or $user_id == "" or $description == "" or $phone_number == "" or $country_code == "" or $tap911_user=="") {
+        if ($token == "" or $name == "" or $user_id == "" or $description == "" or $phone_number == "" or $country_code == "" or $tap911_user == "") {
             die(json_encode(array(
                 "status" => 0,
                 "message" => "Input parameters are not found"
             )));
             
         } else {
-            $token = $_REQUEST['token'];
+            $token   = $_REQUEST['token'];
             $user_id = $_REQUEST['user_id'];
-            $sql   = "SELECT token FROM tbl_user where token='$token' and user_id='$user_id'";
-            $res   = $this->db->query($sql);
-            $row   = $res->row();
+            $sql     = "SELECT token,user_id FROM tbl_user where token='$token' and user_id='$user_id'";
+            $res     = $this->db->query($sql);
+            $row     = $res->row();
             if ($row) {
                 $response = $this->user_model->add_other_emergency_contact($token);
                 $response = json_encode($response);
@@ -2870,16 +2863,16 @@ class Webservice extends CI_Controller
             }
         }
     }
-
-
- function get_accept_notification_user_list()
- {
-
-        $user_id=$_REQUEST['user_id'];
-        $emergency_id=$_REQUEST['emergency_id'];
-        $token=$_REQUEST['token'];
-        $token   = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
-        $user_id = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
+    
+    
+    function get_accept_notification_user_list()
+    {
+        
+        $user_id      = $_REQUEST['user_id'];
+        $emergency_id = $_REQUEST['emergency_id'];
+        $token        = $_REQUEST['token'];
+        $token        = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+        $user_id      = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
         
         if ($token == "" or $user_id == '') {
             die(json_encode(array(
@@ -2887,136 +2880,174 @@ class Webservice extends CI_Controller
                 "message" => "Input parameters are not found"
             )));
             
-        }
-        else{
-
-           $sql   = "SELECT token,user_id FROM tbl_user where token='$token' and user_id='$user_id'";
-            $res   = $this->db->query($sql);
-            $row   = $res->row();
-     if ($row) {
-
-    $results = $this->db->query("SELECT * from tbl_emergency_notification where emergency_id='".$_REQUEST['emergency_id']."' and emergency_status=1");
-
-        $resultdata     = $results->result_array();
-          $countvarresult = count($resultdata);
-
-          $emcreateusers=array();
-
-        for ($i = 0; $i < $countvarresult; $i++) {
-            //$alert_type ='user';
-                $id = $resultdata[$i]['notification_user_id'];
-               // $em_lat = $resultdata[$i]['em_lat'];
-                //$em_long = $resultdata[$i]['em_long'];
-
-            $sql = "SELECT * FROM tbl_user WHERE `user_id` IN('$id')";
+        } else {
+            
+            $sql = "SELECT token,user_id FROM tbl_user where token='$token' and user_id='$user_id'";
             $res = $this->db->query($sql);
-            $rows = $res->row();
-            $user_ids = $rows->user_id;
-            $phone_number = $rows->phone_number_text_msg;
-          //  $em_long = $rows->em_long;
-              $first_name = $rows->first_name;
-             $last_name = $rows->last_name;
-            $user_name = $first_name." ".$last_name;
-
-
-            if (!ini_get('date.timezone')) {
-            date_default_timezone_set('UTC');
-             }
-        $dateValue = date("Y-m-d H:i:s");
-        $time      = strtotime($dateValue);
-        $month     = date("F", $time);
-        $year      = date("Y", $time);
-        $table     = "tbl_tracking" . '_' . $month . '_' . $year;
-
-
-            $sql = "SELECT latitude,longitude FROM  $table  WHERE `user_id` IN('$id')";
-            $res = $this->db->query($sql);
-            $rows = $res->row();
-            $latitude = $rows->latitude;
-            $longitude = $rows->longitude;
-
-
-             $returnresult1[] = array(
-                 'user_name' =>$user_name,
-                'phone_number' =>$phone_number,
-                 'user_id' => $user_ids,
-                 'latitude' => $longitude,
-                 'longitude' => $longitude
-            );
-         }
-
-     $sql = "SELECT * FROM tbl_emergency WHERE `emergency_id`='".$_REQUEST['emergency_id']."'";
-                $res = $this->db->query($sql);
-                $rows = $res->row();
-                $em_user_id = $rows->user_id;
-                $emergency_id = $rows->emergency_id;
-                $emergency_latitude = $rows->emergency_latitude;
+            $row = $res->row();
+            if ($row) {
+                
+                $results = $this->db->query("SELECT * from tbl_emergency_notification where emergency_id='" . $_REQUEST['emergency_id'] . "' and emergency_status=1");
+                
+                $resultdata     = $results->result_array();
+                $countvarresult = count($resultdata);
+                
+                $emcreateusers = array();
+                
+                for ($i = 0; $i < $countvarresult; $i++) {
+                    //$alert_type ='user';
+                    $id = $resultdata[$i]['notification_user_id'];
+                    // $em_lat = $resultdata[$i]['em_lat'];
+                    //$em_long = $resultdata[$i]['em_long'];
+                    
+                    $sql          = "SELECT * FROM tbl_user WHERE `user_id` IN('$id')";
+                    $res          = $this->db->query($sql);
+                    $rows         = $res->row();
+                    $user_ids     = $rows->user_id;
+                    $phone_number = $rows->phone_number_text_msg;
+                    //  $em_long = $rows->em_long;
+                    $first_name   = $rows->first_name;
+                    $last_name    = $rows->last_name;
+                    $user_name    = $first_name . " " . $last_name;
+                    
+                    
+                    if (!ini_get('date.timezone')) {
+                        date_default_timezone_set('UTC');
+                    }
+                    $dateValue = date("Y-m-d H:i:s");
+                    $time      = strtotime($dateValue);
+                    $month     = date("F", $time);
+                    $year      = date("Y", $time);
+                    $table     = "tbl_tracking" . '_' . $month . '_' . $year;
+                    
+                    
+                    $sql       = "SELECT latitude,longitude FROM  $table  WHERE `user_id` IN('$id')";
+                    $res       = $this->db->query($sql);
+                    $rows      = $res->row();
+                    $latitude  = $rows->latitude;
+                    $longitude = $rows->longitude;
+                    
+                    
+                    $returnresult1[] = array(
+                        'user_name' => $user_name,
+                        'phone_number' => $phone_number,
+                        'user_id' => $user_ids,
+                        'latitude' => $latitude,
+                        'longitude' => $longitude
+                    );
+                }
+                
+                $sql                 = "SELECT * FROM tbl_emergency WHERE `emergency_id`='" . $_REQUEST['emergency_id'] . "'";
+                $res                 = $this->db->query($sql);
+                $rows                = $res->row();
+                $em_user_id          = $rows->user_id;
+                $emergency_id        = $rows->emergency_id;
+                $emergency_latitude  = $rows->emergency_latitude;
                 $emergency_longitude = $rows->emergency_longitude;
                 // $emergency_address = $rows->emergency_address;
                 // $emergency_type = $rows->emergency_type;
                 // $add_date = $rows->add_date;
-
-             $sql = "SELECT * FROM tbl_user WHERE `user_id`='$em_user_id'";
-             $res = $this->db->query($sql);
-            $row = $res->row();
-            $first_name = $row->first_name;
-             $last_name = $row->last_name;
-             $phone_numbers = $row->phone_number_text_msg;
-            $user_name = $first_name." ".$last_name;
-             $emcreateuser[] = array(
-                'user_name' => $user_name,
-                 'user_id' => $em_user_id,
-                'emergency_id' => $emergency_id,
-                'emergency_latitude' => $emergency_latitude,
-                'emergency_longitude' => $emergency_longitude,
-                'phone_number' => $phone_numbers
-
-            );
-          
-                 array_push($emcreateusers, $emcreateuser);
-
-
-         
-              $returnresult = array(
-                        'status' => 1,
-                        'message' => 'Record found',
-                        'emergency_create_user' => $emcreateuser,
-                        'emergency_accept_user' => $returnresult1
-                         
-                    );
-          
-
-        if($returnresult1){
-   
-           $response  = json_encode($returnresult);
-           print_r($response);
-       }
-       
-         else {
+                
+                $sql            = "SELECT * FROM tbl_user WHERE `user_id`='$em_user_id'";
+                $res            = $this->db->query($sql);
+                $row            = $res->row();
+                $first_name     = $row->first_name;
+                $last_name      = $row->last_name;
+                $phone_numbers  = $row->phone_number_text_msg;
+                $user_name      = $first_name . " " . $last_name;
+                $emcreateuser[] = array(
+                    'user_name' => $user_name,
+                    'user_id' => $em_user_id,
+                    'emergency_id' => $emergency_id,
+                    'emergency_latitude' => $emergency_latitude,
+                    'emergency_longitude' => $emergency_longitude,
+                    'phone_number' => $phone_numbers
+                    
+                );
+                
+                array_push($emcreateusers, $emcreateuser);
+                
+                
+                
+                $returnresult = array(
+                    'status' => 1,
+                    'message' => 'Record found',
+                    'emergency_create_user' => $emcreateuser,
+                    'emergency_accept_user' => $returnresult1
+                    
+                );
+                
+                
+                if ($returnresult1) {
+                    
+                    $response = json_encode($returnresult);
+                    print_r($response);
+                }
+                
+                else {
                     $returnresult = array(
                         'status' => 0,
                         'message' => 'Record not found'
-                
+                        
                     );
                     $response     = json_encode($returnresult);
                     print_r($response);
-              
-         }
-
-       }
-       else{
-
-         $returnresult = array(
+                    
+                }
+                
+            } else {
+                
+                $returnresult = array(
                     'status' => 0,
                     'message' => 'Authentication failed'
                 );
                 $response     = json_encode($returnresult);
                 print_r($response);
-       }
-     }
-   } 
-
-
+            }
+        }
+    }
+    
+    
+    /*
+    ----------------------------------------------------------------------------------------------------------
+    http://104.237.3.116/tap911/index.php/webservice/end_emergency_by_helping_user?token=dd088bfaaaf468cb&notification_user_id=147&emergency_id=603&message_data=test for end emergency
+    -----------------------------------------------------------------------------------------------------------
+    */
+    
+    function end_emergency_by_helping_user()
+    {
+        $token                = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+        $notification_user_id = isset($_REQUEST['notification_user_id']) ? $_REQUEST['notification_user_id'] : "";
+        $emergency_id         = isset($_REQUEST['emergency_id']) ? $_REQUEST['emergency_id'] : "";
+        $message_data         = isset($_REQUEST['message_data']) ? $_REQUEST['message_data'] : "";
+        if ($token == "" or $notification_user_id == "" or $emergency_id == "" or $message_data == "") {
+            die(json_encode(array(
+                "status" => 0,
+                "message" => "Input parameters are not found"
+            )));
+            
+        } else {
+            $token                = $_REQUEST['token'];
+            $notification_user_id = $_REQUEST['notification_user_id'];
+            $sql                  = "SELECT token,user_id FROM tbl_user where token='$token' and user_id='$notification_user_id'";
+            $res                  = $this->db->query($sql);
+            $row                  = $res->row();
+            if ($row) {
+                $response = $this->user_model->end_emergency_by_helping_user($token);
+                $response = json_encode($response);
+                print_r($response);
+            } else {
+                $returnresult = array(
+                    'status' => 0,
+                    'message' => 'Authentication failed'
+                );
+                $response     = json_encode($returnresult);
+                print_r($response);
+            }
+        }
+    }
+    
+    
 }
 /* End of file welcome.php */
 /* Location: ./application/controllers/welcome.php */
