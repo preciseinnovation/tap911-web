@@ -171,7 +171,8 @@ class Webservice extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $json_data = $this->user_model->get_community($token); //user_id
+                 $total_page = $this->user_model->get_page_number_community();
+                  $json_data = $this->user_model->get_community($token); //user_id
                 if ($json_data) {
                     $arr = array();
                     foreach ($json_data as $results) {
@@ -201,11 +202,13 @@ class Webservice extends CI_Controller
                     
                     $returnresult = array(
                         'status' => 1,
+                        'total_page'=>$total_page,
                         'message' => 'Record found',
                         'community_list' => $arr
                     );
-                    $response     = json_encode($returnresult);
+                    $response = json_encode($returnresult);
                     print_r($response);
+
                     
                 } else {
                     $returnresult = array(
@@ -908,9 +911,9 @@ class Webservice extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
+                 
                 
-                
-                $results        = $this->db->query("SELECT community_id from tbl_community_user_mapping where user_id=$user_id and request_status =3");
+                $results        = $this->db->query("SELECT community_id from tbl_community_user_mapping where user_id=$user_id and request_status =3 and status=1");
                 $resultdata     = $results->result_array();
                 $countvarresult = count($resultdata);
                 
@@ -931,8 +934,9 @@ class Webservice extends CI_Controller
                     $add_date              = $rows->add_date;
                     
                     $arr1 = array();
-                    
-                    $json_data = $this->user_model->get_community_emergency_contact($id,$index);
+                    $total_page = $this->user_model->get_page_number_community_contact($id);
+                
+                    $json_data = $this->user_model->get_community_emergency_contact($id);
                     if ($json_data == '') {
                         $returnresult = array(
                             'status' => 0,
@@ -979,6 +983,7 @@ class Webservice extends CI_Controller
                 
                 $returnresult = array(
                     'status' => 1,
+                    'total_page'=>$total_page,
                     'message' => 'Record found',
                     'all_record' => $arr2
                 );
@@ -2894,32 +2899,17 @@ class Webservice extends CI_Controller
             $row     = $res->row();
             if ($row) {
 
-                $json_data2 = $this->user_model->emergency_create_user($user_id);
-
-                 $emergencyuser = array();
-                    foreach ($json_data2 as $results) {
-                        $emergencyuser[] = array(
-                       
-                       'emergency_notification_id' =>$results->emergency_notification_id,
-                        'user_name' =>$results->user_name,
-                        'user_id' => $results->user_id,
-                        'emergency_id' => $results->emergency_id,
-                        'emergency_latitude' => $results->emergency_latitude,
-                        'emergency_longitude' => $results->emergency_longitude,
-                        'emergency_address' => $results->emergency_address,
-                        'emergency_type' =>$results->emergency_type,
-                        'add_date' => $results->add_date,
-                        'emergency_status' =>$results->emergency_status
-                            
-                        );
-                    }
-
-                $json_data = $this->user_model->get_emergency_user($token,$user_id,$index);
+               
+               $json_datatotal = $this->user_model->emergency_create_user();
+               //echo $json_datatotal;
+                 $json_data = $this->user_model->get_emergency_user();
+                 //print_r($json_data);die();
                 if ($json_data) {
-                    $notificationuser = array();
+                    // $notificationuser = array();
                     foreach ($json_data as $results) {
-                        $emergency_status =$results->emergency_status;
-                        if($emergency_status!=2){
+                      // echo $results->estatus;die();
+                       $loginuserid =$results->user_id;
+                       if($loginuserid==$user_id){
                         $notificationuser[] = array(
 
                          'emergency_notification_id' =>$results->emergency_notification_id,
@@ -2931,18 +2921,38 @@ class Webservice extends CI_Controller
                         'emergency_address' => $results->emergency_address,
                         'emergency_type' =>$results->emergency_type,
                         'add_date' => $results->add_date,
-                        'emergency_status' =>$emergency_status
+                        'emergency_status' =>'3'
                             
                         );
-                    }
+                       }
+                          if($loginuserid!=$user_id){
+                          $notificationuser[] = array(
+
+                         'emergency_notification_id' =>$results->emergency_notification_id,
+                        'user_name' =>$results->user_name,
+                        'user_id' => $results->user_id,
+                        'emergency_id' => $results->emergency_id,
+                        'emergency_latitude' => $results->emergency_latitude,
+                        'emergency_longitude' => $results->emergency_longitude,
+                        'emergency_address' => $results->emergency_address,
+                        'emergency_type' =>$results->emergency_type,
+                        'add_date' => $results->add_date,
+                        'emergency_status' =>$results->estatus
+                            
+                        );
+
+                       }
+                       // print_r($notificationuser);
+                    //}
                 }
              
-                    $result = array_merge($notificationuser, $emergencyuser);
+                    // $result = array_merge($notificationuser, $emergencyuser);
                   
                     $returnresult = array(
                         'status' => 1,
+                         'total_page'=>$json_datatotal,
                         'message' => 'Record found',
-                        'emergency_user_list' => $result
+                        'emergency_user_list' => $notificationuser
                     );
                     $response     = json_encode($returnresult);
                     print_r($response);
