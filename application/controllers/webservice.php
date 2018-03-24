@@ -124,21 +124,18 @@ class Webservice extends CI_Controller
         $user_type_id              = isset($_REQUEST['user_type_id']) ? $_REQUEST['user_type_id'] : "";
         $country_id                = isset($_REQUEST['country_id']) ? $_REQUEST['country_id'] : "";
         $phone_number              = isset($_REQUEST['phone_number']) ? $_REQUEST['phone_number'] : "";
-        // $phone_number_voice_notification_country_code = isset($_REQUEST['phone_number_voice_notification_country_code']) ? $_REQUEST['phone_number_voice_notification_country_code'] : "";
-        // $phone_number_voice_notification              = isset($_REQUEST['phone_number_voice_notification']) ? $_REQUEST['phone_number_voice_notification'] : "";
+        $user_lat              = isset($_REQUEST['user_lat']) ? $_REQUEST['user_lat'] : "";
+        $user_long              = isset($_REQUEST['user_long']) ? $_REQUEST['user_long'] : "";
         $password                  = isset($_REQUEST['password']) ? $_REQUEST['password'] : "";
         $notification_device_token = isset($_REQUEST['notification_device_token']) ? $_REQUEST['notification_device_token'] : "";
         $mobile_type               = isset($_REQUEST['mobile_type']) ? $_REQUEST['mobile_type'] : "";
-        // $profile_pic = isset($_REQUEST['profile_pic']) ? $_REQUEST['profile_pic'] :"";
-        
-        if ($first_name == "" or $last_name == "" or $user_name = "" or $email = "" or $country_id = "" or $phone_number == "" or $password == "" or $notification_device_token == "" or $mobile_type = "" or $user_type_id == "") {
+        if ($first_name == "" or $last_name == "" or $user_name = "" or $email = "" or $country_id = "" or $phone_number == "" or $password == "" or $notification_device_token == "" or $mobile_type == "" or $user_type_id == "" or $user_lat=="" or $user_long=="") {
             die(json_encode(array(
                 "status" => 0,
                 "message" => "Input parameters are not found"
             )));
             
         } else {
-            // $profile_pic = $_REQUEST['profile_pic'];
             $response = $this->user_model->user_registration();
             $response = json_encode($response);
             print_r($response);
@@ -1960,11 +1957,11 @@ class Webservice extends CI_Controller
         $user_id             = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
         $emergency_latitude  = isset($_REQUEST['emergency_latitude']) ? $_REQUEST['emergency_latitude'] : "";
         $emergency_longitude = isset($_REQUEST['emergency_longitude']) ? $_REQUEST['emergency_longitude'] : "";
-        $emergency_address   = isset($_REQUEST['emergency_address']) ? $_REQUEST['emergency_address'] : "";
+        // $emergency_address   = isset($_REQUEST['emergency_address']) ? $_REQUEST['emergency_address'] : "";
         $emergency_type      = isset($_REQUEST['emergency_type']) ? $_REQUEST['emergency_type'] : "";
         
         
-        if ($token == "" or $user_id == '' or $emergency_latitude == "" or $emergency_longitude == "" or $emergency_address == "" or $emergency_type == "") {
+        if ($token == "" or $user_id == '' or $emergency_latitude == "" or $emergency_longitude == "" or $emergency_type == "") {
             die(json_encode(array(
                 "status" => 0,
                 "message" => "Input parameters are not found"
