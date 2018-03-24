@@ -1185,9 +1185,9 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
         $sql        = "SELECT * FROM tbl_user WHERE `user_id`='$emuserid'";
         $resultdata = $this->db->query($sql);
         $resultdata = $resultdata->row();
-        $first_name = $resultdata->first_name;
-        $last_name  = $resultdata->last_name;
-        $user_names = $first_name . " " . $last_name;
+        $emfirst_name = $resultdata->first_name;
+        $emlast_name  = $resultdata->last_name;
+        $user_name = $emfirst_name . " " . $emlast_name;
         // print_r($notification_device_token);die();
         
         $results           = $this->db->query("SELECT * from tbl_emergency_contact where user_id='$emuserid'");
@@ -1196,10 +1196,8 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
         $require           = array();
         for ($j = 0; $j < $countvarresults; $j++) {
             
-            $id = $remergencycontact[$j]['emergency_user_help_id'];
+                $id = $remergencycontact[$j]['emergency_user_help_id'];
             
-            if ($id) {
-                
                 
                 $SQL = "insert into tbl_emergency_notification(notification_user_id,emergency_id)values('$id','$ids')";
                 $res = mysql_query($SQL);
@@ -1214,7 +1212,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
                     $notification_device_token = $result->notification_device_token;
                     $first_name                = $result->first_name;
                     $last_name                 = $result->last_name;
-                    $user_name                 = $first_name . " " . $last_name;
+                    $helpuser_name                 = $first_name . " " . $last_name;
                     // print_r($notification_device_token);die();
                     $mobile_type               = $result->mobile_type;
                      $user_id               = $row->user_id;
@@ -1226,8 +1224,8 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
                     
                     $sound = $notification_tone;
                     $usertoken    = $notification_device_token;
-                    $title        = "hello i am" . $user_names;
-                    $body         = $user_name . " " . "Please help me";
+                    $title        = "hello i am" . $user_name;
+                    $body         = $helpuser_name . " " . "Please help me";
                     $notification = array(
                         'title' => $title,
                         'text' => $body,
@@ -1253,33 +1251,36 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
                     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
                     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                     // $returnresult = 
-                    array_push($require, curl_exec($ch));
+
+                     array_push($require, curl_exec($ch));
+                    if ($usertoken){
+                         $returnresult = array(
+            'status' => 1,
+            'data' => $require,
+            'message' => 'success'
+            
+           );
+                  
+}else{
+     die(json_encode(array(
+                "status" => 0,
+                "message" => "no user"
+            )));
+}
                     curl_close($ch);
                     if ($mobile_type == 'android' || $mobile_type == 'ios') {
                         
                     }
                 }
                 
-                $returnresult = array(
-                    'status' => 1,
-                    'data' => $require,
-                    'message' => 'success'
+                // $returnresult = array(
+                //     'status' => 1,
+                //     'data' => $require,
+                //     'message' => 'success'
                     
-                );
+                // );
                 
                 return $returnresult;
-            } else {
-                
-                $address = file_get_contents("http://maps.googleapis.com/maps/api/geocode/json?latlng=$user_lat,$user_long&sensor=true");
-                
-                $returnresult = array(
-                    'status' => 1,
-                    'data' => $address,
-                    'message' => 'No user in range'
-                    
-                );
-                
-            }
             
         }
         
@@ -1311,9 +1312,6 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
         $last_name  = $resultdata->last_name;
         $user_name  = $first_name . " " . $last_name;
         
-        // if (!ini_get('date.timezone')) {
-        //     date_default_timezone_set('UTC');
-        // }
         $dateValue = date("Y-m-d H:i:s");
         $time      = strtotime($dateValue);
         $month     = date("F", $time);
@@ -1332,19 +1330,15 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
         
         $datas = $result->result_array();
         
-        if ($datas) {
-            
             
             $countvars = count($datas);
             $require   = array();
-            // $alert_type[] ='user';
             for ($j = 0; $j < $countvars; $j++) {
-                //$alert_type ='user';
+
                 $uid                       = $datas[$j]['user_id'];
-                // $alert_address = $data[$i]['address'];
-                $alert_lat                 = $data[$j]['latitude'];
-                $alert_lang                = $data[$j]['longitude'];
-                $SQL                       = "insert into tbl_emergency_notification(notification_user_id,emergency_id,em_lat,em_long) values('$uid','$ids','$alert_lat','$alert_lang')";
+
+                $SQL = "insert into tbl_emergency_notification(notification_user_id,emergency_id) values('$uid','$ids')";
+
                 $res                       = mysql_query($SQL);
                 $emergency_notification_id = $this->db->insert_id();
                 
@@ -1352,25 +1346,24 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
                 $sql = "SELECT * FROM tbl_user WHERE `user_id` IN ('$uid')";
                 $res = $this->db->query($sql);
                 $row = $res->row();
-                // print_r($row);
-                // die();
+
                 if ($row) {
                     $notification_device_token = $row->notification_device_token;
-                    $first_name                = $resultdata->first_name;
-                    $last_name                 = $resultdata->last_name;
-                    $user_names                = $first_name . " " . $last_name;
+                    $first_names                = $row->first_name;
+                    $last_names                 = $row->last_name;
+                    $helpuser_name                = $first_names . " " . $last_names;
                     $mobile_type               = $row->mobile_type;
                       $user_id               = $row->user_id;
                     $sql        = "SELECT notification_tone,user_id FROM tbl_notification WHERE `user_id`='$user_id'";
                     $resultdatatone = $this->db->query($sql);
                     $resultdatatone = $resultdatatone->row();
                     $notification_tone = $resultdatatone->notification_tone;
-                    // print_r($mobile_type);die();
+            
                     $ch                        = curl_init("https://fcm.googleapis.com/fcm/send");
                     $sound = $notification_tone;
                     $usertoken    = $notification_device_token;
                     $title        = "Hello i am" ." ". $user_name;
-                    $body         = $user_names . " " . "Please help me";
+                    $body         = $helpuser_name . " " . "Please help me";
                     $notification = array(
                         'title' => $title,
                         'text' => $body,
@@ -1395,8 +1388,24 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
                     curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
                     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
                     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                    // $returnresult = 
-                    array_push($require, curl_exec($ch));
+    
+                   array_push($require, curl_exec($ch));
+                    if ($usertoken){
+                          $returnresult = array(
+            'status' => 1,
+            'data' => $require,
+            'message' => 'success'
+            
+           );
+                   
+}else{
+   
+      die(json_encode(array(
+                "status" => 0,
+                "message" => "no user"
+            )));
+
+}
                     curl_close($ch);
                     if ($mobile_type == 'android' || $mobile_type == 'ios') {
                         
@@ -1409,28 +1418,14 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
                     );
                 }
             }
-            $returnresult = array(
-                'status' => 1,
-                'data' => $require,
-                'message' => 'success'
+            // $returnresult = array(
+            //     'status' => 1,
+            //     'data' => $require,
+            //     'message' => 'success'
                 
-            );
+            // );
             
             return $returnresult;
-            
-        }
-        
-        else {
-            
-            $address = file_get_contents("http://maps.googleapis.com/maps/api/geocode/json?latlng=$user_lat,$user_long&sensor=true");
-            
-            $returnresult = array(
-                'status' => 1,
-                'data' => $address,
-                'message' => 'No user in range'
-                
-            );
-        }
         
     }
     
@@ -1441,18 +1436,38 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
     {
         $user_lat  = $_REQUEST['emergency_latitude'];
         $user_long = $_REQUEST['emergency_longitude'];
+        $emergency_address = $_REQUEST['emergency_address'];
+        if($emergency_address==""){
+        $address=file_get_contents("http://maps.googleapis.com/maps/api/geocode/json?latlng=$user_lat,$user_long&sensor=true");
+        $json_data=json_decode($address);
+        $full_address=$json_data->results[0]->formatted_address;
+
         $data      = array(
             'user_id' => $_REQUEST['user_id'],
             'emergency_latitude' => $user_lat,
             'emergency_longitude' => $user_long,
-            'emergency_address' => $_REQUEST['emergency_address'],
+            'emergency_address' => $full_address,
             'emergency_type' => $_REQUEST['emergency_type'],
-            'emergency_status'=>3,
             'status' => 1
         );
         
         $data = $this->db->insert('tbl_emergency', $data);
         $ids  = $this->db->insert_id();
+    }else{
+
+         $data      = array(
+            'user_id' => $_REQUEST['user_id'],
+            'emergency_latitude' => $user_lat,
+            'emergency_longitude' => $user_long,
+            'emergency_address' => $emergency_address,
+            'emergency_type' => $_REQUEST['emergency_type'],
+            'status' => 1
+        );
+        
+        $data = $this->db->insert('tbl_emergency', $data);
+        $ids  = $this->db->insert_id();
+
+    }
         
         
         $register = $this->send_miles_notification($ids, $user_lat, $user_long);
@@ -1461,8 +1476,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
         return $temp;
         return $register;
         
-        //echo  $temp; die();
-        /*--------------------------------------------------------get user create by----------------------------------------------------------*/
+/*--------------------------------------------------------get user create by----------------------------------------------------------*/
         
         $sql        = "SELECT user_id FROM tbl_emergency where emergency_id='$ids'";
         $res        = $this->db->query($sql);
@@ -1471,9 +1485,11 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
         $sql        = "SELECT * FROM tbl_user WHERE `user_id`='$emuserid'";
         $resultdataname = $this->db->query($sql);
         $resultdataname = $resultdataname->row();
-        $first_name = $resultdataname->first_name;
-        $last_name  = $resultdataname->last_name;
-        $user_name  = $first_name . " " . $last_name;
+        $emfirst_name = $resultdataname->first_name;
+        $emlast_name  = $resultdataname->last_name;
+        $user_name  = $emfirst_name . " " . $emlast_name;
+        $fcmtoken = $resultdataname->$notification_device_token;
+     
         
         /*-----------------------------------------------------------------------------------------------------------------------------------*/
         
@@ -1489,22 +1505,15 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
         
         
         
-        $resultdata = $results->result_array();
-        if ($resultdata) {
-            
+            $resultdata = $results->result_array();
             $countvarresult = count($resultdata);
             $require        = array();
 
-
-
-            // $alert_type[] ='user';
             for ($i = 0; $i < $countvarresult; $i++) {
-                //$alert_type ='user';
+             
                 $id                        = $resultdata[$i]['user_id'];
-                // $alert_address = $data[$i]['address'];
-                $alert_lat                 = $resultdata[$i]['user_lat'];
-                $alert_lang                = $resultdata[$i]['user_long'];
-                $SQL                       = "insert into tbl_emergency_notification(notification_user_id,emergency_id,em_lat,em_long) values('$id','$ids','$alert_lat','$alert_lang')";
+               
+        $SQL = "insert into tbl_emergency_notification(notification_user_id,emergency_id) values('$id','$ids')";
                 $res                       = mysql_query($SQL);
                 $emergency_notification_id = $this->db->insert_id();
                 
@@ -1512,12 +1521,10 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
                 $sql = "SELECT * FROM tbl_user WHERE `user_id` IN ('$id')";
                 $res = $this->db->query($sql);
                 $row = $res->row();
-                // print_r($row);
-                // die();
                 if ($row) {
                     $notification_device_token = $row->notification_device_token;
-                    $first_name                = $resultdata->first_name;
-                    $last_name                 = $resultdata->last_name;
+                    $first_name                = $row->first_name;
+                    $last_name                 = $row->last_name;
                     $user_names                = $first_name . " " . $last_name;
                     $mobile_type               = $row->mobile_type;
                     $user_id                   = $row->user_id;
@@ -1555,46 +1562,44 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
                     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
                     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                     // $returnresult = 
-                    array_push($require, curl_exec($ch));
+                     array_push($require, curl_exec($ch));
+                    if ($usertoken){
+            $returnresult = array(
+            'status' => 1,
+            'data' => $require,
+            'message' => 'success'
+            
+           );
+        }else{
+     
+     die(json_encode(array(
+                "status" => 0,
+                "message" => "no user"
+            )));
+
+}
                     curl_close($ch);
                     if ($mobile_type == 'android' || $mobile_type == 'ios') {
                         
                     }
                     
                 } else {
+                    
+
                     $returnresult = array(
-                        'status' => 0,
-                        'message' => 'Some data not valid'
-                    );
+                    'status' => 1,
+                    'message' =>'No user available for help'
+            
+                   );  
                 }
             }
-        } else {
-            
-            $address = file_get_contents("http://maps.googleapis.com/maps/api/geocode/json?latlng=$user_lat,$user_long&sensor=true");
-            
-            $returnresult = array(
-                'status' => 1,
-                'data' => $address,
-                'message' => 'No user in range'
-                
-            );
-        }
-        
-        
         
         /*-------------------------------end 3 miles user notification----------------------------------------------- */
+
         
-        $returnresult = array(
-            'status' => 1,
-            'data' => $require,
-            'message' => 'success'
-            
-        );
-        
+      
         return $returnresult;
     }
-    
-    
     
     /*-------------------------------accept_emergency_request----------------------------------------------- */
     
@@ -1729,9 +1734,9 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
     function get_emergency_live_location()
     {
         
-        if (!ini_get('date.timezone')) {
-            date_default_timezone_set('UTC');
-        }
+        // if (!ini_get('date.timezone')) {
+        //     date_default_timezone_set('UTC');
+        // }
         $dateValue    = date("Y-m-d H:i:s");
         $time         = strtotime($dateValue);
         $month        = date("F", $time);
