@@ -24,10 +24,13 @@ class User_model extends CI_Model
             $token                     = bin2hex($tokens);
             $notification_device_token = $_REQUEST['notification_device_token'];
             $mobile_type               = $_REQUEST['mobile_type'];
+            $time_zone               =   $_REQUEST['time_zone'];
             $data                      = array(
                 'token' => $token,
                 'notification_device_token' => $notification_device_token,
-                'mobile_type' => $mobile_type
+                'mobile_type' => $mobile_type,
+                'time_zone' => $time_zone
+                
             );
             $this->db->where('user_id', $customer_id);
             $value       = $this->db->update('tbl_user', $data);
@@ -2013,26 +2016,29 @@ function get_emergency_user(){
           
          // $limit = $index*$end;
 
-        $result  =$this->db->query("SELECT `tbl_user`.*,`tbl_emergency`.*,`tbl_emergency_notification`.*,`tbl_emergency_notification`.`emergency_status` as estatus
-        FROM `tbl_user`
-        JOIN `tbl_emergency` ON `tbl_emergency`.`user_id` = `tbl_user`.`user_id`
-        JOIN `tbl_emergency_notification` on `tbl_emergency`.`emergency_id` = `tbl_emergency_notification`.`emergency_id`
- WHERE (`tbl_emergency_notification`.`notification_user_id`=$user_id or `tbl_emergency`.`user_id` = $user_id)and `tbl_emergency_notification`.emergency_status!=2 LIMIT $start,10
-");
+$result  =$this->db->query("SELECT `tbl_user`.user_id,`tbl_user`.user_name,`tbl_emergency`.user_id,`tbl_emergency`.emergency_id,`tbl_emergency`.emergency_latitude,`tbl_emergency`.emergency_longitude,`tbl_emergency`.emergency_address,`tbl_emergency`.emergency_type,`tbl_emergency`.add_date,`tbl_emergency_notification`.emergency_notification_id,`tbl_emergency_notification`.emergency_status,`tbl_emergency_notification`.send_date_time,`tbl_emergency_notification`.accept_date_time
+FROM `tbl_emergency`
+LEFT JOIN `tbl_user` ON `tbl_emergency`.`user_id` = `tbl_user`.`user_id`
+LEFT JOIN `tbl_emergency_notification` on `tbl_emergency`.`emergency_id` = `tbl_emergency_notification`.`emergency_id`
+ WHERE(`tbl_emergency_notification`.`notification_user_id`=$user_id or `tbl_emergency`.`user_id` = $user_id) and `tbl_emergency_notification`.emergency_status!=2 LIMIT $start,10
 
-       
-        return $result->result();
+"); 
+    return $result->result();
 
   
 
 }
  function emergency_create_user(){
      $user_id = $_REQUEST['user_id'];
-  $result  =$this->db->query("SELECT `tbl_user`.*,`tbl_emergency`.*,`tbl_emergency_notification`.*
-        FROM `tbl_user`
-        JOIN `tbl_emergency` ON `tbl_emergency`.`user_id` = `tbl_user`.`user_id`
-        JOIN `tbl_emergency_notification` on `tbl_emergency`.`emergency_id` = `tbl_emergency_notification`.`emergency_id`
- WHERE (`tbl_emergency_notification`.`notification_user_id`=$user_id or `tbl_emergency`.`user_id` = $user_id) and `tbl_emergency_notification`.emergency_status!=2
+  $result  =$this->db->query("SELECT `tbl_user`.*,`tbl_emergency`.*
+FROM `tbl_user`
+JOIN `tbl_emergency` ON `tbl_emergency`.`user_id` = `tbl_user`.`user_id`
+JOIN `tbl_emergency_notification` on `tbl_emergency`.`emergency_id` = `tbl_emergency_notification`.`emergency_id`
+ WHERE `tbl_emergency_notification`.`notification_user_id`=$user_id and `tbl_emergency_notification`.emergency_status!=2
+UNION SELECT `tbl_user`.*, `tbl_emergency`.*
+FROM `tbl_user`
+JOIN `tbl_emergency` ON `tbl_emergency`.`user_id` = `tbl_user`.`user_id`
+WHERE `tbl_emergency`.`user_id` = $user_id
 ");
   
   $total = count($result->result());
@@ -2041,5 +2047,18 @@ function get_emergency_user(){
     $pagenumber = ceil($totalpage);
   return $pagenumber;
  }
+
+
+ function get_status($user_id){
+
+
+$result  =$this->db->query("SELECT emergency_notification_id,emergency_status FROM tbl_emergency_notification  where notification_user_id ='$user_id'
+");
+
+        return $result->result();
+
+  
+
+}
   
 }
