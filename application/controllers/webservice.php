@@ -26,9 +26,10 @@ class Webservice extends CI_Controller
         $password                  = isset($_REQUEST['password']) ? $_REQUEST['password'] : "";
         $notification_device_token = isset($_REQUEST['notification_device_token']) ? $_REQUEST['notification_device_token'] : "";
         $mobile_type               = isset($_REQUEST['mobile_type']) ? $_REQUEST['mobile_type'] : "";
+        $time_zone               = isset($_REQUEST['time_zone']) ? $_REQUEST['time_zone'] : "";
         
         
-        if ($login == "" or $password == "" or $notification_device_token == '' or $mobile_type == "") {
+        if ($login == "" or $password == "" or $notification_device_token == '' or $mobile_type == "" or $time_zone=="") {
             die(json_encode(array(
                 "status" => 0,
                 "message" => "Input parameters are not found"
@@ -2891,25 +2892,24 @@ class Webservice extends CI_Controller
         } else {
             $token   = $_REQUEST['token'];
             $user_id = $_REQUEST['user_id'];
-            $sql     = "SELECT token,user_id FROM tbl_user where token='$token' and user_id='$user_id'";
+            $sql     = "SELECT token,user_id,time_zone FROM tbl_user where token='$token' and user_id='$user_id'";
             $res     = $this->db->query($sql);
             $row     = $res->row();
+            $time_zone     = $row->time_zone;
             if ($row) {
 
-               
-               $json_datatotal = $this->user_model->emergency_create_user();
-               //echo $json_datatotal;
+                 $json_datatotal = $this->user_model->emergency_create_user();
                  $json_data = $this->user_model->get_emergency_user();
-                 //print_r($json_data);die();
+                
                 if ($json_data) {
-                    // $notificationuser = array();
                     foreach ($json_data as $results) {
-                      // echo $results->estatus;die();
                        $loginuserid =$results->user_id;
+                        $add_date =$results->add_date;
+                       // $datetime = new DateTime($add_date, new DateTimeZone($time_zone));
                        if($loginuserid==$user_id){
                         $notificationuser[] = array(
 
-                         'emergency_notification_id' =>$results->emergency_notification_id,
+                         'emergency_notification_id' =>"",
                         'user_name' =>$results->user_name,
                         'user_id' => $results->user_id,
                         'emergency_id' => $results->emergency_id,
@@ -2917,15 +2917,15 @@ class Webservice extends CI_Controller
                         'emergency_longitude' => $results->emergency_longitude,
                         'emergency_address' => $results->emergency_address,
                         'emergency_type' =>$results->emergency_type,
-                        'add_date' => $results->add_date,
+                        'add_date' => $add_date,
                         'emergency_status' =>'3'
                             
-                        );
+                           );
                        }
-                          if($loginuserid!=$user_id){
-                          $notificationuser[] = array(
+                       if($loginuserid!=$user_id){
 
-                         'emergency_notification_id' =>$results->emergency_notification_id,
+                          $notificationuser[] = array(
+                        'emergency_notification_id' =>$results->emergency_notification_id,
                         'user_name' =>$results->user_name,
                         'user_id' => $results->user_id,
                         'emergency_id' => $results->emergency_id,
@@ -2933,17 +2933,14 @@ class Webservice extends CI_Controller
                         'emergency_longitude' => $results->emergency_longitude,
                         'emergency_address' => $results->emergency_address,
                         'emergency_type' =>$results->emergency_type,
-                        'add_date' => $results->add_date,
-                        'emergency_status' =>$results->estatus
+                        'add_date' =>$add_date,
+                        'emergency_status' =>$results->emergency_status
                             
                         );
 
-                       }
-                       // print_r($notificationuser);
-                    //}
-                }
-             
-                    // $result = array_merge($notificationuser, $emergencyuser);
+                        }
+                
+                     }
                   
                     $returnresult = array(
                         'status' => 1,
