@@ -24,7 +24,7 @@ class User_model extends CI_Model
             $token                     = bin2hex($tokens);
             $notification_device_token = $_REQUEST['notification_device_token'];
             $mobile_type               = $_REQUEST['mobile_type'];
-            $time_zone               =   $_REQUEST['time_zone'];
+             $time_zone               = $_REQUEST['time_zone'];
             $data                      = array(
                 'token' => $token,
                 'notification_device_token' => $notification_device_token,
@@ -197,13 +197,6 @@ $check = "SELECT * FROM tbl_user WHERE status=1 and (email ='" . $_REQUEST['emai
             );
           
         } 
-        // if($status==1) {
-        //         $returnresult = die(json_encode(array(
-        //             'status' => 0,
-        //         'message' => 'User already in Exists'
-        //         )));
-                
-        //     } 
         
         else {
             
@@ -219,7 +212,6 @@ $check = "SELECT * FROM tbl_user WHERE status=1 and (email ='" . $_REQUEST['emai
                     )));
                     
                 }
-                // if (!preg_match('/^[0-9]{20}+$/', $_REQUEST['phone_number']))
                 if (!is_numeric($_REQUEST['phone_number'])) {
                     $returnresult = die(json_encode(array(
                         "status" => 0,
@@ -312,7 +304,7 @@ $check = "SELECT * FROM tbl_user WHERE status=1 and (email ='" . $_REQUEST['emai
           $user_id = $_REQUEST['user_id'];
         $result  = $this->db->query("SELECT tc.community_name,tc.community_id,tc.community_description,tc.community_logo,tc.community_website,tc.community_email,tc.community_address,tc.add_date,tc.status,
 ifnull((select ifnull(tcum.`request_status`,0) as request_status from `tbl_community_user_mapping` tcum where tcum.`user_id`=$user_id and tcum.`community_id`=tc.`community_id`),tc.`default_status`) as request_status
-FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00' LIMIT $start,10");
+FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00' ORDER BY add_date DESC LIMIT $start,10");
         return $result->result();
     }
     
@@ -380,144 +372,24 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
         return $returnresult;
     }
     
-    /*-------------------------------change functinalty code----------------------------------------------- */
-    
-    // function user_comment_alertwise()
-    // {
-    //     $data = array(
-    //         'comment_user_id' => $_REQUEST['comment_user_id'],
-    //         'alert_id' => $_REQUEST['alert_id'],
-    //         'comment_text' => $_REQUEST['comment_text'],
-    //         'status' => 1
-    //     );
-    //     $data = $this->db->insert('tbl_comment', $data);
-    //     if ($data) {
-    //         $returnresult = array(
-    //             'status' => 1,
-    //             'message' => 'User comment successfully submit'
-    //         );
-    //     } else {
-    //         $returnresult = array(
-    //             'status' => 0,
-    //             'message' => 'Some data not valid'
-    //         );
-    //     }
-    
-    //     return $returnresult;
-    // }
-    // function user_comment_communitywise()
-    // {
-    //     $data = array(
-    //         'comment_user_id' => $_REQUEST['user_id'],
-    //         'community_id' => $_REQUEST['community_id'],
-    //         'comment_text' => $_REQUEST['comment_text'],
-    //         'status' => 1
-    //     );
-    //     $data = $this->db->insert('tbl_comment', $data);
-    //     if ($data) {
-    //         $returnresult = array(
-    //             'status' => 1,
-    //             'message' => 'User comment successfully submit'
-    //         );
-    //     } else {
-    //         $returnresult = array(
-    //             'status' => 0,
-    //             'message' => 'Some data not valid'
-    //         );
-    //     }
-    
-    //     return $returnresult;
-    // }
-    
-    
-    // function get_comment_communitywise($limit, $start = 100)
-    // {
-    //     $community_id = $_REQUEST['community_id'];
-    //      $user_id = $_REQUEST['user_id'];
-    //     $this->db->select('tbl_user.*,tbl_user.user_id,tbl_comment.*');
-    //     $this->db->from('tbl_comment');
-    //     $this->db->join('tbl_user', 'tbl_user.user_id = tbl_comment.comment_user_id', 'RIGHT');
-    //     $this->db->join('tbl_community', 'tbl_community.community_id = tbl_comment.community_id', 'RIGHT');
-    //     $this->db->limit($limit, $start);
-    //     $this->db->where('tbl_comment.community_id', $community_id);
-    //     $this->db->where('tbl_user.user_id', $user_id);
-    //     $query = $this->db->get();
-    //     return $query->result();
-    // }
-    
-    // function get_comment_alertwise()
-    // {
-    //     $alert_id = $_REQUEST['alert_id'];
-    //     $user_id = $_REQUEST['user_id'];
-    //     $this->db->select('tbl_user.*,tbl_comment.*');
-    //     $this->db->from('tbl_comment');
-    //     $this->db->join('tbl_user', 'tbl_user.user_id = tbl_comment.comment_user_id', 'INNER');
-    //     $this->db->join('tbl_alert', 'tbl_alert.alert_id = tbl_comment.alert_id', 'INNER');
-    //     $this->db->where('tbl_alert.alert_id', $alert_id);
-    //      $this->db->where('tbl_user.user_id', $user_id);
-    //     $this->db->group_by('comment_id');
-    //     $query = $this->db->get();
-    //     return $query->result();
-    // }
-    
-    // function get_alert_communitywise()
-    // {
-    //     $user_id = $_REQUEST['user_id'];
-    //     $this->db->select('tbl_user.*,tbl_user.user_id,tbl_alert.user_id,tbl_alert.*,tbl_community.*');
-    //     $this->db->from('tbl_alert');
-    //     $this->db->join('tbl_user', 'tbl_user.user_id = tbl_alert.user_id', 'INNER');
-    //     $this->db->join('tbl_community', 'tbl_community.community_id = tbl_alert.community_id', 'INNER');
-    //      $this->db->where('tbl_user.user_id', $user_id);
-    //     $query = $this->db->get();
-    //     return $query->result();
-    // }
-    
-    // function get_user_alert($limit, $start = 50)
-    // {
-    //     $user_id = $_REQUEST['user_id'];
-    //     $this->db->select('tbl_user.*,tbl_user.user_id,tbl_alert.user_id,tbl_alert.*,tbl_community.*,tbl_alert.status as userstatus');
-    //     $this->db->from('tbl_alert');
-    //     $this->db->join('tbl_user', 'tbl_user.user_id = tbl_alert.user_id', 'left');
-    //     $this->db->join('tbl_community', 'tbl_community.community_id = tbl_alert.community_id', 'left');
-    //      $this->db->limit($limit, $start);
-    //     $this->db->where('tbl_alert.user_id', $user_id);
-    //     $query = $this->db->get();
-    //     return $query->result();
-    // }
-    
     
     /*-------------------------------get_community_emergency_contact list ----------------------------------------------- */
     
     function get_community_emergency_contact($id)
     {
         $tmp_community_id = $id;
-        $index = $_REQUEST['index'];
-        $start = ($index-1)*10;
-
+       
         $this->db->select('community_emergency_number_id,community_emergency_number,community_emergency_number_type');
         $this->db->from('tbl_community_emergency_number');
         $this->db->where_in('tbl_community_emergency_number.community_id', $tmp_community_id);
-        $this->db->limit($start,10);
+        //$this->db->limit($start,10);
         $query = $this->db->get();
         return $query->result();
         
         
     }
     
-     function get_page_number_community_contact($id){
-         $tmp_community_id = $id;
-      $this->db->select('community_emergency_number_id,community_emergency_number,community_emergency_number_type');
-        $this->db->from('tbl_community_emergency_number');
-        $this->db->where_in('tbl_community_emergency_number.community_id', $tmp_community_id);
-        $query = $this->db->get();
-        $total = count($query ->result());
-        $totalpage = $total/10;    
-        $pagenumber = ceil($totalpage);
-        return $pagenumber;
-       // echo $total;
-       // die();
- }
-    
+   
     /*-------------------------------get_community_emergency_list ----------------------------------------------- */
     
     
@@ -528,10 +400,8 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
         $results        = $this->db->query("SELECT community_id from tbl_community_user_mapping where user_id=$user_id and request_status=1");
         $resultdata     = $results->result_array();
         $countvarresult = count($resultdata);
-        // $require        = array();
-        // $alert_type[] ='user';
+
         for ($i = 0; $i < $countvarresult; $i++) {
-            //$alert_type ='user';
             $id     = $resultdata[$i]['community_id'];
             $result = $this->db->query("SELECT * FROM tbl_community WHERE `community_id` IN ($id)");
             
@@ -700,16 +570,11 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
                 'last_name' => $_REQUEST['last_name'],
                 'email' => $_REQUEST['email'],
                 'language' => $_REQUEST['language'],
-                // 'phone_number_text_msg_country_code' => $_REQUEST['phone_number_text_msg_country_code'],
                 'phone_number_text_msg' => $_REQUEST['phone_number'],
-                // 'phone_number_voice_notification_country_code' => $_REQUEST['phone_number_voice_notification_country_code'],
-                // 'phone_number_voice_notification' => $_REQUEST['phone_number_voice_notification'],
                 'medical_history' => $_REQUEST['medical_history'],
                 'medication_instraction' => $_REQUEST['medication_instraction'],
                 'allergies' => $_REQUEST['allergies'],
                 'special_need' => $_REQUEST['special_need']
-                // 'user_lat' => $_REQUEST['user_lat'],
-                // 'user_long' => $_REQUEST['user_long']
             );
             $this->db->where('user_id', $user_id);
             $data = $this->db->update('tbl_user', $data);
@@ -740,16 +605,15 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
         if ($res->num_rows > 0) {
             $row         = $res->row();
             $user_id     = $row->user_id;
-            //  echo $user_id;
             $target      = "./uploads/";
             $target      = $target . basename($_FILES['profile_pic']['name']);
             $profile_pic = ($_FILES['profile_pic']['name']);
             
-            // echo  $profile_pic;
+           
             if (move_uploaded_file($_FILES['profile_pic']['tmp_name'], $target)) {
-                // echo  $profile_pic;
+               
                 $data = array(
-                    // 'user_id' => $_REQUEST['user_id'],
+            
                     'profile_pic' => $profile_pic
                 );
                 $this->db->where('user_id', $user_id);
@@ -848,21 +712,13 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
             $emergency_user_help_id = $value;
             
             $result = $this->db->query("SELECT * FROM tbl_user WHERE user_id IN ('$emergency_user_help_id')");
-            //$res   = $this->db->query($result);
-            //            echo "SELECT * FROM  tbl_user WHERE user_id IN ('$emergency_user_help_id')";
             $data   = $result->result_array();
-            
             $countvar = count($data);
-            
-            //            $require=array();
-            // $alert_type[] ='user';
             for ($i = 0; $i < $countvar; $i++) {
-                //$alert_type ='user';
                 $firstname    = $data[$i]['first_name'];
                 $last_name    = $data[$i]['last_name'];
                 $phone_number = $data[$i]['phone_number_text_msg'];
                 $name         = $firstname . " " . $last_name;
-                // echo $user_name;die();
                 
                 $SQL = "insert into tbl_emergency_contact(user_id,emergency_user_help_id,name,phone_number,tap911_user)
             values('$user_id','$emergency_user_help_id','$name','$phone_number','$tap911_user')";
@@ -1253,7 +1109,6 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
                     curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
                     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
                     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                    // $returnresult = 
 
                      array_push($require, curl_exec($ch));
                     if ($usertoken){
@@ -1275,13 +1130,6 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
                         
                     }
                 }
-                
-                // $returnresult = array(
-                //     'status' => 1,
-                //     'data' => $require,
-                //     'message' => 'success'
-                    
-                // );
                 
                 return $returnresult;
             
@@ -1421,13 +1269,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
                     );
                 }
             }
-            // $returnresult = array(
-            //     'status' => 1,
-            //     'data' => $require,
-            //     'message' => 'success'
-                
-            // );
-            
+        
             return $returnresult;
         
     }
@@ -1850,19 +1692,26 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
     /*-------------------------------get_community_communication----------------------------------------------- */
     
     
-    function get_community_communication()
+    function get_community_communication($time_zone)
     {
-        $from_user_id = $_REQUEST['from_user_id'];
-        // $to_user_id = $_REQUEST['to_user_id'];
-        $community_id = $_REQUEST['community_id'];
-        $this->db->select('*');
-        $this->db->from('tbl_community_communitaction');
-        // $this->db->limit($limit,$start);
-        $this->db->where('from_user_id', $from_user_id);
-        // $this->db->where('tbl_community_communitaction.to_user_id', $to_user_id);
-        $this->db->where('community_id', $community_id);
-        $query = $this->db->get();
-        return $query->result();
+            $from_user_id = $_REQUEST['from_user_id'];
+            $community_id = $_REQUEST['community_id'];
+            $timezone1 = explode("+",$time_zone);
+            $timezone2 = explode("-",$time_zone);
+            $time1=$timezone1[1];
+            $time2=$timezone2[1];
+            if($time1!=""){
+              $time="+".$timezone1[1];
+            }else{
+               $time="-".$timezone2[1];
+            }
+
+$result  =$this->db->query("SELECT community_communitaction_id,from_user_id,to_user_id,community_id,community_id,message_data,add_date,msg_type,CONVERT_TZ(add_date, @@session.time_zone, '$time')as senddate
+ FROM `tbl_community_communitaction`
+ WHERE from_user_id=$from_user_id and community_id= $community_id");
+return $result->result();
+
+
     }
     
     
@@ -2006,24 +1855,32 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
     }
     
 
-function get_emergency_user(){
+function get_emergency_user($time_zone){
 
         $user_id = $_REQUEST['user_id'];
         $index = $_REQUEST['index'];
         // $starts=$index*10;
-        $start = ($index-1)*10;
-         
-          
+           $start = ($index-1)*10;
+           $timezone1 = explode("+",$time_zone);
+           $timezone2 = explode("-",$time_zone);
+            $time1=$timezone1[1];
+            $time2=$timezone2[1];
+            if($time1!=""){
+              $time="+".$timezone1[1];
+            }else{
+               $time="-".$timezone2[1];
+            }
+           
          // $limit = $index*$end;
 
-$result  =$this->db->query("SELECT `tbl_user`.user_id,`tbl_user`.user_name,`tbl_emergency`.user_id,`tbl_emergency`.emergency_id,`tbl_emergency`.emergency_latitude,`tbl_emergency`.emergency_longitude,`tbl_emergency`.emergency_address,`tbl_emergency`.emergency_type,`tbl_emergency`.add_date,`tbl_emergency_notification`.emergency_notification_id,`tbl_emergency_notification`.emergency_status,`tbl_emergency_notification`.send_date_time,`tbl_emergency_notification`.accept_date_time
-FROM `tbl_emergency`
-LEFT JOIN `tbl_user` ON `tbl_emergency`.`user_id` = `tbl_user`.`user_id`
-LEFT JOIN `tbl_emergency_notification` on `tbl_emergency`.`emergency_id` = `tbl_emergency_notification`.`emergency_id`
- WHERE(`tbl_emergency_notification`.`notification_user_id`=$user_id or `tbl_emergency`.`user_id` = $user_id) and `tbl_emergency_notification`.emergency_status!=2 LIMIT $start,10
+$result  =$this->db->query("SELECT `tbl_user`.user_id,`tbl_user`.user_name,`tbl_emergency`.user_id,`tbl_emergency`.emergency_id,`tbl_emergency`.emergency_latitude,`tbl_emergency`.emergency_longitude,`tbl_emergency`.emergency_address,`tbl_emergency`.emergency_type,`tbl_emergency`.add_date,`tbl_emergency_notification`.emergency_notification_id,`tbl_emergency_notification`.emergency_status,`tbl_emergency_notification`.send_date_time,`tbl_emergency_notification`.accept_date_time,CONVERT_TZ(`tbl_emergency_notification`.send_date_time, @@session.time_zone, '$time')as senddate
+FROM `tbl_user`
+JOIN `tbl_emergency` ON `tbl_emergency`.`user_id` = `tbl_user`.`user_id`
+JOIN `tbl_emergency_notification` on `tbl_emergency`.`emergency_id` = `tbl_emergency_notification`.`emergency_id`
+ WHERE(`tbl_emergency_notification`.`notification_user_id`=$user_id or `tbl_emergency`.`user_id` = $user_id ) and `tbl_emergency_notification`.emergency_status!=2 ORDER BY `tbl_emergency_notification`.send_date_time DESC LIMIT $start,10");
 
-"); 
-    return $result->result();
+       
+        return $result->result();
 
   
 
