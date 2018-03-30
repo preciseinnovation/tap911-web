@@ -218,13 +218,13 @@ $check = "SELECT * FROM tbl_user WHERE status=1 and (email ='" . $_REQUEST['emai
                         "message" => "Please Enter number only"
                     )));
                 }
-                if (ctype_alpha($_REQUEST['user_name']) === false) {
+                // if (ctype_alpha($_REQUEST['user_name']) === false) {
                     
-                    $returnresult = die(json_encode(array(
-                        "status" => 0,
-                        "message" => "User Name must only contain letters!"
-                    )));
-                }
+                //     $returnresult = die(json_encode(array(
+                //         "status" => 0,
+                //         "message" => "User Name must only contain letters!"
+                //     )));
+                // }
                 
                 if (ctype_alpha($_REQUEST['first_name']) === false) {
                     
@@ -246,7 +246,9 @@ $check = "SELECT * FROM tbl_user WHERE status=1 and (email ='" . $_REQUEST['emai
                     'first_name' => $_REQUEST['first_name'],
                     'last_name' => $_REQUEST['last_name'],
                     'user_name' => $_REQUEST['user_name'],
-                    'email' => $_REQUEST['email'],
+                     'email' => $_REQUEST['email'],
+                     'dob' => $_REQUEST['dob'],
+                    'gender' => $_REQUEST['gender'],
                     'phone_number_text_msg_country_code' => $_REQUEST['country_id'],
                     'phone_number_text_msg' => $_REQUEST['phone_number'],
                     'user_lat' => $_REQUEST['user_lat'],
@@ -289,8 +291,111 @@ $check = "SELECT * FROM tbl_user WHERE status=1 and (email ='" . $_REQUEST['emai
         //}
         return $returnresult;
     }
+
+     /*-------------------------------add question list----------------------------------------------- */
     
+    function add_question_answer(){
+
+        $jsondata    = $_REQUEST['jsondata'];
+        $medical_condition    = $_REQUEST['medical_condition'];
+        $previous_surgeries_procedure    = $_REQUEST['previous_surgeries_procedure'];
+        $medication    = $_REQUEST['medication'];
+        $allergies    = $_REQUEST['allergies'];
+        $special_need    = $_REQUEST['special_need'];
+        $jsondatas = urldecode(stripslashes($jsondata));
+        $data3 = json_decode($jsondatas);
+
+        foreach ($data3 as $row) {
+              $user_id = $row->user_id;
+              $question_id = $row->question_id;
+              $answer = $row->answer;
+         $SQL = "insert into tbl_user_question_answer(user_id,question_id,answer,status)values('$user_id','$question_id','$answer','1')";
+                $res = mysql_query($SQL);
+}
+
+       if ($res) {
+            $data = array(
+                'medical_condition' => $_REQUEST['medical_condition'],
+                'previous_surgeries_procedure' => $_REQUEST['previous_surgeries_procedure'],
+                'medication' => $_REQUEST['medication'],
+                'allergies' => $_REQUEST['allergies'],
+                'special_need' => $_REQUEST['special_need']
+            );
+            $this->db->where('user_id', $user_id);
+            $data = $this->db->update('tbl_user', $data);
+            $returnresult = array(
+                'status' => 1,
+                'message' => 'User data save successfully'
+            );
+        } else {
+            $returnresult = array(
+                'status' => 0,
+                'message' => 'Some data not valid'
+            );
+        }
+        
+        return $returnresult;
+        
+    }
+
+
+  /*-------------------------------add question list----------------------------------------------- */
     
+    function update_question_answer(){
+
+        $jsondata    = $_REQUEST['jsondata'];
+        $medical_condition    = $_REQUEST['medical_condition'];
+        $previous_surgeries_procedure    = $_REQUEST['previous_surgeries_procedure'];
+        $medication    = $_REQUEST['medication'];
+        $allergies    = $_REQUEST['allergies'];
+        $special_need    = $_REQUEST['special_need'];
+        $jsondatas = urldecode(stripslashes($jsondata));
+        $data3 = json_decode($jsondatas);
+
+        foreach ($data3 as $row) {
+              $user_id = $row->user_id;
+              $question_id = $row->question_id;
+              $answer = $row->answer;
+$SQL = "UPDATE tbl_user_question_answer SET question_id='$question_id',answer='$answer' where question_id='$question_id'";
+                $res = mysql_query($SQL);
+}
+
+       if ($res) {
+            $data = array(
+                'medical_condition' => $_REQUEST['medical_condition'],
+                'previous_surgeries_procedure' => $_REQUEST['previous_surgeries_procedure'],
+                'medication' => $_REQUEST['medication'],
+                'allergies' => $_REQUEST['allergies'],
+                'special_need' => $_REQUEST['special_need']
+            );
+            $this->db->where('user_id', $user_id);
+            $data = $this->db->update('tbl_user', $data);
+            $returnresult = array(
+                'status' => 1,
+                'message' => 'User data save successfully'
+            );
+        } else {
+            $returnresult = array(
+                'status' => 0,
+                'message' => 'Some data not valid'
+            );
+        }
+        
+        return $returnresult;
+        
+    }
+
+    /*-------------------------------get city list----------------------------------------------- */
+    
+    function get_user_question_answer()
+    {
+         $user_id = $_REQUEST['user_id'];
+        $this->db->select('tbl_user_question_answer.*');
+        $this->db->from('tbl_user_question_answer');
+        $this->db->where('user_id', $user_id);
+        $query = $this->db->get();
+        return $query->result();
+    }
     
     /*-------------------------------get community list ----------------------------------------------- */
     
@@ -1467,10 +1572,10 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
             
         }
         
-        if ($value >= 2) {
+        if ($value==2) {
             
             $returnresult = array(
-                'status' => 1,
+                'status' => 0,
                 'message' => 'Only two user allow accept request'
             );
             
@@ -1561,13 +1666,14 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
                     
                 }
             }
-        }
-        
-        $returnresult = array(
+             $returnresult = array(
             'status' => 1,
             'message' => 'success',
             'response' => $require
-        );
+           );
+        }
+        
+       
         
         return $returnresult;
     }
