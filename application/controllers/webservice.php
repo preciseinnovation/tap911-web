@@ -120,9 +120,11 @@ class Webservice extends CI_Controller
         
         $first_name                = isset($_REQUEST['first_name']) ? $_REQUEST['first_name'] : "";
         $last_name                 = isset($_REQUEST['last_name']) ? $_REQUEST['last_name'] : "";
-        $user_name                 = isset($_REQUEST['user_name']) ? $_REQUEST['user_name'] : "";
+        // $user_name                 = isset($_REQUEST['user_name']) ? $_REQUEST['user_name'] : "";
         $email                     = isset($_REQUEST['email']) ? $_REQUEST['email'] : "";
-        $user_type_id              = isset($_REQUEST['user_type_id']) ? $_REQUEST['user_type_id'] : "";
+         $dob                     = isset($_REQUEST['dob']) ? $_REQUEST['dob'] : "";
+         $gender                     = isset($_REQUEST['gender']) ? $_REQUEST['gender'] : "";
+        // $user_type_id              = isset($_REQUEST['user_type_id']) ? $_REQUEST['user_type_id'] : "";
         $country_id                = isset($_REQUEST['country_id']) ? $_REQUEST['country_id'] : "";
         $phone_number              = isset($_REQUEST['phone_number']) ? $_REQUEST['phone_number'] : "";
         $user_lat              = isset($_REQUEST['user_lat']) ? $_REQUEST['user_lat'] : "";
@@ -130,7 +132,7 @@ class Webservice extends CI_Controller
         $password                  = isset($_REQUEST['password']) ? $_REQUEST['password'] : "";
         $notification_device_token = isset($_REQUEST['notification_device_token']) ? $_REQUEST['notification_device_token'] : "";
         $mobile_type               = isset($_REQUEST['mobile_type']) ? $_REQUEST['mobile_type'] : "";
-        if ($first_name == "" or $last_name == "" or $user_name = "" or $email = "" or $country_id = "" or $phone_number == "" or $password == "" or $notification_device_token == "" or $mobile_type == "" or $user_type_id == "" or $user_lat=="" or $user_long=="") {
+        if ($first_name == "" or $last_name == ""  or $email = "" or $country_id = "" or $phone_number == "" or $password == "" or $notification_device_token == "" or $mobile_type == "" or $user_lat=="" or $user_long=="" or $dob=="" or  $gender=="") {
             die(json_encode(array(
                 "status" => 0,
                 "message" => "Input parameters are not found"
@@ -459,6 +461,435 @@ class Webservice extends CI_Controller
     }
     
     /*
+    -----------------------------------------------------------------------------------------------------------
+    http://104.237.3.116/tap911/index.php/webservice/user_comment_alertwise?token=dd088bfaaaf468cb&comment_user_id=2&alert_id=2&comment_text=this%20is%20my%20first
+    -----------------------------------------------------------------------------------------------------------
+    */
+    
+    // function user_comment_alertwise()
+    // {
+    //     $comment_user_id = isset($_REQUEST['comment_user_id']) ? $_REQUEST['comment_user_id'] : "";
+    //     $alert_id        = isset($_REQUEST['alert_id']) ? $_REQUEST['alert_id'] : "";
+    //     $comment_text    = isset($_REQUEST['comment_text']) ? $_REQUEST['comment_text'] : "";
+    //     $token           = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+    
+    //     if ($comment_text == "" or $alert_id == "" or $comment_text == "" or $token == "") {
+    //         die(json_encode(array(
+    //             "status" => 0,
+    //             "message" => "Input parameters are not found"
+    //         )));
+    
+    //     } else {
+    
+    //         $token = $_REQUEST['token'];
+    //          $comment_user_id = $_REQUEST['comment_user_id'];
+    //         $sql   = "SELECT token FROM tbl_user where token='$token' and user_id='$comment_user_id'";
+    //         $res   = $this->db->query($sql);
+    //         $row   = $res->row();
+    //         if ($row) {
+    //             $response = $this->user_model->user_comment_alertwise($token);
+    //             $response = json_encode($response);
+    //             print_r($response);
+    //         } else {
+    //             $returnresult = array(
+    //                 'status' => 0,
+    //                 'message' => 'Authentication failed'
+    //             );
+    //             $response     = json_encode($returnresult);
+    //             print_r($response);
+    //         }
+    //     }
+    // }
+    
+    /*
+    -----------------------------------------------------------------------------------------------------------
+    http://104.237.3.116/tap911/index.php/webservice/user_comment_communitywise?token=dd088bfaaaf468cb&comment_user_id=1&community_id=2&comment_text=this%20is%20good
+    -----------------------------------------------------------------------------------------------------------
+    */
+    
+    // function user_comment_communitywise()
+    // {
+    //     $user_id = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
+    //     $community_id    = isset($_REQUEST['community_id']) ? $_REQUEST['community_id'] : "";
+    //     $comment_text    = isset($_REQUEST['comment_text']) ? $_REQUEST['comment_text'] : "";
+    //     $token           = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+    //     $comment_user_id = isset($_REQUEST['comment_user_id']) ? $_REQUEST['comment_user_id'] : "";
+    
+    //     if ($comment_text == "" or $community_id == "" or $comment_text == "" or $token == "" or $user_id=="" ) {
+    //         die(json_encode(array(
+    //             "status" => 0,
+    //             "message" => "Input parameters are not found"
+    //         )));
+    
+    //     } else {
+    
+    //         $token = $_REQUEST['token'];
+    //         $user_id = $_REQUEST['user_id'];
+    //         $sql   = "SELECT token FROM tbl_user where token='$token' and user_id='$user_id'";
+    //         $res   = $this->db->query($sql);
+    //         $row   = $res->row();
+    //         if ($row) {
+    //             $response = $this->user_model->user_comment_communitywise($token);
+    
+    //               $response     = json_encode($response);
+    //             print_r($response);
+    //         } else {
+    //             $returnresult = array(
+    //                 'status' => 0,
+    //                 'message' => 'Authentication failed'
+    //             );
+    //             $response     = json_encode($returnresult);
+    //             print_r($response);
+    //         }
+    //     }
+    // }
+    
+    /*
+    -------------------------------------------------------------------------------------------------------
+    http://104.237.3.116/tap911/index.php/webservice/get_comment_communitywise?token=dd088bfaaaf468cb
+    ------------------------------------------------------------------------------------------------------
+    */
+    
+    // function get_comment_communitywise()
+    // {
+    //     $token = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+    //      $user_id = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
+    //       $limit = isset($_REQUEST['limit']) ? $_REQUEST['limit'] : "";
+    //     if ($token == "") {
+    //         die(json_encode(array(
+    //             "status" => 0,
+    //             "message" => "Input parameters are not found"
+    //         )));
+    
+    //     } else {
+    //         $token = $_REQUEST['token'];
+    //         $user_id = $_REQUEST['user_id'];
+    //         $limit = $_REQUEST['limit'];
+    //         $sql   = "SELECT token FROM tbl_user where token='$token' and user_id=$user_id";
+    //         $res   = $this->db->query($sql);
+    //         $row   = $res->row();
+    //         if ($row) {
+    //             $response = $this->user_model->get_comment_communitywise($token, $limit);
+    //             if ($response) {
+    //                 $arr = array();
+    //                 foreach ($response as $results) {
+    //                     $arr[] = array(
+    //                         'user_name' => $results->first_name." ".$results->last_name,
+    //                         'comment_id' => $results->comment_id,
+    //                         'community_id' => $results->community_id,
+    //                         'comment_user_id' => $results->comment_user_id,
+    //                         'comment_text' => $results->comment_text,
+    //                         'comment_date_time' => $results->comment_date_time,
+    //                         'add_date' => $results->add_date
+    //                         // 'status' => $results->status
+    
+    //                     );
+    //                 }
+    //                 $returnresult = array(
+    //                     'status' => 1,
+    //                     'message' => 'Record found',
+    //                     'comment_community_wise' => $arr
+    //                 );
+    //                 $data         = json_encode($returnresult);
+    //                 print_r($data);
+    
+    
+    //             } else {
+    //                 $returnresult = array(
+    //                     'status' => 0,
+    //                     'message' => 'Record not found'
+    //                 );
+    //                 $data         = json_encode($returnresult);
+    //                 print_r($data);
+    //             }
+    
+    
+    
+    //         } else {
+    //             $returnresult = array(
+    //                 'status' => 0,
+    //                 'message' => 'Authentication failed'
+    //             );
+    //             $response     = json_encode($returnresult);
+    //             print_r($response);
+    //         }
+    //     }
+    // }
+    
+    /*
+    --------------------------------------------------------------------------------------------------
+    http://104.237.3.116/tap911/index.php/webservice/get_comment_alertwise?token=dd088bfaaaf468cb
+    --------------------------------------------------------------------------------------------------
+    */
+    
+    // function get_comment_alertwise()
+    // {
+    //     $token    = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+    //     $alert_id = isset($_REQUEST['alert_id']) ? $_REQUEST['alert_id'] : "";
+    //     if ($token == "" or $alert_id == '') {
+    //         die(json_encode(array(
+    //             "status" => 0,
+    //             "message" => "Input parameters are not found"
+    //         )));
+    
+    //     } else {
+    //         $token = $_REQUEST['token'];
+    //         $user_id = $_REQUEST['user_id'];
+    //         $sql   = "SELECT token FROM tbl_user where token='$token' and user_id=$user_id";
+    //         $res   = $this->db->query($sql);
+    //         $row   = $res->row();
+    //         if ($row) {
+    //             $response = $this->user_model->get_comment_alertwise($token, $alert_id);
+    //             if ($response) {
+    //                 $arr = array();
+    //                 foreach ($response as $results) {
+    
+    //                     $arr[] = array(
+    //                         'user_name' => $results->first_name." ".$results->last_name,
+    //                         'comment_id' => $results->comment_id,
+    //                         'comment_user_id' => $results->comment_user_id,
+    //                         'comment_text' => $results->comment_text,
+    //                         'comment_date_time' => $results->comment_date_time,
+    //                         'add_date' => $results->add_date
+    
+    
+    //                     );
+    //                 }
+    //                 $returnresult = array(
+    //                     'status' => 1,
+    //                     'message' => 'Record found',
+    //                     'comment' => $arr
+    //                 );
+    //                 $data         = json_encode($returnresult);
+    //                 print_r($data);
+    //             } else {
+    //                 $returnresult   = array(
+    //                     'status' => 0,
+    //                     'message' => 'Record not found'
+    //                 );
+    //                 $responseresult = json_encode($returnresult);
+    //                 print_r($responseresult);
+    //             }
+    //         } else {
+    //             $returnresult = array(
+    //                 'status' => 0,
+    //                 'message' => 'Authentication failed'
+    //             );
+    //             $response     = json_encode($returnresult);
+    //             print_r($response);
+    //         }
+    //     }
+    // }
+    
+    /*
+    ------------------------------------------------------------------------------------------------
+    http://104.237.3.116/tap911/index.php/webservice/get_alert_communitywise?token=dd088bfaaaf468cb
+    ------------------------------------------------------------------------------------------------
+    */
+    
+    // function get_alert_communitywise()
+    // {
+    //     $token = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+    //     if ($token == "") {
+    //         die(json_encode(array(
+    //             "status" => 0,
+    //             "message" => "Input parameters are not found"
+    //         )));
+    
+    //     } else {
+    //         $token = $_REQUEST['token'];
+    //          $user_id = $_REQUEST['user_id'];
+    //         $sql   = "SELECT token,user_id FROM tbl_user where token='$token' and user_id=$user_id ";
+    //         $res   = $this->db->query($sql);
+    //         $row   = $res->row();
+    //         if ($row) {
+    //             $response = $this->user_model->get_alert_communitywise($token);
+    
+    //             if ($response) {
+    
+    //                 $arr = array();
+    //                 foreach ($response as $results) {
+    //                     $logo=$results->community_logo;
+    //                       $path = base_url().'uploads/';
+    //                       if($logo){
+    
+    //                         $logos= $path.$logo;
+    
+    //                      }
+    //                      else{
+    //                      $logos= $path.'1517561100258.png';
+    //                      }
+    //                     $arr[] = array(
+    //                         'alert_id' => $results->alert_id,
+    //                         'user_id' => $results->user_id,
+    //                        // 'alert_id' => $results->alert_id,
+    //                         'alert_lat' => $results->alert_lat,
+    //                         'alert_lang' => $results->alert_lang,
+    //                         'alert_heading' => $results->alert_heading,
+    //                         'alert_descrption' => $results->alert_descrption,
+    //                         'community_logo' => $logos,
+    //                         'is_comment' => $results->is_comment,
+    //                         'alert_date_time' => $results->alert_date_time,
+    //                         'add_date' => $results->add_date
+    //                         // 'status' => $results->status
+    
+    //                     );
+    //                 }
+    //                 $returnresult = array(
+    //                     'status' => 1,
+    //                     'message' => 'Record found',
+    //                     'alert_communitywise' => $arr
+    //                 );
+    //                 $response     = json_encode($returnresult);
+    //                 print_r($response);
+    
+    
+    //             } else {
+    //                 $returnresult = array(
+    //                     'status' => 0,
+    //                     'message' => 'Record not found'
+    //                 );
+    //                 $response     = json_encode($returnresult);
+    //                 print_r($response);
+    //             }
+    
+    //         } else {
+    //             $returnresult = array(
+    //                 'status' => 0,
+    //                 'message' => 'Authentication failed'
+    //             );
+    //             $response     = json_encode($returnresult);
+    //             print_r($response);
+    //         }
+    //     }
+    // }
+    
+    
+    
+    /*
+    ------------------------------------------------------------------------------------------------
+    http://104.237.3.116/tap911/index.php/webservice/get_user_alert?token=c53afe04a17ef62b&user_id=101&alert_type=user
+    ------------------------------------------------------------------------------------------------
+    */
+    
+    // function get_user_alert()
+    // {
+    //     $token = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+    //      $user_id = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
+    //     // $alert_type = isset($_REQUEST['alert_type']) ? $_REQUEST['alert_type'] : "";
+    //       $limit = isset($_REQUEST['limit']) ? $_REQUEST['limit'] : "";
+    //     if ($token == "" or  $user_id=="") {
+    //         die(json_encode(array(
+    //             "status" => 0,
+    //             "message" => "Input parameters are not found"
+    //         )));
+    
+    //     } else {
+    //          $user_id = $_REQUEST['user_id'];
+    //         $token = $_REQUEST['token'];
+    //          $sql   = "SELECT token,user_id FROM tbl_user where token='$token' and user_id=$user_id ";
+    //         $res   = $this->db->query($sql);
+    //         $row   = $res->row();
+    //         if ($row) {
+    //             $response = $this->user_model->get_user_alert($token,$limit);
+    
+    //             if ($response) {
+    
+    //                 $arr = array();
+    //                 foreach ($response as $results) {
+    //                     if (is_null($results->community_id)) {
+    //                        $results->community_id = "";
+    
+    //                          }
+    
+    //                          if (is_null($results->add_date)) {
+    //                        $results->add_date = "";
+    
+    //                          }
+    
+    //                      $logo=$results->community_logo;
+    //                       $path = base_url().'uploads/';
+    //                       if($logo){
+    
+    //                         $logos= $path.$logo;
+    
+    //                      }
+    //                      else{
+    //                      $logos= $path.'1517561100258.png';
+    //                      }
+    
+    //                     $profile_pic=$results->profile_pic;
+    //                       $path = base_url().'uploads/';
+    //                       if($profile_pic){
+    
+    //                         $profile_picture= $path.$profile_pic;
+    
+    //                      }
+    //                      else{
+    //                      $profile_picture= $path.'1517561100258.png';
+    //                      }
+    
+    
+    
+    
+    //                     $arr[] = array(
+    //                         'alert_id' => $results->alert_id,
+    //                         'community_id' => $results->community_id,
+    //                         'user_id' => $results->user_id,
+    //                         'alert_type' => $results->alert_type,
+    //                         'tracking_user_id' => $results->tracking_user_id,
+    //                         'alert_lat' => $results->alert_lat,
+    //                         'alert_lang' => $results->alert_lang,
+    //                          'alert_address' => $results->alert_address,
+    //                         'request_status' => $results->request_status,
+    //                         'add_date' => $results->add_date,
+    //                         'accept_time' => $results->accept_time,
+    //                         'community_logo' =>$logos,
+    //                         'alert_heading' => $results->alert_heading,
+    //                         'alert_descrption' => $results->alert_descrption,
+    //                         'is_comment' => $results->is_comment,
+    //                         'alert_date_time' => $results->alert_date_time,
+    //                         'add_date' => $results->add_date,
+    //                         'user_name' => $results->first_name." ".$results->last_name,
+    //                         'profile_pic' => $profile_picture,
+    //                         'user_message' => 'i need help'
+    
+    
+    //                     );
+    //                 }
+    //                 $returnresult = array(
+    //                     'status' => 1,
+    //                     'message' => 'Record found',
+    //                     'user_alert_list' => $arr
+    //                 );
+    //                 $response     = json_encode($returnresult);
+    //                 print_r($response);
+    
+    
+    //             } else {
+    //                 $returnresult = array(
+    //                     'status' => 0,
+    //                     'message' => 'Record  not found'
+    //                 );
+    //                 $response     = json_encode($returnresult);
+    //                 print_r($response);
+    //             }
+    
+    //         } else {
+    //             $returnresult = array(
+    //                 'status' => 0,
+    //                 'message' => 'Authentication failed'
+    //             );
+    //             $response     = json_encode($returnresult);
+    //             print_r($response);
+    //         }
+    //     }
+    // }
+    
+    
+    
+    
+    /*
     -------------------------------------------------------------------------------------------------------
     http://104.237.3.116/tap911/index.php/webservice/get_community_emergency_contact?token=f70bfae97dc8c2d5
     -------------------------------------------------------------------------------------------------------
@@ -495,7 +926,7 @@ class Webservice extends CI_Controller
                 for ($i = 0; $i < $countvarresult; $i++) {
                     
                     $id                    = $resultdata[$i]['community_id'];
-                    $sql                   = "SELECT * FROM tbl_community WHERE `community_id` IN ('$id') ORDER BY `add_date` DESC limit $start,10";
+                    $sql                   = "SELECT * FROM tbl_community WHERE `community_id` IN ('$id') limit $start,10";
                     $res                   = $this->db->query($sql);
                     $rows                  = $res->row();
                     $community_id_my       = $rows->community_id;
@@ -2548,6 +2979,164 @@ class Webservice extends CI_Controller
         }
     }
 
+
+ /*
+    ----------------------------------------------------------------------------------------------------------
+     http://104.237.3.116/tap911/index.php/webservice/add_question_answer
+     token:6e69a9b93b907406
+     user_id:2
+    jsondata:[{ "user_id":"2", "question_id": "1", "answer": "" },{ "user_id":"2", "question_id": "2", "answer": "Switzerland" } ]
+    medical_condition:no
+    previous_surgeries_procedure:no
+    medication:no
+    allergies:no
+    special_need:no
+    -----------------------------------------------------------------------------------------------------------
+    */
+    
+    function add_question_answer()
+    {
+        $token        = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+        if ($token == "") {
+            die(json_encode(array(
+                "status" => 0,
+                "message" => "Input parameters are not found"
+            )));
+            
+        } else {
+            $token   = $_REQUEST['token'];
+             $user_id = $_REQUEST['user_id'];
+            $sql     = "SELECT token,user_id FROM tbl_user where token='$token' and user_id='$user_id'";
+            $res     = $this->db->query($sql);
+            $row     = $res->row();
+            if ($row) {
+                $response = $this->user_model->add_question_answer($token,$user_id);
+                $response = json_encode($response);
+                print_r($response);
+            } else {
+                $returnresult = array(
+                    'status' => 0,
+                    'message' => 'Authentication failed'
+                );
+                $response     = json_encode($returnresult);
+                print_r($response);
+            }
+        }
+    }
+
+    /*
+    ----------------------------------------------------------------------------------------------------------
+     http://104.237.3.116/tap911/index.php/webservice/add_question_answer
+     token:6e69a9b93b907406
+     user_id:2
+    jsondata:[{ "user_id":"2", "question_id": "1", "answer": "" },{ "user_id":"2", "question_id": "2", "answer": "Switzerland" } ]
+    medical_condition:no
+    previous_surgeries_procedure:no
+    medication:no
+    allergies:no
+    special_need:no
+    -----------------------------------------------------------------------------------------------------------
+    */
+    
+    function update_question_answer()
+    {
+        $token        = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+        if ($token == "") {
+            die(json_encode(array(
+                "status" => 0,
+                "message" => "Input parameters are not found"
+            )));
+            
+        } else {
+            $token   = $_REQUEST['token'];
+             $user_id = $_REQUEST['user_id'];
+            $sql     = "SELECT token,user_id FROM tbl_user where token='$token' and user_id='$user_id'";
+            $res     = $this->db->query($sql);
+            $row     = $res->row();
+            if ($row) {
+                $response = $this->user_model->update_question_answer($token,$user_id);
+                $response = json_encode($response);
+                print_r($response);
+            } else {
+                $returnresult = array(
+                    'status' => 0,
+                    'message' => 'Authentication failed'
+                );
+                $response     = json_encode($returnresult);
+                print_r($response);
+            }
+        }
+    }
+
+ /*
+    -----------------------------------------------------------------------------------------------------
+    http://104.237.3.116/tap911/index.php/webservice/get_user_question_answer
+    token:6e69a9b93b907406
+    user_id:2
+    -----------------------------------------------------------------------------------------------------
+    */
+    
+    function get_user_question_answer()
+    {
+        
+        $token        = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+        $user_id = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
+        if ($token == "" or $user_id == "") {
+            die(json_encode(array(
+                "status" => 0,
+                "message" => "Input parameters are not found"
+            )));
+            
+        } else {
+            $token        = $_REQUEST['token'];
+            $user_id = $_REQUEST['user_id'];
+            $sql          = "SELECT token,user_id FROM tbl_user where token='$token'and user_id='$user_id'";
+            $res          = $this->db->query($sql);
+            $row          = $res->row();
+            // $time_zone          = $row->time_zone;
+            if ($row) {
+                $response = $this->user_model->get_user_question_answer();
+                if ($response) {
+                    $arr = array();
+                    foreach ($response as $results) {
+                        $arr[] = array(
+                            'question_answer_id' => $results->question_answer_id,
+                            'user_id' => $results->user_id,
+                            'question_id' => $results->question_id,
+                            'answer' => $results->answer
+                        );
+                    }
+                    $returnresult = array(
+                        'status' => 1,
+                        'message' => 'Record found',
+                        'message_list' => $arr
+                    );
+                    $data         = json_encode($returnresult);
+                    print_r($data);
+                    
+                    
+                } else {
+                    $returnresult = array(
+                        'status' => 0,
+                        'message' => 'Record not found'
+                    );
+                    $data         = json_encode($returnresult);
+                    print_r($data);
+                }
+                
+                
+                
+            } else {
+                $returnresult = array(
+                    'status' => 0,
+                    'message' => 'Authentication failed'
+                );
+                $response     = json_encode($returnresult);
+                print_r($response);
+            }
+        }
+    }
+    
 }
 /* End of file welcome.php */
 /* Location: ./application/controllers/welcome.php */
