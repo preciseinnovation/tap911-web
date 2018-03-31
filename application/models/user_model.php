@@ -356,7 +356,7 @@ $check = "SELECT * FROM tbl_user WHERE status=1 and (email ='" . $_REQUEST['emai
               $user_id = $row->user_id;
               $question_id = $row->question_id;
               $answer = $row->answer;
-$SQL = "UPDATE tbl_user_question_answer SET question_id='$question_id',answer='$answer' where question_id='$question_id'";
+$SQL = "UPDATE tbl_user_question_answer SET question_id='$question_id',answer='$answer' where question_id='$question_id' and user_id='$user_id'";
                 $res = mysql_query($SQL);
 }
 
