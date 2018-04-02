@@ -3136,9 +3136,147 @@ class Webservice extends CI_Controller
             }
         }
     }
-    
 
+
+
+ /*
+    ----------------------------------------------------------------------------------------------------------
+     http://104.237.3.116/tap911/index.php/webservice/add_question_answer
+     token:12285175ad570f86
+     user_id:1
+     asset_name:car                                                                         
+     asset_type:travel type
+     asset_number:4291
+     address:indore
+     latitude:73.12334
+     longitude:72.34455
+    -----------------------------------------------------------------------------------------------------------
+    */
     
+    function add_asset()
+    {
+        $token        = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+        if ($token == "") {
+            die(json_encode(array(
+                "status" => 0,
+                "message" => "Input parameters are not found"
+            )));
+            
+        } else {
+            $token   = $_REQUEST['token'];
+             $user_id = $_REQUEST['user_id'];
+            $sql     = "SELECT token,user_id FROM tbl_user where token='$token' and user_id='$user_id'";
+            $res     = $this->db->query($sql);
+            $row     = $res->row();
+            if ($row) {
+                $response = $this->user_model->add_asset($token,$user_id);
+                $response = json_encode($response);
+                print_r($response);
+            } else {
+                $returnresult = array(
+                    'status' => 0,
+                    'message' => 'Authentication failed'
+                );
+                $response     = json_encode($returnresult);
+                print_r($response);
+            }
+        }
+    }
+
+
+/*
+    ----------------------------------------------------------------------------------------------------------
+     http://104.237.3.116/tap911/index.php/webservice/add_question_answer
+     token:12285175ad570f86
+     user_id:1
+     asset_name:car                                                                         
+     asset_type:travel type
+     asset_number:4291
+     address:indore
+     latitude:73.12334
+     longitude:72.34455
+    -----------------------------------------------------------------------------------------------------------
+    */
+    
+    function get_asset()
+    {
+        $token        = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+         $user_id        = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
+        if ($token == "" or $user_id=="") {
+            die(json_encode(array(
+                "status" => 0,
+                "message" => "Input parameters are not found"
+            )));
+            
+        } else {
+            $token   = $_REQUEST['token'];
+             $user_id = $_REQUEST['user_id'];
+            $sql     = "SELECT token,user_id FROM tbl_user where token='$token' and user_id='$user_id'";
+            $res     = $this->db->query($sql);
+            $row     = $res->row();
+            if ($row) {
+                $response = $this->user_model->get_asset($token,$user_id);
+                  $returnresult = array(
+                    'status' => 1,
+                    'asset_record' =>$response
+                );    
+                $responseresult = json_encode($returnresult);
+                print_r($responseresult);
+            } else {
+                $returnresult = array(
+                    'status' => 0,
+                    'message' => 'Authentication failed'
+                );
+                $response     = json_encode($returnresult);
+                print_r($response);
+            }
+        }
+    }
+
+
+      /*
+    -----------------------------------------------------------------------------------------------------------
+    http://104.237.3.116/tap911/index.php/webservice/update_asset?token=dd088bfaaaf468cb&emergency_contact_id=1&name=govind&description=anywhere%20contect%20me&phone_number=1234567&country_code=12345
+    -----------------------------------------------------------------------------------------------------------
+    */
+    
+    function update_asset()
+    {
+        $token                = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+         $asset_id                = isset($_REQUEST['asset_id']) ? $_REQUEST['asset_id'] : "";
+        $asset_name           = isset($_REQUEST['asset_name']) ? $_REQUEST['asset_name'] : "";
+        $asset_type = isset($_REQUEST['asset_type']) ? $_REQUEST['asset_type'] : "";
+        $asset_number          = isset($_REQUEST['asset_number']) ? $_REQUEST['asset_number'] : "";
+        $address               = isset($_REQUEST['address']) ? $_REQUEST['address'] : "";
+        $latitude              = isset($_REQUEST['latitude']) ? $_REQUEST['latitude'] : "";
+        $longitude             = isset($_REQUEST['longitude']) ? $_REQUEST['longitude'] : "";
+        if ($token == "" or $asset_name == "" or $asset_type == "" or $asset_number == "" or $address == "" or $latitude == "" or $longitude == "" or $asset_id =="") {
+            die(json_encode(array(
+                "status" => 0,
+                "message" => "Input parameters are not found"
+            )));
+            
+        } else {
+            $token   = $_REQUEST['token'];
+            $user_id = $_REQUEST['user_id'];
+            $sql     = "SELECT token,user_id FROM tbl_user where token='$token' and user_id=$user_id";
+            $res     = $this->db->query($sql);
+            $row     = $res->row();
+            if ($row) {
+                $response = $this->user_model->update_asset($token);
+                $response = json_encode($response);
+                print_r($response);
+            } else {
+                $returnresult = array(
+                    'status' => 0,
+                    'message' => 'Authentication failed'
+                );
+                $response     = json_encode($returnresult);
+                print_r($response);
+            }
+        }
+    }
+      
 }
 /* End of file welcome.php */
 /* Location: ./application/controllers/welcome.php */
