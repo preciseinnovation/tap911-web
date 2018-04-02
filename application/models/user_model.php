@@ -2011,17 +2011,93 @@ WHERE `tbl_emergency`.`user_id` = $user_id
   return $pagenumber;
  }
 
+function add_asset(){
 
- function get_status($user_id){
+$check = "SELECT asset_number FROM tbl_user_asset WHERE status=1 and asset_number ='".$_REQUEST['asset_number']."'";
+        $rs    = mysql_query($check);
+        $data  = mysql_fetch_array($rs);
+        // $status = $data['status'];
 
+        if ($data[0] > 1) {
+            
+            $returnresult = array(
+                'status' => 0,
+                'message' => 'Asset number already in Exists'
+            );
+          
+        } 
+        
+        else {
 
-$result  =$this->db->query("SELECT emergency_notification_id,emergency_status FROM tbl_emergency_notification  where notification_user_id ='$user_id'
-");
+             $data = array(
+                     'user_id' => $_REQUEST['user_id'],
+                     'asset_name' => $_REQUEST['asset_name'],
+                     'asset_type' => $_REQUEST['asset_type'],
+                     'asset_number' => $_REQUEST['asset_number'],
+                     'address' => $_REQUEST['address'],
+                     'latitude' => $_REQUEST['latitude'],
+                     'longitude' => $_REQUEST['longitude'],
+                     'status' => 1
+                );
 
-        return $result->result();
+                $data = $this->db->insert('tbl_user_asset', $data);
 
-  
-
+                $returnresult = array(
+                'status' => 1,
+                'message' => 'User asset added successfully'
+            );
+        }
+         return $returnresult;
 }
+
+
+ /*-------------------------------get state list----------------------------------------------- */
+    
+    function get_asset()
+    {
+       $user_id = $_REQUEST['user_id'];
+       $result  = $this->db->query("SELECT asset_id,user_id,asset_name,asset_type,asset_number,asset_number,latitude,longitude from tbl_user_asset where user_id='$user_id'");
   
+       return $result->result();
+  
+     }
+     
+
+
+     /*-------------------------------update_user_emergency_contact with community----------------------------------------------- */
+    
+    
+    function update_asset()
+    {
+        
+           $asset_id = $_REQUEST['asset_id'];
+            
+            $data = array(
+               
+                 'asset_name' => $_REQUEST['asset_name'],
+                 'asset_type' => $_REQUEST['asset_type'],
+                 'asset_number' => $_REQUEST['asset_number'],
+                 'address' => $_REQUEST['address'],
+                 'latitude' => $_REQUEST['latitude'],
+                 'longitude' => $_REQUEST['longitude']
+            );
+            $this->db->where('asset_id', $asset_id);
+            $data = $this->db->update('tbl_user_asset', $data);
+            if ($data) {
+                $returnresult = array(
+                    'status' => 1,
+                    'message' => 'User asset update successfully'
+                );
+            }
+         else {
+            $returnresult = array(
+                'status' => 0,
+                'message' => 'contact not found'
+            );
+        }
+        
+        return $returnresult;
+        
+    }
+
 }
