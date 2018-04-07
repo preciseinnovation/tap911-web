@@ -309,7 +309,9 @@ $check = "SELECT * FROM tbl_user WHERE status=1 and (email ='" . $_REQUEST['emai
               $user_id = $row->user_id;
               $question_id = $row->question_id;
               $answer = $row->answer;
-         $SQL = "insert into tbl_user_question_answer(user_id,question_id,answer,status)values('$user_id','$question_id','$answer','1')";
+              $yes_no_ans = $row->yes_no_ans;
+              $other = $row->other;
+         $SQL = "insert into tbl_user_question_answer(user_id,question_id,answer,yes_no_ans,other,status)values('$user_id','$question_id','$answer','$yes_no_ans','$other','1')";
                 $res = mysql_query($SQL);
 }
 
@@ -356,7 +358,9 @@ $check = "SELECT * FROM tbl_user WHERE status=1 and (email ='" . $_REQUEST['emai
               $user_id = $row->user_id;
               $question_id = $row->question_id;
               $answer = $row->answer;
-$SQL = "UPDATE tbl_user_question_answer SET question_id='$question_id',answer='$answer' where question_id='$question_id' and user_id='$user_id'";
+              $yes_no_ans = $row->yes_no_ans;
+              $other = $row->other;
+$SQL = "UPDATE tbl_user_question_answer SET question_id='$question_id',answer='$answer',yes_no_ans='$yes_no_ans',other='$other' where question_id='$question_id' and user_id='$user_id'";
                 $res = mysql_query($SQL);
 }
 
