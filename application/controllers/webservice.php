@@ -3103,7 +3103,9 @@ class Webservice extends CI_Controller
                             'question_answer_id' => $results->question_answer_id,
                             'user_id' => $results->user_id,
                             'question_id' => $results->question_id,
-                            'answer' => $results->answer
+                            'answer' => $results->answer,
+                            'yes_no_ans' => $results->yes_no_ans,
+                            'other' => $results->other
                         );
                     }
                     $returnresult = array(
@@ -3276,6 +3278,52 @@ class Webservice extends CI_Controller
             }
         }
     }
+
+
+    function pushnotification(){
+      $ch = curl_init("https://fcm.googleapis.com/fcm/send");
+    //The device token.
+    $token = "dcVuDN5B458:APA91bFKK2BS_UQ90wsWUJgA9L29TGLUE6d28etoht3YTmf6IxfVFd2i1L8hECYsewBN-QuJ2PE3INA3ii810p4O5bUKGSyDVbIo24bcIoRQGa_l3Wj2DHUHN7Aspu346dJD4jqea-zF";
+    $token = "f2bEV13XwtA:APA91bGmtUMGNXeAW48RG_o2yHxOrQiGZV6jIr4dI-inmQhpJf6LkJg9_5x9V_y-_7T5c0idOCScjV5LhtuzBPqpvPTqb6xfhKhUOYq6npPRI82mkiaNnrE5skJB8tDCieWtsI1y5tC0";
+    //Title of the Notification.
+    $title = "K9TOK9";
+    //Body of the Notification.
+    $body = "This is test message from k9 to k9 app.";
+    //Creating the notification array.
+    $notification = array('title' =>$title , 'text' => $body);
+    //This array contains, the token and the notification. The 'to' attribute stores the token.
+    $arrayToSend = array('to' => $token, 'notification' => $notification,'priority'=>'high');
+    //Generating JSON encoded string form the above array.
+    $json = json_encode($arrayToSend);
+    //Setup headers:
+    $headers = array();
+    $headers[] = 'Content-Type: application/json';
+    $headers[] = 'Authorization: key= AIzaSyAoqpGCTIDQJ5JtNwSRRGjsR5D9LsCgLcE'; // key here
+    //Setup curl, add headers and post parameters.
+    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");                                                                     
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
+    curl_setopt($ch, CURLOPT_HTTPHEADER,$headers);       
+    //Send the request
+    $response = curl_exec($ch);
+    //Close request
+    curl_close($ch);
+    return $response;
+                     if($response){
+                          $returnresult = array(
+                                 'status' => 1,
+                                 'data' => $response
+                );
+                $responses     = json_encode($returnresult);
+                print_r($responses);
+            }else{
+                $returnresult = array(
+                                 'status' => 0,
+                                 'data' => "not found"
+                );
+                $responses     = json_encode($returnresult);
+                print_r($responses);
+            }
+}
       
 }
 /* End of file welcome.php */
