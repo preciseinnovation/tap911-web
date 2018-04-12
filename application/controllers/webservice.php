@@ -1167,17 +1167,17 @@ class Webservice extends CI_Controller
         $last_name              = isset($_REQUEST['last_name']) ? $_REQUEST['last_name'] : "";
         $email                  = isset($_REQUEST['email']) ? $_REQUEST['email'] : "";
         $language               = isset($_REQUEST['language']) ? $_REQUEST['language'] : "";
-        $medical_history        = isset($_REQUEST['medical_history']) ? $_REQUEST['medical_history'] : "";
-        $medication_instraction = isset($_REQUEST['medication_instraction']) ? $_REQUEST['medication_instraction'] : "";
-        $allergies              = isset($_REQUEST['allergies']) ? $_REQUEST['allergies'] : "";
-        $special_need           = isset($_REQUEST['special_need']) ? $_REQUEST['special_need'] : "";
+        //$medical_history        = isset($_REQUEST['medical_history']) ? $_REQUEST['medical_history'] : "";
+       // $medication_instraction = isset($_REQUEST['medication_instraction']) ? $_REQUEST['medication_instraction'] : "";
+      //  $allergies              = isset($_REQUEST['allergies']) ? $_REQUEST['allergies'] : "";
+       // $special_need           = isset($_REQUEST['special_need']) ? $_REQUEST['special_need'] : "";
         // $user_lat                                     = isset($_REQUEST['user_lat']) ? $_REQUEST['user_lat'] : "";
         // $user_long                                    = isset($_REQUEST['user_long']) ? $_REQUEST['user_long'] : "";
         // $phone_number_text_msg_country_code           = isset($_REQUEST['phone_number_text_msg_country_code']) ? $_REQUEST['phone_number_text_msg_country_code'] : "";
         $phone_number           = isset($_REQUEST['phone_number']) ? $_REQUEST['phone_number'] : "";
         // $phone_number_voice_notification_country_code = isset($_REQUEST['phone_number_voice_notification_country_code']) ? $_REQUEST['phone_number_voice_notification_country_code'] : "";
         // $phone_number_voice_notification              = isset($_REQUEST['phone_number_voice_notification']) ? $_REQUEST['phone_number_voice_notification'] : "";
-        if ($first_name == "" or $last_name == ""  or $email = "" or $phone_number == "" or $user_id == "" or $medical_history == "" or $medication_instraction == "" or $allergies == "" or $special_need == "" or $token == "" or $language == "") {
+        if ($first_name == "" or $last_name == ""  or $email = "" or $phone_number == "" or $user_id == "") {
             die(json_encode(array(
                 "status" => 0,
                 "message" => "Input parameters are not found"
@@ -2997,7 +2997,8 @@ class Webservice extends CI_Controller
     function add_question_answer()
     {
         $token        = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
-        if ($token == "") {
+        $user_id        = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
+        if ($token == "" or $user_id=="") {
             die(json_encode(array(
                 "status" => 0,
                 "message" => "Input parameters are not found"
@@ -3005,7 +3006,7 @@ class Webservice extends CI_Controller
             
         } else {
             $token   = $_REQUEST['token'];
-             $user_id = $_REQUEST['user_id'];
+            $user_id = $_REQUEST['user_id'];
             $sql     = "SELECT token,user_id FROM tbl_user where token='$token' and user_id='$user_id'";
             $res     = $this->db->query($sql);
             $row     = $res->row();
@@ -3217,8 +3218,10 @@ class Webservice extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
+                $json_datatotal = $this->user_model->get_total_asset_page();
                 $response = $this->user_model->get_asset($token,$user_id);
                   $returnresult = array(
+                    'total_page'=> $json_datatotal,
                     'status' => 1,
                     'asset_record' =>$response
                 );    
@@ -3279,52 +3282,45 @@ class Webservice extends CI_Controller
         }
     }
 
-
-    function pushnotification(){
-      $ch = curl_init("https://fcm.googleapis.com/fcm/send");
-    //The device token.
-    $token = "dcVuDN5B458:APA91bFKK2BS_UQ90wsWUJgA9L29TGLUE6d28etoht3YTmf6IxfVFd2i1L8hECYsewBN-QuJ2PE3INA3ii810p4O5bUKGSyDVbIo24bcIoRQGa_l3Wj2DHUHN7Aspu346dJD4jqea-zF";
-    $token = "f2bEV13XwtA:APA91bGmtUMGNXeAW48RG_o2yHxOrQiGZV6jIr4dI-inmQhpJf6LkJg9_5x9V_y-_7T5c0idOCScjV5LhtuzBPqpvPTqb6xfhKhUOYq6npPRI82mkiaNnrE5skJB8tDCieWtsI1y5tC0";
-    //Title of the Notification.
-    $title = "K9TOK9";
-    //Body of the Notification.
-    $body = "This is test message from k9 to k9 app.";
-    //Creating the notification array.
-    $notification = array('title' =>$title , 'text' => $body);
-    //This array contains, the token and the notification. The 'to' attribute stores the token.
-    $arrayToSend = array('to' => $token, 'notification' => $notification,'priority'=>'high');
-    //Generating JSON encoded string form the above array.
-    $json = json_encode($arrayToSend);
-    //Setup headers:
-    $headers = array();
-    $headers[] = 'Content-Type: application/json';
-    $headers[] = 'Authorization: key= AIzaSyAoqpGCTIDQJ5JtNwSRRGjsR5D9LsCgLcE'; // key here
-    //Setup curl, add headers and post parameters.
-    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");                                                                     
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
-    curl_setopt($ch, CURLOPT_HTTPHEADER,$headers);       
-    //Send the request
-    $response = curl_exec($ch);
-    //Close request
-    curl_close($ch);
-    return $response;
-                     if($response){
-                          $returnresult = array(
-                                 'status' => 1,
-                                 'data' => $response
-                );
-                $responses     = json_encode($returnresult);
-                print_r($responses);
-            }else{
+     /*
+    -----------------------------------------------------------------------------------------------------
+    http://104.237.3.116/tap911/index.php/webservice/delete_user?token=8bead3d5ec6c562c&user_id=47
+    -----------------------------------------------------------------------------------------------------
+    */
+    function delete_asset()
+    {
+        
+        $token   = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+        $user_id = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
+        $asset_id = isset($_REQUEST['asset_id']) ? $_REQUEST['asset_id'] : "";
+        
+        if ($token == "" or $user_id == '' or $asset_id=="") {
+            die(json_encode(array(
+                "status" => 0,
+                "message" => "Input parameters are not found"
+            )));
+            
+        } else {
+            $token   = $_REQUEST['token'];
+            $user_id = $_REQUEST['user_id'];
+            $sql     = "SELECT token,user_id FROM tbl_user where token='$token' and user_id=$user_id";
+            $res     = $this->db->query($sql);
+            $row     = $res->row();
+            if ($row) {
+                $json_data = $this->user_model->delete_asset($token);
+                $data      = json_encode($json_data);
+                print_r($data);
+            } else {
                 $returnresult = array(
-                                 'status' => 0,
-                                 'data' => "not found"
+                    'status' => 0,
+                    'message' => 'Authentication failed'
                 );
-                $responses     = json_encode($returnresult);
-                print_r($responses);
+                $response     = json_encode($returnresult);
+                print_r($response);
             }
-}
-      
+        }
+        
+    }  
 }
 /* End of file welcome.php */
 /* Location: ./application/controllers/welcome.php */
