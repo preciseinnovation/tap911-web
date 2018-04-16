@@ -45,7 +45,7 @@ class User_model extends CI_Model
             
             $returnarray = array(
                 'status' => 0,
-                'message' => 'Username or pasword is invalid'
+                'message' => 'Email or Password is invalid'
             );
         }
         return $returnarray;
@@ -193,7 +193,7 @@ $check = "SELECT * FROM tbl_user WHERE status=1 and (email ='" . $_REQUEST['emai
             
             $returnresult = array(
                 'status' => 0,
-                'message' => 'User already in Exists'
+                'message' => '"This email is already registered with another user'
             );
           
         } 
@@ -294,16 +294,22 @@ $check = "SELECT * FROM tbl_user WHERE status=1 and (email ='" . $_REQUEST['emai
 
      /*-------------------------------add question list----------------------------------------------- */
     
-    function add_question_answer(){
+    function add_question_answer($token,$user_id){
 
         $jsondata    = $_REQUEST['jsondata'];
-        $medical_condition    = $_REQUEST['medical_condition'];
-        $previous_surgeries_procedure    = $_REQUEST['previous_surgeries_procedure'];
-        $medication    = $_REQUEST['medication'];
-        $allergies    = $_REQUEST['allergies'];
-        $special_need    = $_REQUEST['special_need'];
+         $loginuser_id = $user_id;
+         //$loginuser_id ;
         $jsondatas = urldecode(stripslashes($jsondata));
         $data3 = json_decode($jsondatas);
+
+            //$user_id = $_REQUEST['user_id'];
+            $sql     = "SELECT question_id,user_id FROM tbl_user_question_answer where user_id='$loginuser_id'";
+            $res     = $this->db->query($sql);
+            $row     = $res->row();
+             $user_ids=$row->user_id;
+             $question_ids=$row->question_id;
+       
+//die;
 
         foreach ($data3 as $row) {
               $user_id = $row->user_id;
@@ -311,20 +317,22 @@ $check = "SELECT * FROM tbl_user WHERE status=1 and (email ='" . $_REQUEST['emai
               $answer = $row->answer;
               $yes_no_ans = $row->yes_no_ans;
               $other = $row->other;
+
+       
+         if($question_id==$question_ids && $user_ids==$user_id){
+        $returnresult =  die(json_encode(array(
+                'status' => 0,
+                'message' => 'Question allrady available'
+            )));
+         }
+else{
          $SQL = "insert into tbl_user_question_answer(user_id,question_id,answer,yes_no_ans,other,status)values('$user_id','$question_id','$answer','$yes_no_ans','$other','1')";
                 $res = mysql_query($SQL);
+   }
 }
 
        if ($res) {
-            $data = array(
-                'medical_condition' => $_REQUEST['medical_condition'],
-                'previous_surgeries_procedure' => $_REQUEST['previous_surgeries_procedure'],
-                'medication' => $_REQUEST['medication'],
-                'allergies' => $_REQUEST['allergies'],
-                'special_need' => $_REQUEST['special_need']
-            );
-            $this->db->where('user_id', $user_id);
-            $data = $this->db->update('tbl_user', $data);
+            
             $returnresult = array(
                 'status' => 1,
                 'message' => 'User data save successfully'
@@ -346,11 +354,6 @@ $check = "SELECT * FROM tbl_user WHERE status=1 and (email ='" . $_REQUEST['emai
     function update_question_answer(){
 
         $jsondata    = $_REQUEST['jsondata'];
-        $medical_condition    = $_REQUEST['medical_condition'];
-        $previous_surgeries_procedure    = $_REQUEST['previous_surgeries_procedure'];
-        $medication    = $_REQUEST['medication'];
-        $allergies    = $_REQUEST['allergies'];
-        $special_need    = $_REQUEST['special_need'];
         $jsondatas = urldecode(stripslashes($jsondata));
         $data3 = json_decode($jsondatas);
 
@@ -365,15 +368,7 @@ $SQL = "UPDATE tbl_user_question_answer SET question_id='$question_id',answer='$
 }
 
        if ($res) {
-            $data = array(
-                'medical_condition' => $_REQUEST['medical_condition'],
-                'previous_surgeries_procedure' => $_REQUEST['previous_surgeries_procedure'],
-                'medication' => $_REQUEST['medication'],
-                'allergies' => $_REQUEST['allergies'],
-                'special_need' => $_REQUEST['special_need']
-            );
-            $this->db->where('user_id', $user_id);
-            $data = $this->db->update('tbl_user', $data);
+           // $data = $this->db->update('tbl_user', $data);
             $returnresult = array(
                 'status' => 1,
                 'message' => 'User data save successfully'
@@ -682,6 +677,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
                 'phone_number_text_msg' => $_REQUEST['phone_number'],
                 'medical_history' => $_REQUEST['medical_history'],
                 'medication_instraction' => $_REQUEST['medication_instraction'],
+                'previous_surgeries_procedure' => $_REQUEST['previous_surgeries_procedure'],
                 'allergies' => $_REQUEST['allergies'],
                 'special_need' => $_REQUEST['special_need']
             );
@@ -829,8 +825,8 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
                 $phone_number = $data[$i]['phone_number_text_msg'];
                 $name         = $firstname . " " . $last_name;
                 
-                $SQL = "insert into tbl_emergency_contact(user_id,emergency_user_help_id,name,phone_number,tap911_user)
-            values('$user_id','$emergency_user_help_id','$name','$phone_number','$tap911_user')";
+                $SQL = "insert into tbl_emergency_contact(user_id,emergency_user_help_id,name,phone_number,tap911_user,country_code,status)
+            values('$user_id','$emergency_user_help_id','$name','$phone_number','$tap911_user','1','1')";
                 $res = mysql_query($SQL);
                 
             }
@@ -876,7 +872,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
             if ($data) {
                 $returnresult = array(
                     'status' => 1,
-                    'message' => 'User emergency contact update successfully'
+                    'message' => 'Contact updated successfully'
                 );
             }
         } else {
@@ -1127,7 +1123,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
         if ($data) {
             $returnresult = array(
                 'status' => 1,
-                'message' => 'User emergency contact delete successfully'
+                'message' => 'contact deleted successfully'
             );
         } else {
             $returnresult = array(
@@ -1220,19 +1216,20 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
                     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
                      array_push($require, curl_exec($ch));
-                    if ($usertoken){
-                         $returnresult = array(
-            'status' => 1,
-            'data' => $require,
-            'message' => 'success'
-            
-           );
+                    if(is_null($result)){
+                          $returnresult = die(json_encode(array(
+                 "status" => 0,
+                 "message" => "no user"
+            ))); 
                   
-}else{
-     die(json_encode(array(
-                "status" => 0,
-                "message" => "no user"
-            )));
+              }else{
+               
+                 $returnresult = array(
+                               'status' => 1,
+                               'data' => $require,
+                               'message' => 'success'
+            
+                         );
 }
                     curl_close($ch);
                     if ($mobile_type == 'android' || $mobile_type == 'ios') {
@@ -1290,6 +1287,10 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
         
         $datas = $result->result_array();
         
+         $returnresult = die(json_encode(array(
+                "status" => 0,
+                "message" => "no user"
+            )));
             
             $countvars = count($datas);
             $require   = array();
@@ -1350,17 +1351,17 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
                     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     
                    array_push($require, curl_exec($ch));
-                    if ($usertoken){
-                          $returnresult = array(
-            'status' => 1,
-            'data' => $require,
-            'message' => 'success'
+                    if ($returnresult){
+                                 $returnresult = array(
+                                'status' => 1,
+                                'data' => $require,
+                                'message' => 'success'
             
            );
                    
 }else{
    
-      die(json_encode(array(
+      $returnresult = die(json_encode(array(
                 "status" => 0,
                 "message" => "no user"
             )));
@@ -1429,6 +1430,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
         
         return $temp;
         return $register;
+
         
 /*--------------------------------------------------------get user create by----------------------------------------------------------*/
         
@@ -1515,23 +1517,21 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
                     curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
                     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
                     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                    // $returnresult = 
-                     array_push($require, curl_exec($ch));
-                    if ($usertoken){
-            $returnresult = array(
-            'status' => 1,
-            'data' => $require,
-            'message' => 'success'
-            
-           );
-        }else{
-     
-     die(json_encode(array(
+                     $returnresult =  array_push($require, curl_exec($ch));
+                    if ($resultdata==""){
+          
+             $returnresult = die(json_encode(array(
                 "status" => 0,
-                "message" => "no user"
-            )));
-
-}
+                "message" =>"no user"
+                         )));
+            }else{
+                    $returnresult = array(
+                    'status' => 1,
+                    'data' => $require,
+                    'message' =>'success'
+            
+                );
+             }
                     curl_close($ch);
                     if ($mobile_type == 'android' || $mobile_type == 'ios') {
                         
@@ -1804,6 +1804,9 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
     
     function get_community_communication($time_zone)
     {
+          $index = $_REQUEST['index'];
+        // $starts=$index*10;
+           $start = ($index-1)*10;
             $from_user_id = $_REQUEST['from_user_id'];
             $community_id = $_REQUEST['community_id'];
             $timezone1 = explode("+",$time_zone);
@@ -1818,13 +1821,33 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
 
 $result  =$this->db->query("SELECT community_communitaction_id,from_user_id,to_user_id,community_id,community_id,message_data,add_date,msg_type,CONVERT_TZ(add_date, @@session.time_zone, '$time')as senddate
  FROM `tbl_community_communitaction`
- WHERE from_user_id=$from_user_id and community_id= $community_id");
+ WHERE from_user_id=$from_user_id and community_id= $community_id ORDER BY `tbl_community_communitaction`.add_date DESC LIMIT $start,10");
 return $result->result();
 
 
     }
     
+    /*-------------------------------total_community_msg----------------------------------------------- */
     
+    
+    function total_community_msg()
+    {
+        
+            $from_user_id = $_REQUEST['from_user_id'];
+            $community_id = $_REQUEST['community_id'];
+            
+$result  =$this->db->query("SELECT community_communitaction_id,from_user_id,to_user_id,community_id,community_id,message_data,add_date,msg_type
+ FROM `tbl_community_communitaction`
+ WHERE from_user_id=$from_user_id and community_id= $community_id");
+ $total = count($result->result());
+     
+    $totalpage = $total/10;    
+    $pagenumber = ceil($totalpage);
+  return $pagenumber;
+
+    }
+
+
     /*-------------------------------get_tap911_user_list----------------------------------------------- */
     
     
@@ -1850,8 +1873,9 @@ return $result->result();
         }
         $result = implode(",", $arrayName);
         
+       // echo $result;die;
         if ($result) {
-            $query = $this->db->query("SELECT * FROM `tbl_user` WHERE user_id NOT IN($result) and user_id NOT IN($user_id)");
+    $query = $this->db->query("SELECT * FROM `tbl_user` WHERE user_id NOT IN($result) and user_id NOT IN($user_id)");
             $data  = $query->result();
         } else {
             $query = $this->db->query("SELECT * FROM `tbl_user` WHERE  user_id NOT IN($user_id)");
@@ -1881,15 +1905,26 @@ return $result->result();
     
     function add_other_emergency_contact()
     {
-        $check = "SELECT * FROM tbl_emergency_contact WHERE user_id ='" . $_REQUEST['user_id'] . "' and emergency_user_help_id ='0' and phone_number ='" . $_REQUEST['phone_number'] . "' ";
+        $checkdata = "SELECT user_id,phone_number_text_msg FROM tbl_user WHERE user_id ='" . $_REQUEST['user_id'] ."'";
+             $res     = $this->db->query($checkdata);
+            $row     = $res->row();
+            $phone_number_text_msg=$row->phone_number_text_msg;
+        $check = "SELECT * FROM tbl_emergency_contact WHERE user_id ='" . $_REQUEST['user_id'] . "' and phone_number ='" . $_REQUEST['phone_number'] . "' ";
         $rs    = mysql_query($check);
         $data  = mysql_fetch_array($rs);
         if ($data[0] > 1) {
             $returnresult = array(
                 'status' => 0,
-                'message' => 'User contact in Exists'
+                'message' => 'This contact is already exist'
             );
-        } else {
+        }
+            elseif($phone_number_text_msg==$_REQUEST['phone_number']){
+              $returnresult = die(json_encode(array(
+                    "status" => 0,
+                    "message" => "Please do not insert your own number"
+                )));
+            }
+         else {
             if (!is_numeric($_REQUEST['phone_number'])) {
                 $returnresult = die(json_encode(array(
                     "status" => 0,
@@ -2059,13 +2094,30 @@ $check = "SELECT asset_number FROM tbl_user_asset WHERE status=1 and asset_numbe
     
     function get_asset()
     {
+        $index = $_REQUEST['index'];
+        // $starts=$index*10;
+           $start = ($index-1)*10;
        $user_id = $_REQUEST['user_id'];
-       $result  = $this->db->query("SELECT asset_id,user_id,asset_name,asset_type,asset_number,asset_number,latitude,longitude from tbl_user_asset where user_id='$user_id'");
+       $result  = $this->db->query("SELECT asset_id,user_id,asset_name,asset_type,asset_number,asset_number,latitude,longitude,address as asset_address from tbl_user_asset where user_id='$user_id' and status=1 ORDER BY asset_id DESC LIMIT $start,10");
   
        return $result->result();
   
      }
      
+
+    function get_total_asset_page()
+    {
+      
+     $user_id = $_REQUEST['user_id'];
+       $result  = $this->db->query("SELECT asset_id,user_id,asset_name,asset_type,asset_number,asset_number,latitude,longitude,address as asset_address from tbl_user_asset where user_id='$user_id' and status=1");
+  
+    $total = count($result->result());
+     
+    $totalpage = $total/10;    
+    $pagenumber = ceil($totalpage);
+    return $pagenumber;
+ }
+
 
 
      /*-------------------------------update_user_emergency_contact with community----------------------------------------------- */
@@ -2096,12 +2148,38 @@ $check = "SELECT asset_number FROM tbl_user_asset WHERE status=1 and asset_numbe
          else {
             $returnresult = array(
                 'status' => 0,
-                'message' => 'contact not found'
+                'message' => 'Asset not found'
             );
         }
         
         return $returnresult;
         
+    }
+
+     /*-------------------------------delete user from user list----------------------------------------------- */
+    
+    function delete_asset()
+    {
+        $asset_id = $_REQUEST['asset_id'];
+        
+        $data = array(
+            
+            'status' => 0
+        );
+        $this->db->where('asset_id', $asset_id);
+        $data = $this->db->update('tbl_user_asset', $data);
+        if ($data) {
+            $returnresult = array(
+                'status' => 1,
+                'message' => 'Asset delete successfully'
+            );
+        } else {
+            $returnresult = array(
+                'status' => 0,
+                'message' => 'Some data not valid'
+            );
+        }
+        return $returnresult;
     }
 
 }
