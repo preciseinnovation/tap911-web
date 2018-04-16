@@ -1489,7 +1489,7 @@ class Webservice extends CI_Controller
                 } else {
                     $returnresult = array(
                         'status' => 0,
-                        'message' => 'Record not found'
+                        'message' => 'No emergency contact found'
                     );
                     $response     = json_encode($returnresult);
                     print_r($response);
@@ -1981,8 +1981,15 @@ class Webservice extends CI_Controller
             $row     = $res->row();
             if ($row) {
                 $json_data = $this->user_model->add_emergency_user($token);
-                $data      = json_encode($json_data);
+                if(empty($json_data)){
+                 $returnresult = die(json_encode(array(
+                "status" => 0,
+                "message" =>"No user on radius"
+                         )));
+               }else{
+                $data = json_encode($json_data);
                 print_r($data);
+               }
             } else {
                 $returnresult = array(
                     'status' => 0,
@@ -2461,6 +2468,7 @@ class Webservice extends CI_Controller
             $time_zone          = $row->time_zone;
             if ($row) {
                 $response = $this->user_model->get_community_communication($time_zone);
+                $totalpage = $this->user_model->total_community_msg();
                 if ($response) {
                     $arr = array();
                     foreach ($response as $results) {
@@ -2478,6 +2486,7 @@ class Webservice extends CI_Controller
                     }
                     $returnresult = array(
                         'status' => 1,
+                        'total_page'=>$totalpage,
                         'message' => 'Record found',
                         'message_list' => $arr
                     );
@@ -2557,7 +2566,7 @@ class Webservice extends CI_Controller
                 else {
                     $returnresult = array(
                         'status' => 0,
-                        'message' => 'No emergency contact found'
+                        'message' => 'Record not found'
                         
                     );
                     $response     = json_encode($returnresult);
