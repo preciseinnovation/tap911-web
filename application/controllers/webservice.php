@@ -1248,12 +1248,12 @@ class Webservice extends CI_Controller
         $token               = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
         $home_address_line_1 = isset($_REQUEST['home_address_line_1']) ? $_REQUEST['home_address_line_1'] : "";
         $user_id             = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
-        $home_address_line_2 = isset($_REQUEST['home_address_line_2']) ? $_REQUEST['home_address_line_2'] : "";
+        // $home_address_line_2 = isset($_REQUEST['home_address_line_2']) ? $_REQUEST['home_address_line_2'] : "";
         $city_id             = isset($_REQUEST['city_id']) ? $_REQUEST['city_id'] : "";
         $state_id            = isset($_REQUEST['state_id']) ? $_REQUEST['state_id'] : "";
         $zip                 = isset($_REQUEST['zip']) ? $_REQUEST['zip'] : "";
         $country_id          = isset($_REQUEST['country_id']) ? $_REQUEST['country_id'] : "";
-        if ($token == "" or $home_address_line_1 == "" or $user_id == "" or $home_address_line_2 == "" or $city_id == "" or $state_id == "" or $zip == "" or $country_id == "") {
+        if ($token == "" or $home_address_line_1 == "" or $user_id == "" or $city_id == "" or $state_id == "" or $zip == "" or $country_id == "") {
             die(json_encode(array(
                 "status" => 0,
                 "message" => "Input parameters are not found"
