@@ -183,22 +183,27 @@ class User_model extends CI_Model
     
     function user_registration()
     {
-        
-$check = "SELECT * FROM tbl_user WHERE status=1 and (email ='" . $_REQUEST['email'] . "' OR user_name ='" . $_REQUEST['user_name'] . "')";
+        $phone_number= $_REQUEST['phone_number'];
+        $check = "SELECT phone_number_text_msg,email FROM tbl_user WHERE status=1 and (email ='" . $_REQUEST['email'] . "' OR phone_number_text_msg ='" . $phone_number . "')";
         $rs    = mysql_query($check);
         $data  = mysql_fetch_array($rs);
-        // $status = $data['status'];
-
-        if ($data[0] > 1) {
+          $phone_number_text_msg = $data['phone_number_text_msg'];
+           $email = $data['email']; 
+        if ($email==$_REQUEST['email']) {
             
             $returnresult = array(
                 'status' => 0,
-                'message' => '"This email is already registered with another user'
+                'message' =>'This email is already registered with another user'
             );
           
-        } 
-        
-        else {
+        }
+         elseif($phone_number_text_msg==$phone_number){
+              $returnresult = die(json_encode(array(
+                    "status" => 0,
+                    "message" => "This Phone number is already registered with another user"
+                )));
+            }
+         else {
             
             $target      = "./uploads/";
             $target      = $target . basename($_FILES['profile_pic']['name']);
@@ -212,20 +217,13 @@ $check = "SELECT * FROM tbl_user WHERE status=1 and (email ='" . $_REQUEST['emai
                     )));
                     
                 }
-                if (!is_numeric($_REQUEST['phone_number'])) {
+                if (!is_numeric($phone_number)) {
                     $returnresult = die(json_encode(array(
                         "status" => 0,
                         "message" => "Please Enter number only"
                     )));
                 }
-                // if (ctype_alpha($_REQUEST['user_name']) === false) {
-                    
-                //     $returnresult = die(json_encode(array(
-                //         "status" => 0,
-                //         "message" => "User Name must only contain letters!"
-                //     )));
-                // }
-                
+              
                 if (ctype_alpha($_REQUEST['first_name']) === false) {
                     
                     $returnresult = die(json_encode(array(
@@ -250,7 +248,7 @@ $check = "SELECT * FROM tbl_user WHERE status=1 and (email ='" . $_REQUEST['emai
                      'dob' => $_REQUEST['dob'],
                     'gender' => $_REQUEST['gender'],
                     'phone_number_text_msg_country_code' => $_REQUEST['country_id'],
-                    'phone_number_text_msg' => $_REQUEST['phone_number'],
+                    'phone_number_text_msg' => $phone_number,
                     'user_lat' => $_REQUEST['user_lat'],
                     'user_long' => $_REQUEST['user_long'],
                     'password' => md5($_REQUEST['password']),
@@ -335,7 +333,7 @@ else{
             
             $returnresult = array(
                 'status' => 1,
-                'message' => 'User data save successfully'
+                'message' => 'Assistance info saved successfully'
             );
         } else {
             $returnresult = array(
@@ -371,7 +369,7 @@ $SQL = "UPDATE tbl_user_question_answer SET question_id='$question_id',answer='$
            // $data = $this->db->update('tbl_user', $data);
             $returnresult = array(
                 'status' => 1,
-                'message' => 'User data save successfully'
+                'message' => 'Assistance info saved successfully'
             );
         } else {
             $returnresult = array(
@@ -662,6 +660,29 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
     
     function update_profile()
     {
+       
+        $checkuser = "SELECT phone_number_text_msg,email FROM tbl_user WHERE status=1 and (email ='" . $_REQUEST['email'] . "' OR phone_number_text_msg ='" . $_REQUEST['phone_number'] . "')";
+        $resresult    = mysql_query($checkuser);
+        $data  = mysql_fetch_array($resresult);
+        $phone_number_text_msg = $data['phone_number_text_msg'];
+        $email = $data['email']; 
+        if ($email==$_REQUEST['email']) {
+            
+           $returnresult = array(
+                'status' => 0,
+                'message' =>'This email is already registered with another user'
+            );
+          
+        }
+         elseif($phone_number_text_msg==$_REQUEST['phone_number']){
+             $returnresult = die(json_encode(array(
+                    "status" => 0,
+                    "message" => "This Phone number is already registered with another user"
+                )));
+            }
+
+        else{
+
         $check = "SELECT * FROM  tbl_user WHERE user_id ='" . $_REQUEST['user_id'] . "'";
         $res   = $this->db->query($check);
         if ($res->num_rows > 0) {
@@ -672,7 +693,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
                 'user_id' => $_REQUEST['user_id'],
                 'first_name' => $_REQUEST['first_name'],
                 'last_name' => $_REQUEST['last_name'],
-                'email' => $_REQUEST['email'],
+                 'email' => $_REQUEST['email'],
                 'language' => $_REQUEST['language'],
                 'phone_number_text_msg' => $_REQUEST['phone_number'],
                 'medical_history' => $_REQUEST['medical_history'],
@@ -686,7 +707,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
             if ($data) {
                 $returnresult = array(
                     'status' => 1,
-                    'message' => 'User profile update successfully'
+                    'message' => 'User profile updated successfully'
                 );
             } else {
                 $returnresult = array(
@@ -695,8 +716,11 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
                 );
             }
             
-            return $returnresult;
+            }
         }
+            return $returnresult;
+        
+    
     }
     
     
@@ -1123,7 +1147,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
         if ($data) {
             $returnresult = array(
                 'status' => 1,
-                'message' => 'contact deleted successfully'
+                'message' => 'Contact deleted successfully'
             );
         } else {
             $returnresult = array(
@@ -1216,13 +1240,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
                     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
                      array_push($require, curl_exec($ch));
-                    if(is_null($result)){
-                          $returnresult = die(json_encode(array(
-                 "status" => 0,
-                 "message" => "no user"
-            ))); 
-                  
-              }else{
+                    
                
                  $returnresult = array(
                                'status' => 1,
@@ -1230,7 +1248,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
                                'message' => 'success'
             
                          );
-}
+
                     curl_close($ch);
                     if ($mobile_type == 'android' || $mobile_type == 'ios') {
                         
@@ -1287,16 +1305,12 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
         
         $datas = $result->result_array();
         
-         $returnresult = die(json_encode(array(
-                "status" => 0,
-                "message" => "no user"
-            )));
             
             $countvars = count($datas);
             $require   = array();
             for ($j = 0; $j < $countvars; $j++) {
 
-                $uid                       = $datas[$j]['user_id'];
+                $uid = $datas[$j]['user_id'];
 
                 $SQL = "insert into tbl_emergency_notification(notification_user_id,emergency_id) values('$uid','$ids')";
 
@@ -1351,23 +1365,15 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
                     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     
                    array_push($require, curl_exec($ch));
-                    if ($returnresult){
-                                 $returnresult = array(
-                                'status' => 1,
-                                'data' => $require,
-                                'message' => 'success'
+                   
+                          $returnresult = array(
+                          'status' => 1,
+                           'data' => $require,
+                           'message' => 'success'
             
            );
                    
-}else{
-   
-      $returnresult = die(json_encode(array(
-                "status" => 0,
-                "message" => "no user"
-            )));
-
-}
-                    curl_close($ch);
+                   curl_close($ch);
                     if ($mobile_type == 'android' || $mobile_type == 'ios') {
                         
                     }
@@ -1517,21 +1523,15 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
                     curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
                     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
                     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                     $returnresult =  array_push($require, curl_exec($ch));
-                    if ($resultdata==""){
-          
-             $returnresult = die(json_encode(array(
-                "status" => 0,
-                "message" =>"no user"
-                         )));
-            }else{
+                     array_push($require, curl_exec($ch));
+
                     $returnresult = array(
                     'status' => 1,
                     'data' => $require,
                     'message' =>'success'
             
                 );
-             }
+          
                     curl_close($ch);
                     if ($mobile_type == 'android' || $mobile_type == 'ios') {
                         
@@ -2142,7 +2142,7 @@ $check = "SELECT asset_number FROM tbl_user_asset WHERE status=1 and asset_numbe
             if ($data) {
                 $returnresult = array(
                     'status' => 1,
-                    'message' => 'User asset update successfully'
+                    'message' => 'User asset updated successfully'
                 );
             }
          else {
@@ -2171,7 +2171,7 @@ $check = "SELECT asset_number FROM tbl_user_asset WHERE status=1 and asset_numbe
         if ($data) {
             $returnresult = array(
                 'status' => 1,
-                'message' => 'Asset delete successfully'
+                'message' => 'Asset deleted successfully'
             );
         } else {
             $returnresult = array(
