@@ -14,7 +14,7 @@ class Webservice extends CI_Controller
     {
         
         
-    }
+    } 
     /*
     ------------------------------------------------------------------------------------------------------
     http://104.237.3.116/tap911/index.php/webservice/checklogin?login=sbsgroup@gmail.com&password=123456
@@ -104,7 +104,7 @@ class Webservice extends CI_Controller
             $result = json_encode($result);
             print_r($result);
         }
-    }
+     }
     
     
     
