@@ -1981,14 +1981,14 @@ class Webservice extends CI_Controller
             $row     = $res->row();
             if ($row) {
                 $json_data = $this->user_model->add_emergency_user($token);
-                if(empty($json_data)){
-                 $returnresult = die(json_encode(array(
-                "status" => 0,
-                "message" =>"No user on radius"
-                         )));
-               }else{
+               if($json_data){
                 $data = json_encode($json_data);
                 print_r($data);
+               }else{
+                $returnresult = die(json_encode(array(
+                "status" => 0,
+               "message" =>"No user on radius"
+                        )));
                }
             } else {
                 $returnresult = array(
@@ -2883,6 +2883,44 @@ class Webservice extends CI_Controller
     }
     
 
+/*
+    ----------------------------------------------------------------------------------------------------------
+    http://104.237.3.116/tap911/index.php/webservice/update_accept_user?token=dd088bfaaaf468cb&notification_user_id=147&emergency_id=603
+    -----------------------------------------------------------------------------------------------------------
+    */
+    
+    function update_accept_user()
+    {
+        $token                = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+        $notification_user_id = isset($_REQUEST['notification_user_id']) ? $_REQUEST['notification_user_id'] : "";
+        $emergency_id         = isset($_REQUEST['emergency_id']) ? $_REQUEST['emergency_id'] : "";
+        // $message_data         = isset($_REQUEST['message_data']) ? $_REQUEST['message_data'] : "";
+        if ($token == "" or $notification_user_id == "" or $emergency_id == "") {
+            die(json_encode(array(
+                "status" => 0,
+                "message" => "Input parameters are not found"
+            )));
+            
+        } else {
+            $token                = $_REQUEST['token'];
+            $notification_user_id = $_REQUEST['notification_user_id'];
+            $sql                  = "SELECT token,user_id FROM tbl_user where token='$token' and user_id='$notification_user_id'";
+            $res                  = $this->db->query($sql);
+            $row                  = $res->row();
+            if ($row) {
+                $response = $this->user_model->update_accept_user($token);
+                $response = json_encode($response);
+                print_r($response);
+            } else {
+                $returnresult = array(
+                    'status' => 0,
+                    'message' => 'Authentication failed'
+                );
+                $response     = json_encode($returnresult);
+                print_r($response);
+            }
+        }
+    }
 
     
  /*
