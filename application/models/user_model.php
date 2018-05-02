@@ -14,12 +14,13 @@ class User_model extends CI_Model
     function checklogin($login, $password)
     {
         
-        $sql = "SELECT user_name ,user_id, password, email FROM tbl_user where ( user_name='$login' OR email = '$login') and password = '$password' and status=1";
+        $sql = "SELECT user_name ,user_id, password,assistance_status, email FROM tbl_user where ( user_name='$login' OR email = '$login') and password = '$password' and status=1";
         $res = $this->db->query($sql);
         
         if ($res->num_rows > 0) {
             $row                       = $res->row();
             $customer_id               = $row->user_id;
+            $assistance_status               = $row->assistance_status;
             $tokens                    = openssl_random_pseudo_bytes(8);
             $token                     = bin2hex($tokens);
             $notification_device_token = $_REQUEST['notification_device_token'];
@@ -30,6 +31,7 @@ class User_model extends CI_Model
                 'notification_device_token' => $notification_device_token,
                 'mobile_type' => $mobile_type,
                 'time_zone' => $time_zone
+                  
                 
             );
             $this->db->where('user_id', $customer_id);
@@ -37,7 +39,8 @@ class User_model extends CI_Model
             $returnarray = array(
                 'status' => 1,
                 'token' => $token,
-                'user_id' => $customer_id
+                'user_id' => $customer_id,
+                'assistance_status'=>$assistance_status
             );
             
             
@@ -256,6 +259,7 @@ class User_model extends CI_Model
                     'profile_pic' => $profile_pic,
                     'notification_device_token' => $_REQUEST['notification_device_token'],
                     'mobile_type' => $_REQUEST['mobile_type'],
+                    'assistance_status' => 1,
                     'status' => 1
                 );
                 $data = $this->db->insert('tbl_user', $data);
@@ -330,7 +334,13 @@ else{
 }
 
        if ($res) {
+                  $data = array(
+                  'assistance_status' => 0
             
+                         );
+        
+             $this->db->where('user_id', $loginuser_id);
+             $data = $this->db->update('tbl_user', $data);
             $returnresult = array(
                 'status' => 1,
                 'message' => 'Assistance info saved successfully'
@@ -1212,8 +1222,8 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
                     
                     $sound = $notification_tone;
                     $usertoken    = $notification_device_token;
-                    $title        = "hello i am" . $user_name;
-                    $body         = $helpuser_name . " " . "Please help me";
+                    $title        = $helpuser_name." "."need your help," ;
+                    $body         =  "Please help me";
                     $notification = array(
                         'title' => $title,
                         'text' => $body,
@@ -1255,17 +1265,20 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
                     }
                 }
                 
-                return $returnresult;
+             if($returnresult){
+                $data = json_encode($returnresult);
+                print_r($data);
+               }else{
+                $data = die(json_encode(array(
+                "status" => 0,
+               "message" =>"No user on radius"
+                        )));
+                print_r($data);
+               }
             
         }
-        
-        
-        
-        
+           
     }
-    
-    
-    
     
     public function send_miles_notification($ids, $user_lat, $user_long)
     {
@@ -1337,8 +1350,8 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
                     $ch                        = curl_init("https://fcm.googleapis.com/fcm/send");
                     $sound = $notification_tone;
                     $usertoken    = $notification_device_token;
-                    $title        = "Hello i am" ." ". $user_name;
-                    $body         = $helpuser_name . " " . "Please help me";
+                    $title        = $helpuser_name." "."need your help," ;
+                    $body         =  "Please help me";
                     $notification = array(
                         'title' => $title,
                         'text' => $body,
@@ -1386,7 +1399,16 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
                 }
             }
         
-            return $returnresult;
+           if($returnresult){
+                $data = json_encode($returnresult);
+                print_r($data);
+               }else{
+                $returnresult = die(json_encode(array(
+                "status" => 0,
+               "message" =>"No user on radius"
+                        )));
+               }
+      // return $returnresult;
         
     }
     
@@ -1497,8 +1519,8 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
                     $ch                        = curl_init("https://fcm.googleapis.com/fcm/send");
                      $sound = $notification_tone;
                     $usertoken    = $notification_device_token;
-                    $title        = "Hello i am". " " .$user_name;
-                    $body         = $user_names . " " . "Please help me";
+                    $title        = $user_names." "."need your help," ;
+                    $body         =  "Please help me";
                     $notification = array(
                         'title' => $title,
                         'text' => $body,
@@ -1537,15 +1559,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
                         
                     }
                     
-                } else {
-                    
-
-                    $returnresult = array(
-                    'status' => 1,
-                    'message' =>'No user available for help'
-            
-                   );  
-                }
+                } 
             }
         
         /*-------------------------------end 3 miles user notification----------------------------------------------- */
@@ -1638,7 +1652,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
                 $ch                        = curl_init("https://fcm.googleapis.com/fcm/send");
                 $sound = $notification_tone;
                 $title                     = $first_name;
-                $body                      = "Accept your helping request.";
+                $body                      = "has accepted your request.";
                 $notification              = array(
                      'title' => $title,
                      'text' => $body,
@@ -1972,7 +1986,7 @@ $result  =$this->db->query("SELECT community_communitaction_id,from_user_id,to_u
         
         
         $data = array(
-            'emergency_status' => 2
+            'emergency_status' => 4
             
         );
         $this->db->where('notification_user_id', $notification_user_id);
@@ -1999,6 +2013,38 @@ $result  =$this->db->query("SELECT community_communitaction_id,from_user_id,to_u
         
     }
     
+/*-------------------------------end emergency for help user----------------------------------------------- */
+    
+    
+    function update_accept_user()
+    {
+        $notification_user_id = $_REQUEST['notification_user_id'];
+        $emergency_id         = $_REQUEST['emergency_id'];
+        // $message_data         = $_REQUEST['message_data'];
+        
+        
+        
+        $data = array(
+            'emergency_status' => 2
+            
+        );
+        $this->db->where('notification_user_id', $notification_user_id);
+        $this->db->where('emergency_id', $emergency_id);
+        $data = $this->db->update('tbl_emergency_notification', $data);
+        
+        if ($data) {
+            
+            $returnresult = array(
+                'status' => 1,
+                'message' => 'Emergency Accepted Successfully'
+            );
+        }
+        
+        return $returnresult;
+        
+    }
+
+
 
 function get_emergency_user($time_zone){
 
@@ -2022,7 +2068,7 @@ $result  =$this->db->query("SELECT `tbl_user`.user_id,`tbl_user`.user_name,`tbl_
 FROM `tbl_user`
 JOIN `tbl_emergency` ON `tbl_emergency`.`user_id` = `tbl_user`.`user_id`
 JOIN `tbl_emergency_notification` on `tbl_emergency`.`emergency_id` = `tbl_emergency_notification`.`emergency_id`
- WHERE(`tbl_emergency_notification`.`notification_user_id`=$user_id or `tbl_emergency`.`user_id` = $user_id ) and `tbl_emergency_notification`.emergency_status!=2 ORDER BY `tbl_emergency_notification`.send_date_time DESC LIMIT $start,10");
+ WHERE(`tbl_emergency_notification`.`notification_user_id`=$user_id or `tbl_emergency`.`user_id` = $user_id )  ORDER BY `tbl_emergency_notification`.send_date_time DESC LIMIT $start,10");
 
        
         return $result->result();
@@ -2181,5 +2227,9 @@ $check = "SELECT asset_number FROM tbl_user_asset WHERE status=1 and asset_numbe
         }
         return $returnresult;
     }
+
+
+
+
 
 }
