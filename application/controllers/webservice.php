@@ -1248,12 +1248,12 @@ class Webservice extends CI_Controller
         $token               = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
         $home_address_line_1 = isset($_REQUEST['home_address_line_1']) ? $_REQUEST['home_address_line_1'] : "";
         $user_id             = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
-        $home_address_line_2 = isset($_REQUEST['home_address_line_2']) ? $_REQUEST['home_address_line_2'] : "";
+        // $home_address_line_2 = isset($_REQUEST['home_address_line_2']) ? $_REQUEST['home_address_line_2'] : "";
         $city_id             = isset($_REQUEST['city_id']) ? $_REQUEST['city_id'] : "";
         $state_id            = isset($_REQUEST['state_id']) ? $_REQUEST['state_id'] : "";
         $zip                 = isset($_REQUEST['zip']) ? $_REQUEST['zip'] : "";
         $country_id          = isset($_REQUEST['country_id']) ? $_REQUEST['country_id'] : "";
-        if ($token == "" or $home_address_line_1 == "" or $user_id == "" or $home_address_line_2 == "" or $city_id == "" or $state_id == "" or $zip == "" or $country_id == "") {
+        if ($token == "" or $home_address_line_1 == "" or $user_id == ""  or $city_id == "" or $state_id == "" or $zip == "" or $country_id == "") {
             die(json_encode(array(
                 "status" => 0,
                 "message" => "Input parameters are not found"
@@ -2722,7 +2722,7 @@ class Webservice extends CI_Controller
             $row = $res->row();
             if ($row) {
                 
-                $results = $this->db->query("SELECT emergency_id,notification_user_id from tbl_emergency_notification where emergency_id='" . $_REQUEST['emergency_id'] . "' and emergency_status=1");
+                $results = $this->db->query("SELECT emergency_id,notification_user_id from tbl_emergency_notification where emergency_id='" . $_REQUEST['emergency_id'] . "' and emergency_status!=4");
                 
                 $resultdata     = $results->result_array();
                 $countvarresult = count($resultdata);
@@ -2882,6 +2882,48 @@ class Webservice extends CI_Controller
         }
     }
     
+
+
+
+/*
+    ----------------------------------------------------------------------------------------------------------
+    http://104.237.3.116/tap911/index.php/webservice/end_emergency_by_helping_user?token=dd088bfaaaf468cb&notification_user_id=147&emergency_id=603&message_data=test for end emergency
+    -----------------------------------------------------------------------------------------------------------
+    */
+    
+    function end_emergency_by_creator()
+    {
+        $token                = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+        $creator_id = isset($_REQUEST['creator_id']) ? $_REQUEST['creator_id'] : "";
+        $emergency_id         = isset($_REQUEST['emergency_id']) ? $_REQUEST['emergency_id'] : "";
+       // $message_data         = isset($_REQUEST['message_data']) ? $_REQUEST['message_data'] : "";
+        if ($token == "" or $creator_id == "" or $emergency_id == "") {
+            die(json_encode(array(
+                "status" => 0,
+                "message" => "Input parameters are not found"
+            )));
+            
+        } else {
+            $token                = $_REQUEST['token'];
+            $creator_id = $_REQUEST['creator_id'];
+        $sql                  = "SELECT token,user_id FROM tbl_user where token='$token' and user_id='$creator_id'";
+            $res                  = $this->db->query($sql);
+            $row                  = $res->row();
+            if ($row) {
+                $response = $this->user_model->end_emergency_by_creator($token);
+                $response = json_encode($response);
+                print_r($response);
+            } else {
+                $returnresult = array(
+                    'status' => 0,
+                    'message' => 'Authentication failed'
+                );
+                $response     = json_encode($returnresult);
+                print_r($response);
+            }
+        }
+    }
+ 
 
 /*
     ----------------------------------------------------------------------------------------------------------
