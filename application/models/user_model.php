@@ -208,6 +208,9 @@ class User_model extends CI_Model
             }
          else {
             
+            $time_zone               = $_REQUEST['time_zone'];
+            $tokens                    = openssl_random_pseudo_bytes(8);
+            $token                     = bin2hex($tokens);
             $target      = "./uploads/";
             $target      = $target . basename($_FILES['profile_pic']['name']);
             $profile_pic = ($_FILES['profile_pic']['name']);
@@ -249,6 +252,8 @@ class User_model extends CI_Model
                     'user_name' => $_REQUEST['user_name'],
                      'email' => $_REQUEST['email'],
                      'dob' => $_REQUEST['dob'],
+                     'token' => $token,
+                     'time_zone'=>$time_zone,
                     'gender' => $_REQUEST['gender'],
                     'phone_number_text_msg_country_code' => $_REQUEST['country_id'],
                     'phone_number_text_msg' => $phone_number,
@@ -274,6 +279,8 @@ class User_model extends CI_Model
                     
                     $returnresult = array(
                         'status' => 1,
+                        'user_id'=>$id,
+                        'token'=>$token,
                         'message' => 'Your registration is now confirmed'
                     );
                 } else {
@@ -341,8 +348,13 @@ else{
         
              $this->db->where('user_id', $loginuser_id);
              $data = $this->db->update('tbl_user', $data);
+              $sql     = "SELECT assistance_status FROM tbl_user where user_id='$loginuser_id'";
+             $res     = $this->db->query($sql);
+             $row     = $res->row();
+             $assistance_status=$row->assistance_status;
             $returnresult = array(
                 'status' => 1,
+                'assistance_status'=>$assistance_status,
                 'message' => 'Assistance info saved successfully'
             );
         } else {
@@ -671,12 +683,13 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
     function update_profile()
     {
        
-        $checkuser = "SELECT phone_number_text_msg,email FROM tbl_user WHERE status=1 and (email ='" . $_REQUEST['email'] . "' OR phone_number_text_msg ='" . $_REQUEST['phone_number'] . "')";
+        $checkuser = "SELECT phone_number_text_msg,email,user_id FROM tbl_user WHERE status=1 and (email ='" . $_REQUEST['email'] . "' OR phone_number_text_msg ='" . $_REQUEST['phone_number'] . "')";
         $resresult    = mysql_query($checkuser);
         $data  = mysql_fetch_array($resresult);
         $phone_number_text_msg = $data['phone_number_text_msg'];
-        $email = $data['email']; 
-        if ($email==$_REQUEST['email']) {
+        $email = $data['email'];
+        $user_id = $data['user_id']; 
+        if ($email==$_REQUEST['email'] && $user_id!=$_REQUEST['user_id']) {
             
            $returnresult = array(
                 'status' => 0,
@@ -684,7 +697,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
             );
           
         }
-         elseif($phone_number_text_msg==$_REQUEST['phone_number']){
+         elseif($phone_number_text_msg==$_REQUEST['phone_number'] && $user_id!=$_REQUEST['user_id']){
              $returnresult = die(json_encode(array(
                     "status" => 0,
                     "message" => "This Phone number is already registered with another user"
@@ -1197,7 +1210,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
                 $id = $remergencycontact[$j]['emergency_user_help_id'];
             
                 
-                $SQL = "insert into tbl_emergency_notification(notification_user_id,emergency_id)values('$id','$ids')";
+                $SQL = "insert into tbl_emergency_notification(notification_user_id,emergency_id,creator_id)values('$id','$ids','$emuserid')";
                 $res = mysql_query($SQL);
                 
                 $sql     = "SELECT * FROM tbl_user WHERE `user_id` IN('$id')";
@@ -1325,7 +1338,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
 
                 $uid = $datas[$j]['user_id'];
 
-                $SQL = "insert into tbl_emergency_notification(notification_user_id,emergency_id) values('$uid','$ids')";
+                $SQL = "insert into tbl_emergency_notification(notification_user_id,emergency_id,creator_id)values('$uid','$ids','$emuserid')";
 
                 $res                       = mysql_query($SQL);
                 $emergency_notification_id = $this->db->insert_id();
@@ -1497,7 +1510,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
              
                 $id                        = $resultdata[$i]['user_id'];
                
-        $SQL = "insert into tbl_emergency_notification(notification_user_id,emergency_id) values('$id','$ids')";
+        $SQL = "insert into tbl_emergency_notification(notification_user_id,emergency_id,creator_id) values('$id','$ids','$emuserid')";
                 $res                       = mysql_query($SQL);
                 $emergency_notification_id = $this->db->insert_id();
                 
@@ -1596,6 +1609,17 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
                 'status' => 0,
                 'message' => 'Only two user allow accept request'
             );
+
+      $result = "SELECT emergency_id FROM  tbl_emergency_notification WHERE emergency_id ='" . $emergency_id . "'";
+        $res                       = $this->db->query($result);
+        $row                       = $res->row();
+        $emergency_id              = $row->emergency_id;
+
+            $data = array(
+                'emergency_status' => 3, 
+            );
+            $this->db->where('emergency_id', $emergency_id);
+            $data = $this->db->update('tbl_emergency_notification', $data);
             
         } else {
             $date = date("Y-m-d H:i:s");
@@ -2012,6 +2036,107 @@ $result  =$this->db->query("SELECT community_communitaction_id,from_user_id,to_u
         return $returnresult;
         
     }
+
+
+
+ /*-------------------------------end emergency for help user----------------------------------------------- */
+    
+    
+    function end_emergency_by_creator()
+    {
+        $creator_id = $_REQUEST['creator_id'];
+        $emergency_id         = $_REQUEST['emergency_id'];
+      
+        
+        $data = array(
+            'emergency_status' => 4
+            
+        );
+        $this->db->where('creator_id', $creator_id);
+        $this->db->where('emergency_id', $emergency_id);
+        $data = $this->db->update('tbl_emergency_notification', $data);
+        
+          $sql = "SELECT first_name,last_name FROM tbl_user WHERE user_id='$creator_id'";
+                $res = $this->db->query($sql);
+                $row = $res->row();
+                $first_names                = $row->first_name;
+                $last_names                 = $row->last_name;
+                $helpuser_name                = $first_names . " " . $last_names;
+
+            $sql = "SELECT notification_user_id FROM tbl_emergency_notification WHERE emergency_id='$emergency_id'";
+             $result = $this->db->query($sql);
+            $datas = $result->result_array();
+            $countvars = count($datas);
+            $require   = array();
+
+            for ($j = 0; $j < $countvars; $j++) {
+                $uid = $datas[$j]['notification_user_id'];              
+                $sql = "SELECT * FROM tbl_user WHERE `user_id` IN ('$uid')";
+                $res = $this->db->query($sql);
+                $row = $res->row();
+
+                if ($row) {
+                    $notification_device_token = $row->notification_device_token;
+                    $mobile_type               = $row->mobile_type;
+                      $user_id               = $row->user_id;
+                    $sql        = "SELECT notification_tone,user_id FROM tbl_notification WHERE `user_id`='$user_id'";
+                    $resultdatatone = $this->db->query($sql);
+                    $resultdatatone = $resultdatatone->row();
+                    $notification_tone = $resultdatatone->notification_tone;
+            
+                    $ch                        = curl_init("https://fcm.googleapis.com/fcm/send");
+                    $sound = $notification_tone;
+                    $usertoken    = $notification_device_token;
+                    $title        = $helpuser_name." "."End Emergency," ;
+                    $body         =  "Thank For Help";
+                    $notification = array(
+                        'title' => $title,
+                        'text' => $body,
+                        'sound' =>$sound
+                       
+                    );
+                    $arrayToSend  = array(
+                        'to' => $usertoken,
+                        'notification' => $notification,
+                        'priority' => 'high'
+                    );
+                    
+                    $json      = json_encode($arrayToSend);
+                    $headers   = array();
+                    $headers[] = 'Content-Type: application/json';
+                    if ($mobile_type == 'android') {
+                        $headers[] = 'Authorization: key= AIzaSyC5Z-wS9-IFx4nVCAfMjF9v7MwBQQR_5kw'; // key here
+                    } else {
+                        $headers[] = 'Authorization: key= AIzaSyAkPpQ-GiN4GVSjniMyHuSwXJVekEL7FWk'; // key here
+                    }
+                    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                    array_push($require, curl_exec($ch));
+                    curl_close($ch);
+                    if ($mobile_type == 'android' || $mobile_type == 'ios') {
+                        
+                    }
+                    
+                } else {
+                    $returnresult = array(
+                        'status' => 0,
+                        'message' => 'Some data not valid'
+                    );
+                }
+            }
+        
+           $returnresult = array(
+            'status' => 1,
+            'message' => 'success',
+            'response' => $require
+           );
+
+        return $returnresult;
+        
+    }
+
     
 /*-------------------------------end emergency for help user----------------------------------------------- */
     
