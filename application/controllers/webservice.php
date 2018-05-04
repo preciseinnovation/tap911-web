@@ -2822,7 +2822,7 @@ class Webservice extends CI_Controller
                 else {
                     $returnresult = array(
                         'status' => 0,
-                        'message' => 'Record not found'
+                        'message' => 'Emergency Ended'
                         
                     );
                     $response     = json_encode($returnresult);
@@ -3004,6 +3004,14 @@ class Webservice extends CI_Controller
                        //$datetme = $date->setTimezone(new DateTimeZone('Asia/Calcutta'));
                       // echo  $datetme;die();
                        if($loginuserid==$user_id){
+                      $emergency_status=$results->emergency_status;
+
+                         if($emergency_status==4)
+                         {
+                            $status='4';
+                         }else{
+                            $status='3';
+                         }
                         $notificationuser[] = array(
 
                          'emergency_notification_id' =>"",
@@ -3015,7 +3023,7 @@ class Webservice extends CI_Controller
                         'emergency_address' => $results->emergency_address,
                         'emergency_type' =>$results->emergency_type,
                         'add_date' => $senddate,
-                        'emergency_status' =>'3'
+                        'emergency_status' =>$status
                             
                            );
                        }
