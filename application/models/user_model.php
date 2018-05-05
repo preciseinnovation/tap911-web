@@ -265,10 +265,16 @@ class User_model extends CI_Model
                     'notification_device_token' => $_REQUEST['notification_device_token'],
                     'mobile_type' => $_REQUEST['mobile_type'],
                     'assistance_status' => 1,
+                     'radius' => 3,
                     'status' => 1
                 );
                 $data = $this->db->insert('tbl_user', $data);
                 $id   = $this->db->insert_id();
+                $check = "SELECT assistance_status FROM tbl_user WHERE status=1 and user_id= $id";
+                $rs    = mysql_query($check);
+                $data  = mysql_fetch_array($rs);
+                $assistance_status = $data['assistance_status'];
+        
                 if ($data) {
                     
                     $data = array(
@@ -281,6 +287,7 @@ class User_model extends CI_Model
                         'status' => 1,
                         'user_id'=>$id,
                         'token'=>$token,
+                        'assistance_status'=>$assistance_status,
                         'message' => 'Your registration is now confirmed'
                     );
                 } else {
@@ -723,7 +730,9 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
                 'medication_instraction' => $_REQUEST['medication_instraction'],
                 'previous_surgeries_procedure' => $_REQUEST['previous_surgeries_procedure'],
                 'allergies' => $_REQUEST['allergies'],
-                'special_need' => $_REQUEST['special_need']
+                'special_need' => $_REQUEST['special_need'],
+                 'radius' => $_REQUEST['radius']
+                
             );
             $this->db->where('user_id', $user_id);
             $data = $this->db->update('tbl_user', $data);
@@ -1189,6 +1198,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
         $ids        = $ids;
         $user_lat   = $user_lat;
         $user_long  = $user_long;
+
         $sql        = "SELECT * FROM tbl_emergency where emergency_id='$ids'";
         $res        = $this->db->query($sql);
         $row        = $res->row();
@@ -1293,7 +1303,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
            
     }
     
-    public function send_miles_notification($ids, $user_lat, $user_long)
+    public function send_miles_notification($ids, $user_lat, $user_long,$radius)
     {
         
         /*-------------------------------register user notfication end start 3 miles user notification----------------------------------------------- */
@@ -1301,6 +1311,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
         $ids       = $ids;
         $user_lat  = $user_lat;
         $user_long = $user_long;
+        $radius = $radius;
         
         $sql        = "SELECT * FROM tbl_emergency where emergency_id='$ids'";
         $res        = $this->db->query($sql);
@@ -1325,7 +1336,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
             distance FROM $table
              JOIN  tbl_user on tbl_user.user_id =   $table.user_id
              WHERE  $table.add_date >= NOW() - INTERVAL 10 MINUTE and  $table.user_id NOT IN ('" . $_REQUEST['user_id'] . "')   
-            GROUP BY  $table.tracking_id HAVING distance <= 5 ORDER by distance ASC");
+            GROUP BY  $table.tracking_id HAVING distance <= $radius ORDER by distance ASC");
         
         
         
@@ -1464,9 +1475,12 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
         $ids  = $this->db->insert_id();
 
     }
-        
-        
-        $register = $this->send_miles_notification($ids, $user_lat, $user_long);
+       $sqlradius        = "SELECT radius FROM tbl_user where user_id='".$_REQUEST['user_id']."'";
+        $raduisres        = $this->db->query($sqlradius);
+        $row        = $raduisres->row();
+        $radius   = $row->radius;
+        // echo  $radius;die;
+        $register = $this->send_miles_notification($ids, $user_lat, $user_long,$radius);
         $temp     = $this->send_notification_emegrency_contact($ids, $user_lat, $user_long);
         
         return $temp;
@@ -1498,7 +1512,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
             POWER(SIN(($user_long - tbl_user.user_long) * pi()/180 / 2), 2) )) as
             distance FROM tbl_user
              WHERE  tbl_user.user_id NOT IN ('" . $_REQUEST['user_id'] . "')   
-            GROUP BY tbl_user.user_id HAVING distance <= 5 ORDER by distance ASC");
+            GROUP BY tbl_user.user_id HAVING distance <= $radius ORDER by distance ASC");
         
         
         
