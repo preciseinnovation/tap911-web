@@ -2068,7 +2068,9 @@ class Webservice extends CI_Controller
                             'special_need' => $results->special_need,
                             'user_lat' => $results->user_lat,
                             'user_long' => $results->user_long,
-                            'user_location_date_time' => $results->user_location_date_time
+                            'user_location_date_time' => $results->user_location_date_time,
+                             'radius' => $results->radius
+
                             
                         );
                         
