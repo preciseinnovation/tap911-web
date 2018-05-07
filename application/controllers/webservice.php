@@ -367,7 +367,7 @@ class Webservice extends CI_Controller
             if ($password != $oldpassword) {
                 $returnresult = die(json_encode(array(
                     'status' => 0,
-                    'message' => 'Old password doesnt match!'
+                    'message' => "Old password doesn't match!"
                 )));
                 
             } elseif ($tokens != $token) {
@@ -437,7 +437,7 @@ class Webservice extends CI_Controller
                     $headers = "From: $from\n";
                     $headers .= "MIME-Version: 1.0\n";
                     $headers .= "Content-type: text/html; charset=iso-8859-1 \n";
-                    $subject = "geechat - Forget Password";
+                    $subject = "tap911 - Forget Password";
                     $msg     = "Your Temporary Password is : $tempPass";
                     if (!mail($to, $subject, $msg, $headers)) {
                         echo json_encode(array(
@@ -453,7 +453,7 @@ class Webservice extends CI_Controller
                 } else {
                     echo json_encode(array(
                         'status' => 0,
-                        'message' => 'This email is not exist.'
+                        'message' => 'This email is not found in our system'
                     ));
                 }
             }
