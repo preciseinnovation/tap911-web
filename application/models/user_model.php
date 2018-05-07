@@ -14,7 +14,7 @@ class User_model extends CI_Model
     function checklogin($login, $password)
     {
         
-        $sql = "SELECT user_name ,user_id, password,assistance_status, email FROM tbl_user where ( user_name='$login' OR email = '$login') and password = '$password' and status=1";
+        $sql = "SELECT user_name ,user_id, password,assistance_status, email FROM tbl_user where  email = '$login' and password = '$password' and status=1";
         $res = $this->db->query($sql);
         
         if ($res->num_rows > 0) {
@@ -642,7 +642,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
             if ($data) {
                 $returnresult = array(
                     'status' => 1,
-                    'message' => 'User notification setting update successfully'
+                    'message' => 'User notification setting updated successfully'
                     
                 );
             }
@@ -674,7 +674,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
             if ($data) {
                 $returnresult = array(
                     'status' => 1,
-                    'message' => 'User notification tone update successfully'
+                    'message' => 'User notification tone updated successfully'
                     
                 );
             }
@@ -696,7 +696,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
         $phone_number_text_msg = $data['phone_number_text_msg'];
         $email = $data['email'];
         $user_id = $data['user_id']; 
-        if ($email==$_REQUEST['email'] && $user_id!=$_REQUEST['user_id']) {
+        if ($email==$_REQUEST['email'] && $user_id!= $_REQUEST['user_id']) {
             
            $returnresult = array(
                 'status' => 0,
@@ -704,7 +704,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
             );
           
         }
-         elseif($phone_number_text_msg==$_REQUEST['phone_number'] && $user_id!=$_REQUEST['user_id']){
+         elseif($phone_number_text_msg==$_REQUEST['phone_number'] && $user_id!= $_REQUEST['user_id']){
              $returnresult = die(json_encode(array(
                     "status" => 0,
                     "message" => "This Phone number is already registered with another user"
@@ -782,7 +782,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
                 if ($data) {
                     $returnresult = array(
                         'status' => 1,
-                        'message' => 'User profile picture update successfully'
+                        'message' => 'User profile updated successfully'
                     );
                 }
             } else {
