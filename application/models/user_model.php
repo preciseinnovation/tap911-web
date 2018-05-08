@@ -1245,8 +1245,8 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
                     
                     $sound = $notification_tone;
                     $usertoken    = $notification_device_token;
-                    $title        = $helpuser_name." "."need your help," ;
-                    $body         =  "Please help me";
+                    $title        = $helpuser_name." "."need your help,Please help." ;
+                    $body         =  "";
                     $notification = array(
                         'title' => $title,
                         'text' => $body,
@@ -1291,16 +1291,17 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
              if($returnresult){
                 $data = json_encode($returnresult);
                 print_r($data);
-               }else{
+               }
+                else{
                 $data = die(json_encode(array(
                 "status" => 0,
                "message" =>"No user on radius"
                         )));
                 print_r($data);
                }
-            
-        }
            
+        }
+         return $returnresult;   
     }
     
     public function send_miles_notification($ids, $user_lat, $user_long,$radius)
@@ -1374,8 +1375,8 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
                     $ch                        = curl_init("https://fcm.googleapis.com/fcm/send");
                     $sound = $notification_tone;
                     $usertoken    = $notification_device_token;
-                    $title        = $helpuser_name." "."need your help," ;
-                    $body         =  "Please help me";
+                    $title        = $helpuser_name." "."need your help,Please help." ;
+                    $body         =  "";
                     $notification = array(
                         'title' => $title,
                         'text' => $body,
@@ -1426,13 +1427,14 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
            if($returnresult){
                 $data = json_encode($returnresult);
                 print_r($data);
-               }else{
+               }
+            else{
                 $returnresult = die(json_encode(array(
                 "status" => 0,
                "message" =>"No user on radius"
                         )));
                }
-      // return $returnresult;
+       return $returnresult;
         
     }
     
@@ -1480,8 +1482,8 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
         $row        = $raduisres->row();
         $radius   = $row->radius;
         // echo  $radius;die;
-        $register = $this->send_miles_notification($ids, $user_lat, $user_long,$radius);
-        $temp     = $this->send_notification_emegrency_contact($ids, $user_lat, $user_long);
+        $register = $this->send_miles_notification($ids,$user_lat,$user_long,$radius);
+        $temp     = $this->send_notification_emegrency_contact($ids,$user_lat,$user_long);
         
         return $temp;
         return $register;
@@ -1546,8 +1548,8 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
                     $ch                        = curl_init("https://fcm.googleapis.com/fcm/send");
                      $sound = $notification_tone;
                     $usertoken    = $notification_device_token;
-                    $title        = $user_names." "."need your help," ;
-                    $body         =  "Please help me";
+                    $title        = $user_names." "."need your help,Please help." ;
+                    $body         =  "";
                     $notification = array(
                         'title' => $title,
                         'text' => $body,
@@ -1689,8 +1691,8 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
                 //  print_r($row);  
                 $ch                        = curl_init("https://fcm.googleapis.com/fcm/send");
                 $sound = $notification_tone;
-                $title                     = $first_name;
-                $body                      = "has accepted your request.";
+                $title                     = $first_name." ".'has accepted your request.';
+                $body                      = "";
                 $notification              = array(
                      'title' => $title,
                      'text' => $body,
