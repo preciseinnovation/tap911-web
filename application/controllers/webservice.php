@@ -1984,12 +1984,13 @@ class Webservice extends CI_Controller
                if($json_data){
                 $data = json_encode($json_data);
                 print_r($data);
-               }else{
-                $returnresult = die(json_encode(array(
-                "status" => 0,
-               "message" =>"No user on radius"
-                        )));
                }
+               // else{
+               //  $returnresult = die(json_encode(array(
+               //  "status" => 0,
+               // "message" =>"No user on radius"
+               //          )));
+               // }
             } else {
                 $returnresult = array(
                     'status' => 0,
@@ -3001,6 +3002,8 @@ class Webservice extends CI_Controller
                 if ($json_data) {
                     foreach ($json_data as $results) {
                        $loginuserid =$results->user_id;
+                        $first_name =$results->first_name;
+                        $last_name =$results->last_name;
                         $senddate =$results->senddate;
                         //echo $date = new DateTime($send_date_time);
                        //$datetme = $date->setTimezone(new DateTimeZone('Asia/Calcutta'));
@@ -3017,7 +3020,7 @@ class Webservice extends CI_Controller
                         $notificationuser[] = array(
 
                          'emergency_notification_id' =>"",
-                        'user_name' =>$results->user_name,
+                        'user_name' =>$first_name." ".$last_name,
                         'user_id' => $results->user_id,
                         'emergency_id' => $results->emergency_id,
                         'emergency_latitude' => $results->emergency_latitude,
@@ -3033,7 +3036,7 @@ class Webservice extends CI_Controller
 
                           $notificationuser[] = array(
                         'emergency_notification_id' =>$results->emergency_notification_id,
-                        'user_name' =>$results->user_name,
+                        'user_name' =>$first_name." ".$last_name,
                         'user_id' => $results->user_id,
                         'emergency_id' => $results->emergency_id,
                         'emergency_latitude' => $results->emergency_latitude,
