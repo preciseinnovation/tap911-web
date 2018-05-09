@@ -1242,17 +1242,22 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
                     $resultdatatone = $resultdatatone->row();
                     $notification_tone = $resultdatatone->notification_tone;
                     $ch                        = curl_init("https://fcm.googleapis.com/fcm/send");
-                    
                     $sound = $notification_tone;
+                     if($sound==""){
+                     $sound="notification01.mp3";
+                     }else{
+                     $sound = $notification_tone;
+                     }
                     $usertoken    = $notification_device_token;
-                    $title        = $helpuser_name." "."need your help,Please help." ;
-                    $body         =  "";
-                    $notification = array(
-                        'title' => $title,
-                        'text' => $body,
-                        'sound'=>$sound
-                        // 'emergency_notification_id' => $emergency_notification_id
-                    );
+                    $title        = "Emergency Request" ;
+                    $body         =  $user_name." "."need your help,Please help.";
+                    $click_action    = "ALERT";
+                $notification= array(
+                     'title' => $title,
+                     'text' => $body,
+                     'sound'=>$sound,
+                     'click_action'=>$click_action
+                );
                     $arrayToSend  = array(
                         'to' => $usertoken,
                         'notification' => $notification,
@@ -1374,15 +1379,21 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
             
                     $ch                        = curl_init("https://fcm.googleapis.com/fcm/send");
                     $sound = $notification_tone;
+                     if($sound==""){
+                     $sound="notification01.mp3";
+                     }else{
+                     $sound = $notification_tone;
+                     }
                     $usertoken    = $notification_device_token;
-                    $title        = $helpuser_name." "."need your help,Please help." ;
-                    $body         =  "";
-                    $notification = array(
-                        'title' => $title,
-                        'text' => $body,
-                        'sound' =>$sound
-                       
-                    );
+                    $title        = "Emergency Request" ;
+                    $body         =  $user_name." "."need your help,Please help.";
+                   $click_action    = "ALERT";
+                $notification= array(
+                     'title' => $title,
+                     'text' => $body,
+                     'sound'=>$sound,
+                     'click_action'=>$click_action
+                );
                     $arrayToSend  = array(
                         'to' => $usertoken,
                         'notification' => $notification,
@@ -1547,15 +1558,21 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
                     $notification_tone = $resultdatatone->notification_tone;
                     $ch                        = curl_init("https://fcm.googleapis.com/fcm/send");
                      $sound = $notification_tone;
+                     if($sound==""){
+                     $sound="notification01.mp3";
+                     }else{
+                     $sound = $notification_tone;
+                     }
                     $usertoken    = $notification_device_token;
-                    $title        = $user_names." "."need your help,Please help." ;
-                    $body         =  "";
-                    $notification = array(
-                        'title' => $title,
-                        'text' => $body,
-                        'sound' => $sound
-                       
-                    );
+                    $title        = "Emergency Request" ;
+                    $body         =  $user_name." "."need your help,Please help.";
+                    $click_action    = "ALERT";
+                $notification= array(
+                     'title' => $title,
+                     'text' => $body,
+                     'sound'=>$sound,
+                     'click_action'=>$click_action
+                );
                     $arrayToSend  = array(
                         'to' => $usertoken,
                         'notification' => $notification,
@@ -1609,7 +1626,31 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
         $row                       = $res->row();
         $emergency_id              = $row->emergency_id;
         $notification_user_id      = $row->notification_user_id;
-        
+    
+$enduser = "SELECT COUNT(4) as totalvalue FROM tbl_emergency_notification WHERE emergency_status = 4 and emergency_id='" . $emergency_id . "'";
+        $enduserresult  = $this->db->query($enduser);
+        $endresult     = $enduserresult->result_array();
+        $countresult = count($endresult);
+
+   for ($j = 0; $j < $countresult; $j++) {
+            $endvalue = $endresult[$j]['totalvalue'];
+            
+        }
+
+         if($endvalue==1){
+
+        $returnresult = array(
+                'status' => 0,
+                'message' => 'This Emergency Are Closed By Other User'
+            );
+            $closedemrgency = array(
+                'emergency_status' => 4, 
+            );
+            $this->db->where('emergency_id', $emergency_id);
+            $this->db->update('tbl_emergency_notification', $closedemrgency);
+
+         }
+else{
         $check    = "SELECT COUNT(1) as total FROM tbl_emergency_notification WHERE emergency_status = 1 and emergency_id='" . $emergency_id . "'";
         $res      = $this->db->query($check);
         $data     = $res->result_array();
@@ -1619,7 +1660,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
             
         }
         
-        if ($value==2) {
+        if($value==2) {
             
             $returnresult = array(
                 'status' => 0,
@@ -1637,7 +1678,8 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
             $this->db->where('emergency_id', $emergency_id);
             $data = $this->db->update('tbl_emergency_notification', $data);
             
-        } else {
+         }
+        else {
             $date = date("Y-m-d H:i:s");
             $data = array(
                 'emergency_status' => 1,
@@ -1667,6 +1709,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
                 $res        = $this->db->query($result);
                 $row        = $res->row();
                 $first_name = $row->first_name;
+                $last_name = $row->last_name;
                 // $tracking_user_id = $row->tracking_user_id;
                 
                 
@@ -1690,13 +1733,23 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
                     $notification_tone = $resultdatatone->notification_tone;
                 //  print_r($row);  
                 $ch                        = curl_init("https://fcm.googleapis.com/fcm/send");
-                $sound = $notification_tone;
-                $title                     = $first_name." ".'has accepted your request.';
-                $body                      = "";
+               
+
+                    $sound = $notification_tone;
+                     if($sound==""){
+                     $sound="notification01.mp3";
+                     }else{
+                     $sound = $notification_tone;
+                     }
+                    $usertoken    = $notification_device_token;
+                    $title        = "Emergency Request" ;
+                    $body         =  $first_name."".$last_name." ".'has accepted your request.';
+                    $click_action    = "ALERT";
                 $notification              = array(
                      'title' => $title,
                      'text' => $body,
-                     'sound'=>$sound
+                     'sound'=>$sound,
+                     'click_action'=>$click_action
                 );
                 $arrayToSend               = array(
                     'to' => $notification_device_token,
@@ -1729,9 +1782,8 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
             'message' => 'success',
             'response' => $require
            );
-        }
-        
-       
+         }
+     }
         
         return $returnresult;
     }
@@ -2205,7 +2257,8 @@ function get_emergency_user($time_zone){
            
          // $limit = $index*$end;
 
-$result  =$this->db->query("SELECT `tbl_user`.user_id,`tbl_user`.user_name,`tbl_emergency`.user_id,`tbl_emergency`.emergency_id,`tbl_emergency`.emergency_latitude,`tbl_emergency`.emergency_longitude,`tbl_emergency`.emergency_address,`tbl_emergency`.emergency_type,`tbl_emergency`.add_date,`tbl_emergency_notification`.emergency_notification_id,`tbl_emergency_notification`.emergency_status,`tbl_emergency_notification`.send_date_time,`tbl_emergency_notification`.accept_date_time,CONVERT_TZ(`tbl_emergency_notification`.send_date_time, @@session.time_zone, '$time')as senddate
+$result  =$this->db->query("SELECT `tbl_user`.user_id,`tbl_user`.first_name,
+    `tbl_user`.last_name,`tbl_emergency`.user_id,`tbl_emergency`.emergency_id,`tbl_emergency`.emergency_latitude,`tbl_emergency`.emergency_longitude,`tbl_emergency`.emergency_address,`tbl_emergency`.emergency_type,`tbl_emergency`.add_date,`tbl_emergency_notification`.emergency_notification_id,`tbl_emergency_notification`.emergency_status,`tbl_emergency_notification`.send_date_time,`tbl_emergency_notification`.accept_date_time,CONVERT_TZ(`tbl_emergency_notification`.send_date_time, @@session.time_zone, '$time')as senddate
 FROM `tbl_user`
 JOIN `tbl_emergency` ON `tbl_emergency`.`user_id` = `tbl_user`.`user_id`
 JOIN `tbl_emergency_notification` on `tbl_emergency`.`emergency_id` = `tbl_emergency_notification`.`emergency_id`
