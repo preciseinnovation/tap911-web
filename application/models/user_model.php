@@ -390,10 +390,23 @@ else{
               $answer = $row->answer;
               $yes_no_ans = $row->yes_no_ans;
               $other = $row->other;
+
+$sql = "SELECT question_id,user_id FROM tbl_user_question_answer where question_id='$question_id'and user_id='$user_id'";
+             $res     = $this->db->query($sql);
+             $rowdata     = $res->row();
+             $question_ids=$rowdata->question_id;
+             $user_ids=$rowdata->user_id;
+           if($question_ids=="" && $user_ids=="")
+            {
+
+                $SQL = "insert into tbl_user_question_answer(user_id,question_id,answer,yes_no_ans,other,status)values('$user_id','$question_id','$answer','$yes_no_ans','$other','1')";
+                $res = mysql_query($SQL);
+   }else{
+
 $SQL = "UPDATE tbl_user_question_answer SET question_id='$question_id',answer='$answer',yes_no_ans='$yes_no_ans',other='$other' where question_id='$question_id' and user_id='$user_id'";
                 $res = mysql_query($SQL);
+ }
 }
-
        if ($res) {
            // $data = $this->db->update('tbl_user', $data);
             $returnresult = array(
@@ -824,7 +837,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
             if ($data) {
                 $returnresult = array(
                     'status' => 1,
-                    'message' => 'User address update successfully'
+                    'message' => 'Home address saved successfully'
                 );
             }
         } else {
@@ -842,7 +855,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
             if ($data) {
                 $returnresult = array(
                     'status' => 1,
-                    'message' => 'User address successfully submit'
+                    'message' => 'Home address saved successfully'
                 );
             } else {
                 $returnresult = array(
@@ -1203,7 +1216,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
         $res        = $this->db->query($sql);
         $row        = $res->row();
         $emuserid   = $row->user_id;
-        $sql        = "SELECT * FROM tbl_user WHERE `user_id`='$emuserid'";
+        $sql        = "SELECT * FROM tbl_user WHERE `user_id`='$emuserid' and login_status=1";
         $resultdata = $this->db->query($sql);
         $resultdata = $resultdata->row();
         $emfirst_name = $resultdata->first_name;
@@ -1223,7 +1236,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
                 $SQL = "insert into tbl_emergency_notification(notification_user_id,emergency_id,creator_id)values('$id','$ids','$emuserid')";
                 $res = mysql_query($SQL);
                 
-                $sql     = "SELECT * FROM tbl_user WHERE `user_id` IN('$id')";
+                $sql     = "SELECT * FROM tbl_user WHERE `user_id` IN('$id') and login_status=1";
                 $results = $this->db->query($sql);
                 $result  = $results->row();
                 
@@ -1341,7 +1354,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
             POWER(SIN(($user_long -  $table.longitude) * pi()/180 / 2), 2) )) as
             distance FROM $table
              JOIN  tbl_user on tbl_user.user_id =   $table.user_id
-             WHERE  $table.add_date >= NOW() - INTERVAL 10 MINUTE and  $table.user_id NOT IN ('" . $_REQUEST['user_id'] . "')   
+             WHERE tbl_user.login_status=1 and $table.add_date >= NOW() - INTERVAL 10 MINUTE and  $table.user_id NOT IN ('" . $_REQUEST['user_id'] . "')   
             GROUP BY  $table.tracking_id HAVING distance <= $radius ORDER by distance ASC");
         
         
@@ -1524,7 +1537,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
             3956 * 2 * ASIN(SQRT( POWER(SIN(($user_lat -  tbl_user.user_lat) * pi()/180 / 2), 2) + COS($user_lat * pi()/180) * COS( tbl_user.user_lat * pi()/180) *
             POWER(SIN(($user_long - tbl_user.user_long) * pi()/180 / 2), 2) )) as
             distance FROM tbl_user
-             WHERE  tbl_user.user_id NOT IN ('" . $_REQUEST['user_id'] . "')   
+             WHERE tbl_user.login_status=1 and tbl_user.user_id NOT IN ('" . $_REQUEST['user_id'] . "')   
             GROUP BY tbl_user.user_id HAVING distance <= $radius ORDER by distance ASC");
         
         
@@ -1743,7 +1756,7 @@ else{
                      }
                     $usertoken    = $notification_device_token;
                     $title        = "Emergency Request" ;
-                    $body         =  $first_name."".$last_name." ".'has accepted your request.';
+                    $body         =  $first_name." ".$last_name." ".'has accepted your request.';
                     $click_action    = "ALERT";
                 $notification              = array(
                      'title' => $title,
@@ -2051,7 +2064,7 @@ $result  =$this->db->query("SELECT community_communitaction_id,from_user_id,to_u
             if ($data) {
                 $returnresult = array(
                     'status' => 1,
-                    'message' => 'User contact successfully submit'
+                    'message' => 'Contact added successfully'
                 );
             } else {
                 $returnresult = array(
@@ -2424,6 +2437,36 @@ $check = "SELECT asset_number FROM tbl_user_asset WHERE status=1 and asset_numbe
 
 
 
-
+ /*-------------------------------update_user_emergency_contact with community----------------------------------------------- */
+    
+    
+    function logout()
+    {
+        
+           $user_id = $_REQUEST['user_id'];
+            
+            $data = array(
+               
+                 'login_status' =>0
+                
+            );
+            $this->db->where('user_id', $user_id);
+            $data = $this->db->update('tbl_user', $data);
+            if ($data) {
+                $returnresult = array(
+                    'status' => 1,
+                    'message' => 'User logout successfully'
+                );
+            }
+         else {
+            $returnresult = array(
+                'status' => 0,
+                'message' => 'Asset not found'
+            );
+        }
+        
+        return $returnresult;
+        
+    }
 
 }
