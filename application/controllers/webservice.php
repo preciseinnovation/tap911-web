@@ -3424,6 +3424,48 @@ class Webservice extends CI_Controller
         }
         
     }  
+
+ /*
+    -----------------------------------------------------------------------------------------------------------
+     http://104.237.3.116/tap911/index.php/webservice/logout
+     user_id:49
+     token:7af8dc9e27b5650d
+    -----------------------------------------------------------------------------------------------------------
+    */
+    
+    function logout()
+    {
+        $token                = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+         $user_id                = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
+       
+        if ($token == "" or $user_id == "") {
+            die(json_encode(array(
+                "status" => 0,
+                "message" => "Input parameters are not found"
+            )));
+            
+        } else {
+            $token   = $_REQUEST['token'];
+            $user_id = $_REQUEST['user_id'];
+            $sql     = "SELECT token,user_id FROM tbl_user where token='$token' and user_id=$user_id";
+            $res     = $this->db->query($sql);
+            $row     = $res->row();
+            if ($row) {
+                $response = $this->user_model->logout($token);
+                $response = json_encode($response);
+                print_r($response);
+            } else {
+                $returnresult = array(
+                    'status' => 0,
+                    'message' => 'Authentication failed'
+                );
+                $response     = json_encode($returnresult);
+                print_r($response);
+            }
+        }
+    }
+
+
 }
 /* End of file welcome.php */
 /* Location: ./application/controllers/welcome.php */
