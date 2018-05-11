@@ -30,8 +30,8 @@ class User_model extends CI_Model
                 'token' => $token,
                 'notification_device_token' => $notification_device_token,
                 'mobile_type' => $mobile_type,
-                'time_zone' => $time_zone
-                  
+                'time_zone' => $time_zone,
+                'login_status'=>1
                 
             );
             $this->db->where('user_id', $customer_id);
@@ -1263,7 +1263,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
                      }
                     $usertoken    = $notification_device_token;
                     $title        = "Emergency Request" ;
-                    $body         =  $user_name." "."need your help,Please help.";
+                    $body         =  $user_name." "."need your help. Click to help.";
                     $click_action    = "ALERT";
                 $notification= array(
                      'title' => $title,
@@ -1364,6 +1364,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
             
             $countvars = count($datas);
             $require   = array();
+             //$send_date_time=date("Y-m-d h:i:sa");
             for ($j = 0; $j < $countvars; $j++) {
 
                 $uid = $datas[$j]['user_id'];
@@ -1399,7 +1400,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
                      }
                     $usertoken    = $notification_device_token;
                     $title        = "Emergency Request" ;
-                    $body         =  $user_name." "."need your help,Please help.";
+                    $body         =  $user_name." "."need your help. Click to help.";
                    $click_action    = "ALERT";
                 $notification= array(
                      'title' => $title,
@@ -1545,7 +1546,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
             $resultdata = $results->result_array();
             $countvarresult = count($resultdata);
             $require        = array();
-
+           $send_date_time=date("Y-m-d h:i:sa");
             for ($i = 0; $i < $countvarresult; $i++) {
              
                 $id                        = $resultdata[$i]['user_id'];
@@ -1578,7 +1579,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
                      }
                     $usertoken    = $notification_device_token;
                     $title        = "Emergency Request" ;
-                    $body         =  $user_name." "."need your help,Please help.";
+                    $body         =  $user_name." "."need your help. Click to help.";
                     $click_action    = "ALERT";
                 $notification= array(
                      'title' => $title,
@@ -2108,13 +2109,85 @@ $result  =$this->db->query("SELECT community_communitaction_id,from_user_id,to_u
             );
             $data = $this->db->insert('tbl_emergency_communitaction', $data);
             
-            $returnresult = array(
-                'status' => 1,
-                'message' => 'Emergency end successfully'
-            );
-        }
+     $sql = "SELECT first_name,last_name FROM tbl_user WHERE user_id='$notification_user_id'";
+                $res = $this->db->query($sql);
+                $row = $res->row();
+                $first_names                = $row->first_name;
+                $last_names                 = $row->last_name;
+                $helpuser_name                = $first_names . " " . $last_names;
+
+            $sql = "SELECT notification_user_id FROM tbl_emergency_notification WHERE emergency_id='$emergency_id'";
+             $result = $this->db->query($sql);
+            $datas = $result->result_array();
+            $countvars = count($datas);
+            $require   = array();
+
+            for ($j = 0; $j < $countvars; $j++) {
+                $uid = $datas[$j]['notification_user_id'];              
+                $sql = "SELECT * FROM tbl_user WHERE `user_id` IN ('$uid')";
+                $res = $this->db->query($sql);
+                $row = $res->row();
+
+                if ($row) {
+                    $notification_device_token = $row->notification_device_token;
+                    $mobile_type               = $row->mobile_type;
+                      $user_id               = $row->user_id;
+                    $sql        = "SELECT notification_tone,user_id FROM tbl_notification WHERE `user_id`='$user_id'";
+                    $resultdatatone = $this->db->query($sql);
+                    $resultdatatone = $resultdatatone->row();
+                    $notification_tone = $resultdatatone->notification_tone;
+            
+                    $ch                        = curl_init("https://fcm.googleapis.com/fcm/send");
+                    $sound = $notification_tone;
+                    $usertoken    = $notification_device_token;
+                    $title        = $helpuser_name." "."End Emergency." ;
+                    $body         =  "Thanks for your help!";
+                    $notification = array(
+                        'title' => $title,
+                        'text' => $body,
+                        'sound' =>$sound
+                       
+                    );
+                    $arrayToSend  = array(
+                        'to' => $usertoken,
+                        'notification' => $notification,
+                        'priority' => 'high'
+                    );
+                    
+                    $json      = json_encode($arrayToSend);
+                    $headers   = array();
+                    $headers[] = 'Content-Type: application/json';
+                    if ($mobile_type == 'android') {
+                        $headers[] = 'Authorization: key= AIzaSyC5Z-wS9-IFx4nVCAfMjF9v7MwBQQR_5kw'; // key here
+                    } else {
+                        $headers[] = 'Authorization: key= AIzaSyAkPpQ-GiN4GVSjniMyHuSwXJVekEL7FWk'; // key here
+                    }
+                    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                    array_push($require, curl_exec($ch));
+                    curl_close($ch);
+                    if ($mobile_type == 'android' || $mobile_type == 'ios') {
+                        
+                    }
+                    
+                } else {
+                    $returnresult = array(
+                        'status' => 0,
+                        'message' => 'Some data not valid'
+                    );
+                }
+            }
         
+           $returnresult = array(
+            'status' => 1,
+            'message' => 'success',
+            'response' => $require
+           );
+
         return $returnresult;
+        }
         
     }
 
@@ -2168,8 +2241,8 @@ $result  =$this->db->query("SELECT community_communitaction_id,from_user_id,to_u
                     $ch                        = curl_init("https://fcm.googleapis.com/fcm/send");
                     $sound = $notification_tone;
                     $usertoken    = $notification_device_token;
-                    $title        = $helpuser_name." "."End Emergency," ;
-                    $body         =  "Thank For Help";
+                    $title        = $helpuser_name." "."End Emergency." ;
+                    $body         =  "Thanks for your help!";
                     $notification = array(
                         'title' => $title,
                         'text' => $body,
