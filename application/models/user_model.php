@@ -1224,7 +1224,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
         $user_name = $emfirst_name . " " . $emlast_name;
         // print_r($notification_device_token);die();
         
-        $results           = $this->db->query("SELECT * from tbl_emergency_contact where user_id='$emuserid'");
+        $results           = $this->db->query("SELECT * from tbl_emergency_contact where user_id='$emuserid' and tap911_user=1");
         $remergencycontact = $results->result_array();
         $countvarresults   = count($remergencycontact);
         $require           = array();
@@ -1651,11 +1651,11 @@ $enduser = "SELECT COUNT(4) as totalvalue FROM tbl_emergency_notification WHERE 
             
         }
 
-         if($endvalue==1){
+         if($endvalue>0){
 
         $returnresult = array(
                 'status' => 0,
-                'message' => 'This Emergency Are Closed By Other User'
+                'message' => 'This emergency is ended by other user.'
             );
             $closedemrgency = array(
                 'emergency_status' => 4, 
@@ -1705,37 +1705,25 @@ else{
             
             $emergency_notification_id = $_REQUEST['emergency_notification_id'];
             
-            $result               = "SELECT * FROM  tbl_emergency_notification WHERE emergency_notification_id ='" . $_REQUEST['emergency_notification_id'] . "'";
-            $res                  = $this->db->query($result);
-            $row                  = $res->row();
-            $emergency_id         = $row->emergency_id;
-            $notification_user_id = $row->notification_user_id;
-            
-            $check    = "SELECT * FROM  tbl_emergency_notification WHERE emergency_id ='" . $emergency_id . "'";
-            $res      = $this->db->query($check);
-            $data     = $res->result_array();
-            $countvar = count($data);
-            for ($i = 0; $i < $countvar; $i++) {
-                $user_ids = $data[$i]['notification_user_id'];
-                
-                
-                $result     = "SELECT * FROM  tbl_user WHERE user_id ='" . $user_ids . "'";
-                $res        = $this->db->query($result);
-                $row        = $res->row();
-                $first_name = $row->first_name;
-                $last_name = $row->last_name;
-                // $tracking_user_id = $row->tracking_user_id;
-                
-                
+            $result               = "SELECT emergency_id,notification_user_id FROM  tbl_emergency_notification WHERE emergency_notification_id ='" . $_REQUEST['emergency_notification_id'] . "'";
+               $res                  = $this->db->query($result);
+               $row                  = $res->row();
+               $emergency_id         = $row->emergency_id;
+                $user_ids = $row->notification_user_id;
+
+                $result     = "SELECT first_name,last_name FROM  tbl_user WHERE user_id ='" . $user_ids . "'";
+                $resultdata        = $this->db->query($result);
+                $rowdata        = $resultdata->row();
+                $first_name = $rowdata->first_name;
+                $last_name = $rowdata->last_name;
                 $require = array();
+                $result  = "SELECT user_id FROM tbl_emergency WHERE emergency_id ='" . $emergency_id . "'";
+                $emuser     = $this->db->query($result);
+                $emrow     = $emuser->row();
+                $user_id = $emrow->user_id;
                 
-                $result  = "SELECT * FROM  tbl_emergency WHERE emergency_id ='" . $emergency_id . "'";
-                $res     = $this->db->query($result);
-                $row     = $res->row();
-                $user_id = $row->user_id;
                 
-                
-                $sql                       = "SELECT * FROM tbl_user WHERE `user_id` IN ('$user_id')";
+                $sql                       = "SELECT notification_device_token,mobile_type,user_id FROM tbl_user WHERE user_id='$user_id'";
                 $res                       = $this->db->query($sql);
                 $row                       = $res->row();
                 $notification_device_token = $row->notification_device_token;
@@ -1790,7 +1778,7 @@ else{
                     
                     
                 }
-            }
+           // }
              $returnresult = array(
             'status' => 1,
             'message' => 'success',
@@ -2116,7 +2104,7 @@ $result  =$this->db->query("SELECT community_communitaction_id,from_user_id,to_u
                 $last_names                 = $row->last_name;
                 $helpuser_name                = $first_names . " " . $last_names;
 
-            $sql = "SELECT notification_user_id FROM tbl_emergency_notification WHERE emergency_id='$emergency_id'";
+            $sql = "SELECT notification_user_id FROM tbl_emergency_notification WHERE emergency_id='$emergency_id' and emergency_status=2";
              $result = $this->db->query($sql);
             $datas = $result->result_array();
             $countvars = count($datas);
@@ -2142,11 +2130,12 @@ $result  =$this->db->query("SELECT community_communitaction_id,from_user_id,to_u
                     $usertoken    = $notification_device_token;
                     $title        = $helpuser_name." "."End Emergency." ;
                     $body         =  "Thanks for your help!";
+                    $click_action    = "ALERT";
                     $notification = array(
                         'title' => $title,
                         'text' => $body,
-                        'sound' =>$sound
-                       
+                        'sound' =>$sound,
+                    'click_action'=>$click_action
                     );
                     $arrayToSend  = array(
                         'to' => $usertoken,
@@ -2243,11 +2232,12 @@ $result  =$this->db->query("SELECT community_communitaction_id,from_user_id,to_u
                     $usertoken    = $notification_device_token;
                     $title        = $helpuser_name." "."End Emergency." ;
                     $body         =  "Thanks for your help!";
+                     $click_action    = "ALERT";
                     $notification = array(
                         'title' => $title,
                         'text' => $body,
-                        'sound' =>$sound
-                       
+                        'sound' =>$sound,
+                        'click_action'=>$click_action
                     );
                     $arrayToSend  = array(
                         'to' => $usertoken,
