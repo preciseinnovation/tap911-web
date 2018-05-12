@@ -2725,7 +2725,7 @@ class Webservice extends CI_Controller
             $row = $res->row();
             if ($row) {
                 
-                $results = $this->db->query("SELECT emergency_id,notification_user_id from tbl_emergency_notification where emergency_id='" . $_REQUEST['emergency_id'] . "' and emergency_status!=4");
+                $results = $this->db->query("SELECT emergency_id,notification_user_id from tbl_emergency_notification where emergency_status=1 and emergency_id='" . $_REQUEST['emergency_id'] . "'");
                 
                 $resultdata     = $results->result_array();
                 $countvarresult = count($resultdata);
@@ -2764,8 +2764,23 @@ class Webservice extends CI_Controller
                     $rows      = $res->row();
                     $latitude  = $rows->latitude;
                     $longitude = $rows->longitude;
-                    
-                    
+                    if(empty($user_name)){
+                        $user_name=""; 
+                    }
+
+                 if(empty($phone_number)){
+                        $phone_number=""; 
+                     }
+                      if(empty($user_ids)){
+                        $user_ids=""; 
+                     }
+                   if(empty($latitude)){
+                        $latitude=""; 
+                     }
+
+                     if(empty($longitude)){
+                        $longitude=""; 
+                     }
                     $returnresult1[] = array(
                         'user_name' => $user_name,
                         'phone_number' => $phone_number,
@@ -2775,11 +2790,11 @@ class Webservice extends CI_Controller
                     );
                 }
                 
-                $sql                 = "SELECT emergency_id,user_id,emergency_id,emergency_latitude,emergency_longitude FROM tbl_emergency WHERE `emergency_id`='" . $_REQUEST['emergency_id'] . "'";
+            $sql= "SELECT user_id,emergency_id,emergency_latitude,emergency_longitude FROM tbl_emergency WHERE `emergency_id`='" . $_REQUEST['emergency_id'] . "'";
                 $res                 = $this->db->query($sql);
                 $rows                = $res->row();
                 $em_user_id          = $rows->user_id;
-                $emergency_id        = $rows->emergency_id;
+                 $emergency_id        = $rows->emergency_id;
                 $emergency_latitude  = $rows->emergency_latitude;
                 $emergency_longitude = $rows->emergency_longitude;
                 // $emergency_address = $rows->emergency_address;
@@ -2805,7 +2820,9 @@ class Webservice extends CI_Controller
                 
                 array_push($emcreateusers, $emcreateuser);
                 
-                
+                 if(empty($returnresult1)){
+                        $returnresult1=""; 
+                     }
                 
                 $returnresult = array(
                     'status' => 1,
@@ -2816,11 +2833,11 @@ class Webservice extends CI_Controller
                 );
                 
                 
-                if ($returnresult1) {
+                 if ($returnresult) {
                     
                     $response = json_encode($returnresult);
                     print_r($response);
-                }
+                 }
                 
                 else {
                     $returnresult = array(
