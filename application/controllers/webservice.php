@@ -2821,7 +2821,8 @@ class Webservice extends CI_Controller
                 array_push($emcreateusers, $emcreateuser);
                 
                  if(empty($returnresult1)){
-                        $returnresult1=""; 
+
+                        $returnresult1=array(); 
                      }
                 
                 $returnresult = array(
@@ -3018,6 +3019,16 @@ class Webservice extends CI_Controller
                 
                 if ($json_data) {
                     foreach ($json_data as $results) {
+
+                        $logo = $results->profile_pic;
+                        $path = base_url() . 'uploads/';
+                        if ($logo) {
+                            
+                            $logos = $path . $logo;
+                            
+                        } else {
+                            $logos = $path . '1517561100258.png';
+                        }
                        $loginuserid =$results->user_id;
                         $first_name =$results->first_name;
                         $last_name =$results->last_name;
@@ -3045,6 +3056,7 @@ class Webservice extends CI_Controller
                         'emergency_address' => $results->emergency_address,
                         'emergency_type' =>$results->emergency_type,
                         'add_date' => $senddate,
+                        'profile_pic' => $logos,
                         'emergency_status' =>$status
                             
                            );
@@ -3061,6 +3073,7 @@ class Webservice extends CI_Controller
                         'emergency_address' => $results->emergency_address,
                         'emergency_type' =>$results->emergency_type,
                         'add_date' =>$senddate,
+                         'profile_pic' => $logos,
                         'emergency_status' =>$results->emergency_status
                             
                         );
