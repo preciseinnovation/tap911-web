@@ -2073,7 +2073,7 @@ $result  =$this->db->query("SELECT community_communitaction_id,from_user_id,to_u
     
     function end_emergency_by_helping_user()
     {
-        $notification_user_id = $_REQUEST['notification_user_id'];
+         $notification_user_id = $_REQUEST['notification_user_id'];
         $emergency_id         = $_REQUEST['emergency_id'];
         $message_data         = $_REQUEST['message_data'];
         
@@ -2083,7 +2083,7 @@ $result  =$this->db->query("SELECT community_communitaction_id,from_user_id,to_u
             'emergency_status' => 4
             
         );
-        $this->db->where('notification_user_id', $notification_user_id);
+        // $this->db->where('notification_user_id', $notification_user_id);
         $this->db->where('emergency_id', $emergency_id);
         $data = $this->db->update('tbl_emergency_notification', $data);
         
@@ -2333,12 +2333,12 @@ function get_emergency_user($time_zone){
            
          // $limit = $index*$end;
 
-$result  =$this->db->query("SELECT `tbl_user`.user_id,`tbl_user`.first_name,
+$result  =$this->db->query("SELECT `tbl_user`.user_id,`tbl_user`.first_name,`tbl_user`.profile_pic,
     `tbl_user`.last_name,`tbl_emergency`.user_id,`tbl_emergency`.emergency_id,`tbl_emergency`.emergency_latitude,`tbl_emergency`.emergency_longitude,`tbl_emergency`.emergency_address,`tbl_emergency`.emergency_type,`tbl_emergency`.add_date,`tbl_emergency_notification`.emergency_notification_id,`tbl_emergency_notification`.emergency_status,`tbl_emergency_notification`.send_date_time,`tbl_emergency_notification`.accept_date_time,CONVERT_TZ(`tbl_emergency_notification`.send_date_time, @@session.time_zone, '$time')as senddate
 FROM `tbl_user`
 JOIN `tbl_emergency` ON `tbl_emergency`.`user_id` = `tbl_user`.`user_id`
 JOIN `tbl_emergency_notification` on `tbl_emergency`.`emergency_id` = `tbl_emergency_notification`.`emergency_id`
- WHERE(`tbl_emergency_notification`.`notification_user_id`=$user_id or `tbl_emergency`.`user_id` = $user_id )  ORDER BY `tbl_emergency_notification`.send_date_time DESC LIMIT $start,10");
+ WHERE(`tbl_emergency_notification`.`notification_user_id`=$user_id or `tbl_emergency`.`user_id` = $user_id )GROUP BY `tbl_emergency`.`emergency_id` ORDER BY `tbl_emergency_notification`.send_date_time DESC LIMIT $start,10");
 
        
         return $result->result();
