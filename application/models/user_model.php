@@ -1065,6 +1065,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
       `del_uid` int(11) NOT NULL,
        `del_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
        `status` tinyint(1) NOT NULL,
+       `gps_status` tinyint(1) NOT NULL
         PRIMARY KEY (tracking_id)
 )";
         if (mysql_query($sql)) {
@@ -1354,7 +1355,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
             POWER(SIN(($user_long -  $table.longitude) * pi()/180 / 2), 2) )) as
             distance FROM $table
              JOIN  tbl_user on tbl_user.user_id =   $table.user_id
-             WHERE tbl_user.login_status=1 and $table.add_date >= NOW() - INTERVAL 10 MINUTE and  $table.user_id NOT IN ('" . $_REQUEST['user_id'] . "')   
+             WHERE tbl_user.login_status=1 and $table.gps_status=1 and $table.user_id NOT IN ('" . $_REQUEST['user_id'] . "')   
             GROUP BY  $table.tracking_id HAVING distance <= $radius ORDER by distance ASC");
         
         
@@ -2531,5 +2532,66 @@ $check = "SELECT asset_number FROM tbl_user_asset WHERE status=1 and asset_numbe
         return $returnresult;
         
     }
+
+
+
+      /*-------------------------------gps_setting ----------------------------------------------- */
+    
+    
+    function gps_setting()
+    {
+
+        $dateValue = date("Y-m-d H:i:s");
+        $time      = strtotime($dateValue);
+        $month     = date("F", $time);
+        $year      = date("Y", $time);
+        $table     = "tbl_tracking" . '_' . $month . '_' . $year;
+
+        $check = "SELECT gps_status,user_id FROM $table WHERE user_id ='" . $_REQUEST['user_id'] . "'";
+        $res   = $this->db->query($check);
+        if ($res->num_rows > 0) {
+              $row     = $res->row();
+               $user_id = $row->user_id;
+               $gps_status     = $row->gps_status;
+
+
+                if ($gps_status == 1) {
+                    $data = array(
+                        'gps_status' => 0,
+                        'user_id' => $_REQUEST['user_id']
+                        
+                    );
+                    $this->db->where('user_id', $user_id);
+                    $data = $this->db->update($table, $data);
+                } else {
+                    $data = array(
+                        'gps_status' => 1,
+                        'user_id' => $_REQUEST['user_id']
+                        
+                    );
+                    $this->db->where('user_id', $user_id);
+                    $data = $this->db->update($table, $data);
+                }
+           
+            if ($data) {
+
+            $check = "SELECT gps_status,user_id FROM $table WHERE user_id ='" . $_REQUEST['user_id'] . "'";
+              $res   = $this->db->query($check);
+              $row     = $res->row();
+               $gps_status     = $row->gps_status;
+                $returnresult = array(
+                    'status' => 1,
+                    'message' => 'Gps setting updated successfully',
+                   'gps_status'=>$gps_status
+                    
+                );
+            }
+        }
+        
+        return $returnresult;
+    }
+    
+
+ 
 
 }
