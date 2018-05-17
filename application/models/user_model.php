@@ -282,7 +282,19 @@ class User_model extends CI_Model
                         'status' => 1
                     );
                     $data = $this->db->insert('tbl_notification', $data);
-                    
+                    $dateValue = date("Y-m-d H:i:s");
+                    $time      = strtotime($dateValue);
+                    $month     = date("F", $time);
+                    $year      = date("Y", $time);
+                    $table     = "tbl_tracking" . '_' . $month . '_' . $year;
+
+                      $data = array(
+                        'user_id' => $id,
+                        'gps_status'=>1,
+                        'status' => 1
+                    );
+                    $data = $this->db->insert($table, $data);
+
                     $returnresult = array(
                         'status' => 1,
                         'user_id'=>$id,
@@ -1065,13 +1077,14 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
       `del_uid` int(11) NOT NULL,
        `del_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
        `status` tinyint(1) NOT NULL,
-       `gps_status` tinyint(1) NOT NULL
+       `gps_status` tinyint(1) NOT NULL DEFAULT '1',
         PRIMARY KEY (tracking_id)
 )";
         if (mysql_query($sql)) {
             
             $check = "SELECT * FROM  $table WHERE user_id ='" . $_REQUEST['user_id'] . "'";
             $res   = $this->db->query($check);
+
             if ($res->num_rows > 0 && $check != "") {
                 $row     = $res->row();
                 $user_id = $row->user_id;
@@ -2592,6 +2605,21 @@ $check = "SELECT asset_number FROM tbl_user_asset WHERE status=1 and asset_numbe
     }
     
 
- 
+   /*-------------------------------gps_setting ----------------------------------------------- */
+    
+    
+    // function get_gps_setting()
+    // {
+
+    //     $dateValue = date("Y-m-d H:i:s");
+    //     $time      = strtotime($dateValue);
+    //     $month     = date("F", $time);
+    //     $year      = date("Y", $time);
+    //     $table     = "tbl_tracking" . '_' . $month . '_' . $year;
+
+    //     $check = "SELECT gps_status FROM $table WHERE user_id ='" . $_REQUEST['user_id'] . "'";
+    //     $res   = $this->db->query($check);
+    //     return $res->result(); 
+    // }
 
 }
