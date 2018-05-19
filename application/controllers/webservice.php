@@ -3322,7 +3322,7 @@ class Webservice extends CI_Controller
 
 /*
     ----------------------------------------------------------------------------------------------------------
-     http://104.237.3.116/tap911/index.php/webservice/add_question_answer
+     http://104.237.3.116/tap911/index.php/webservice/get_asset
      token:12285175ad570f86
      user_id:1
      asset_name:car                                                                         
@@ -3465,23 +3465,23 @@ class Webservice extends CI_Controller
     
     function logout()
     {
-        $token                = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+        //$token                = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
          $user_id                = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
        
-        if ($token == "" or $user_id == "") {
+        if ($user_id == "") {
             die(json_encode(array(
                 "status" => 0,
                 "message" => "Input parameters are not found"
             )));
             
         } else {
-            $token   = $_REQUEST['token'];
+           // $token   = $_REQUEST['token'];
             $user_id = $_REQUEST['user_id'];
-            $sql     = "SELECT token,user_id FROM tbl_user where token='$token' and user_id=$user_id";
+            $sql     = "SELECT token,user_id FROM tbl_user where user_id=$user_id";
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $response = $this->user_model->logout($token);
+                $response = $this->user_model->logout();
                 $response = json_encode($response);
                 print_r($response);
             } else {
@@ -3496,6 +3496,236 @@ class Webservice extends CI_Controller
     }
 
 
+  /*
+    ----------------------------------------------------------------------------------------
+    http://104.237.3.116/tap911/index.php/webservice/gps_setting
+    token:7af8dc9e27b5650d
+    user_id:49
+    -------------------------------------------------------------------------------------------
+    */
+    
+    function gps_setting()
+    {
+        $token             = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+        $user_id           = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
+        if ($token == "" or $user_id == "") {
+            die(json_encode(array(
+                "status" => 0,
+                "message" => "Input parameters are not found"
+            )));
+            
+        } else {
+            $token = $_REQUEST['token'];
+            $user_id = $_REQUEST['user_id'];
+     $sql   = "SELECT token,user_id FROM tbl_user where token='$token' and user_id=' $user_id'";
+            $res   = $this->db->query($sql);
+            $row   = $res->row();
+            if ($row) {
+                $response = $this->user_model->gps_setting($token);
+                $response = json_encode($response);
+                print_r($response);
+            } else {
+                $returnresult = array(
+                    'status' => 0,
+                    'message' => 'Authentication failed'
+                );
+                $response     = json_encode($returnresult);
+                print_r($response);
+            }
+        }
+    }
+
+   /*
+    ----------------------------------------------------------------------------------------
+    http://104.237.3.116/tap911/index.php/webservice/get_gps_setting
+    token:7af8dc9e27b5650d
+    user_id:49
+    -------------------------------------------------------------------------------------------
+    */
+    
+    function get_gps_setting()
+    {
+        
+        $token             = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+        $user_id           = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
+        if ($token == "" or $user_id == "") {
+            die(json_encode(array(
+                "status" => 0,
+                "message" => "Input parameters are not found"
+            )));
+            
+        } else {
+            $token = $_REQUEST['token'];
+            $user_id = $_REQUEST['user_id'];
+     $sql   = "SELECT token,user_id FROM tbl_user where token='$token' and user_id=' $user_id'";
+            $res   = $this->db->query($sql);
+            $row   = $res->row();
+            if ($row) {
+        $dateValue = date("Y-m-d H:i:s");
+        $time      = strtotime($dateValue);
+        $month     = date("F", $time);
+        $year      = date("Y", $time);
+        $table     = "tbl_tracking" . '_' . $month . '_' . $year;
+
+        $check = "SELECT gps_status FROM $table WHERE user_id ='" . $_REQUEST['user_id'] . "'";
+        $res   = $this->db->query($check);
+         $rows                  = $res->row();
+        $gps_status       = $rows->gps_status;
+
+      $returnarray = array(
+                'status' => 1,
+                'gps_status' => $gps_status
+        
+            );
+        $response = json_encode($returnarray);
+         print_r($response);
+            } else {
+                $returnresult = array(
+                    'status' => 0,
+                    'message' => 'Authentication failed'
+                );
+                $response     = json_encode($returnresult);
+                print_r($response);
+            }
+        }
+    }
+
+
+
+  /*-------------------------------gps_setting ----------------------------------------------- */
+    
+    
+  //   function send_notification_tenmintues()
+  //   {
+  //      $check = "SELECT * FROM tbl_emergency
+  //      WHERE add_date >= NOW() - INTERVAL 10 MINUTE";
+  //       $res   = $this->db->query($check); 
+  //        $rows  = $res->row();
+  //        $em_user_id          = $rows->user_id;
+  //         $emergency_id        = $rows->emergency_id;
+  //         $emergency_latitude  = $rows->emergency_latitude;
+  //         $emergency_longitude = $rows->emergency_longitude;
+
+  //   //die;
+  //    $sqlradius= "SELECT radius FROM tbl_user where user_id='". $em_user_id."'";
+  //       $raduisres        = $this->db->query($sqlradius);
+  //        $row        = $raduisres->row();
+  //       $radius   = $row->radius;
+
+  //       $result= "SELECT emergency_id FROM `tbl_emergency_notification` WHERE `emergency_id`='$emergency_id' GROUP BY emergency_id";
+  //         $notification_user = $this->db->query($result); 
+  //           $notiuser = $notification_user->row();
+  //          $emergency_ids = $notiuser->emergency_id;
+
+  //          if($emergency_id!=$emergency_ids){
+
+  // $sql        = "SELECT * FROM tbl_emergency where emergency_id='$emergency_id'";
+  //       $res        = $this->db->query($sql);
+  //       $row        = $res->row();
+  //       $emuserid   = $row->user_id;
+  //       $sql        = "SELECT * FROM tbl_user WHERE `user_id`='$emuserid'";
+  //       $resultdata = $this->db->query($sql);
+  //       $resultdata = $resultdata->row();
+  //       $first_name = $resultdata->first_name;
+  //       $last_name  = $resultdata->last_name;
+  //       echo $user_name  = $first_name . " " . $last_name;
+        
+  //       $dateValue = date("Y-m-d H:i:s");
+  //       $time      = strtotime($dateValue);
+  //       $month     = date("F", $time);
+  //       $year      = date("Y", $time);
+  //       $table     = "tbl_tracking" . '_' . $month . '_' . $year;
+        
+  //       $result = $this->db->query("SELECT $table.*, $table.add_date as userdate,tbl_user.*,tbl_user.add_date as adate,
+  //           3956 * 2 * ASIN(SQRT( POWER(SIN(($emergency_latitude -  $table.latitude) * pi()/180 / 2), 2) + COS($emergency_latitude * pi()/180) * COS( $table.latitude * pi()/180) *
+  //           POWER(SIN(($emergency_longitude -  $table.longitude) * pi()/180 / 2), 2) )) as
+  //           distance FROM $table
+  //            JOIN  tbl_user on tbl_user.user_id =   $table.user_id
+  //            WHERE tbl_user.login_status=1 and $table.gps_status=1 and $table.user_id NOT IN ('" .$em_user_id."')   
+  //           GROUP BY  $table.tracking_id HAVING distance <= $radius ORDER by distance ASC");
+        
+        
+        
+  //            $datas = $result->result_array();
+  //            $countvars = count($datas);
+  //           $require   = array();
+  //            //$send_date_time=date("Y-m-d h:i:sa");
+  //           for ($j = 0; $j < $countvars; $j++) {
+
+  //               $uid = $datas[$j]['user_id'];
+
+  //               $SQL = "insert into tbl_emergency_notification(notification_user_id,emergency_id,creator_id)values('$uid','$emergency_id','$emuserid')";
+
+  //               $res                       = mysql_query($SQL);
+  //               $emergency_notification_id = $this->db->insert_id();
+                
+                
+  //               $sql = "SELECT * FROM tbl_user WHERE `user_id` IN ('$uid')";
+  //               $res = $this->db->query($sql);
+  //               $row = $res->row();
+
+  //               if ($row) {
+  //                   $notification_device_token = $row->notification_device_token;
+  //                   $mobile_type               = $row->mobile_type;
+  //                   $user_id               = $row->user_id;
+  //                   $sql        = "SELECT notification_tone,user_id FROM tbl_notification WHERE `user_id`='$user_id'";
+  //                   $resultdatatone = $this->db->query($sql);
+  //                   $resultdatatone = $resultdatatone->row();
+  //                   $notification_tone = $resultdatatone->notification_tone;
+            
+  //                   $ch                        = curl_init("https://fcm.googleapis.com/fcm/send");
+  //                   $sound = $notification_tone;
+  //                    if($sound==""){
+  //                    $sound="notification01.mp3";
+  //                    }else{
+  //                    $sound = $notification_tone;
+  //                    }
+  //                   $usertoken    = $notification_device_token;
+  //                   $title        = "Emergency Request" ;
+  //                   $body         =  $user_name." "."need your help. Click to help.";
+  //                  $click_action    = "ALERT";
+  //               $notification= array(
+  //                    'title' => $title,
+  //                    'text' => $body,
+  //                    'sound'=>$sound,
+  //                    'click_action'=>$click_action
+  //               );
+  //                   $arrayToSend  = array(
+  //                       'to' => $usertoken,
+  //                       'notification' => $notification,
+  //                       'priority' => 'high'
+  //                   );
+                    
+  //                   $json      = json_encode($arrayToSend);
+  //                   $headers   = array();
+  //                   $headers[] = 'Content-Type: application/json';
+  //                   if ($mobile_type == 'android') {
+  //                       $headers[] = 'Authorization: key= AIzaSyC5Z-wS9-IFx4nVCAfMjF9v7MwBQQR_5kw'; // key here
+  //                   } else {
+  //                       $headers[] = 'Authorization: key= AIzaSyAkPpQ-GiN4GVSjniMyHuSwXJVekEL7FWk'; // key here
+  //                   }
+  //                   curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+  //                   curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
+  //                   curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+  //                   curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    
+  //                  array_push($require, curl_exec($ch));         
+  //                  $returnresult = array(
+  //                         'status' => 1,
+  //                          'data' => $require,
+  //                          'message' => 'success'
+                       
+  //                          );      
+  //                  curl_close($ch);
+                  
+  //               }
+               
+  //           }
+  //      }
+  //             $data = json_encode($returnresult);
+  //               print_r($data);
+  //      //}
+  //   }
 }
 /* End of file welcome.php */
 /* Location: ./application/controllers/welcome.php */
