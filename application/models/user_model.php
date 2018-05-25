@@ -14,13 +14,16 @@ class User_model extends CI_Model
     function checklogin($login, $password)
     {
         
-        $sql = "SELECT user_name ,user_id, password,assistance_status, email FROM tbl_user where  email = '$login' and password = '$password' and status=1";
+        $sql = "SELECT user_name,first_name,last_name,phone_number_text_msg,user_id, password,assistance_status, email FROM tbl_user where  email = '$login' and password = '$password' and status=1";
         $res = $this->db->query($sql);
         
         if ($res->num_rows > 0) {
             $row                       = $res->row();
             $customer_id               = $row->user_id;
             $assistance_status               = $row->assistance_status;
+            $first_name               = $row->first_name;
+            $last_name               = $row->last_name;
+            $phone_number_text_msg               = $row->phone_number_text_msg;
             $tokens                    = openssl_random_pseudo_bytes(8);
             $token                     = bin2hex($tokens);
             $notification_device_token = $_REQUEST['notification_device_token'];
@@ -40,7 +43,10 @@ class User_model extends CI_Model
                 'status' => 1,
                 'token' => $token,
                 'user_id' => $customer_id,
-                'assistance_status'=>$assistance_status
+                'assistance_status'=>$assistance_status,
+                'first_name'=>$first_name,
+                'last_name'=>$last_name,
+                'phone_number'=>$phone_number_text_msg
             );
             
             
@@ -1080,7 +1086,7 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
        `gps_status` tinyint(1) NOT NULL DEFAULT '1',
         PRIMARY KEY (tracking_id)
 )";
-        if (mysql_query($sql)) {
+        if ($this->db->query($sql)) {
             
             $check = "SELECT * FROM  $table WHERE user_id ='" . $_REQUEST['user_id'] . "'";
             $res   = $this->db->query($check);
@@ -1336,319 +1342,139 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
          return $returnresult;   
     }
     
-    public function send_miles_notification($ids, $user_lat, $user_long,$radius)
-    {
-        
-        /*-------------------------------register user notfication end start 3 miles user notification----------------------------------------------- */
-        
-        $ids       = $ids;
-        $user_lat  = $user_lat;
-        $user_long = $user_long;
-        $radius = $radius;
-        
-        $sql        = "SELECT * FROM tbl_emergency where emergency_id='$ids'";
-        $res        = $this->db->query($sql);
-        $row        = $res->row();
-        $emuserid   = $row->user_id;
-        $sql        = "SELECT * FROM tbl_user WHERE `user_id`='$emuserid'";
-        $resultdata = $this->db->query($sql);
-        $resultdata = $resultdata->row();
-        $first_name = $resultdata->first_name;
-        $last_name  = $resultdata->last_name;
-        $user_name  = $first_name . " " . $last_name;
-        
-        $dateValue = date("Y-m-d H:i:s");
-        $time      = strtotime($dateValue);
-        $month     = date("F", $time);
-        $year      = date("Y", $time);
-        $table     = "tbl_tracking" . '_' . $month . '_' . $year;
-        
-        $result = $this->db->query("SELECT $table.*, $table.add_date as userdate,tbl_user.*,tbl_user.add_date as adate,
-            3956 * 2 * ASIN(SQRT( POWER(SIN(($user_lat -  $table.latitude) * pi()/180 / 2), 2) + COS($user_lat * pi()/180) * COS( $table.latitude * pi()/180) *
-            POWER(SIN(($user_long -  $table.longitude) * pi()/180 / 2), 2) )) as
-            distance FROM $table
-             JOIN  tbl_user on tbl_user.user_id =   $table.user_id
-             WHERE tbl_user.login_status=1 and $table.gps_status=1 and $table.user_id NOT IN ('" . $_REQUEST['user_id'] . "')   
-            GROUP BY  $table.tracking_id HAVING distance <= $radius ORDER by distance ASC");
-        
-        
-        
-        $datas = $result->result_array();
-        
-            
-            $countvars = count($datas);
-            $require   = array();
-             //$send_date_time=date("Y-m-d h:i:sa");
-            for ($j = 0; $j < $countvars; $j++) {
-
-                $uid = $datas[$j]['user_id'];
-
-                $SQL = "insert into tbl_emergency_notification(notification_user_id,emergency_id,creator_id)values('$uid','$ids','$emuserid')";
-
-                $res                       = mysql_query($SQL);
-                $emergency_notification_id = $this->db->insert_id();
-                
-                
-                $sql = "SELECT * FROM tbl_user WHERE `user_id` IN ('$uid')";
-                $res = $this->db->query($sql);
-                $row = $res->row();
-
-                if ($row) {
-                    $notification_device_token = $row->notification_device_token;
-                    $first_names                = $row->first_name;
-                    $last_names                 = $row->last_name;
-                    $helpuser_name                = $first_names . " " . $last_names;
-                    $mobile_type               = $row->mobile_type;
-                      $user_id               = $row->user_id;
-                    $sql        = "SELECT notification_tone,user_id FROM tbl_notification WHERE `user_id`='$user_id'";
-                    $resultdatatone = $this->db->query($sql);
-                    $resultdatatone = $resultdatatone->row();
-                    $notification_tone = $resultdatatone->notification_tone;
-            
-                    $ch                        = curl_init("https://fcm.googleapis.com/fcm/send");
-                    $sound = $notification_tone;
-                     if($sound==""){
-                     $sound="notification01.mp3";
-                     }else{
-                     $sound = $notification_tone;
-                     }
-                    $usertoken    = $notification_device_token;
-                    $title        = "Emergency Request" ;
-                    $body         =  $user_name." "."need your help. Click to help.";
-                   $click_action    = "ALERT";
-                $notification= array(
-                     'title' => $title,
-                     'text' => $body,
-                     'sound'=>$sound,
-                     'click_action'=>$click_action
-                );
-                    $arrayToSend  = array(
-                        'to' => $usertoken,
-                        'notification' => $notification,
-                        'priority' => 'high'
-                    );
-                    
-                    $json      = json_encode($arrayToSend);
-                    $headers   = array();
-                    $headers[] = 'Content-Type: application/json';
-                    if ($mobile_type == 'android') {
-                        $headers[] = 'Authorization: key= AIzaSyC5Z-wS9-IFx4nVCAfMjF9v7MwBQQR_5kw'; // key here
-                    } else {
-                        $headers[] = 'Authorization: key= AIzaSyAkPpQ-GiN4GVSjniMyHuSwXJVekEL7FWk'; // key here
-                    }
-                    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-                    curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
-                    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    
-                   array_push($require, curl_exec($ch));
-                   
-                          $returnresult = array(
-                          'status' => 1,
-                           'data' => $require,
-                           'message' => 'success'
-            
-           );
-                   
-                   curl_close($ch);
-                    if ($mobile_type == 'android' || $mobile_type == 'ios') {
-                        
-                    }
-                    
-                } else {
-                    $returnresult = array(
-                        'status' => 0,
-                        'message' => 'Some data not valid'
-                    );
-                }
-            }
-        
-           if($returnresult){
-                $data = json_encode($returnresult);
-                print_r($data);
-               }
-            else{
-                $returnresult = die(json_encode(array(
-                "status" => 0,
-               "message" =>"No user on radius"
-                        )));
-               }
-       return $returnresult;
-        
-    }
     
     /*-------------------------------emergency create by user ----------------------------------------------- */
     
     
-    public function add_emergency_user()
-    {
-        $user_lat  = $_REQUEST['emergency_latitude'];
-        $user_long = $_REQUEST['emergency_longitude'];
-        $emergency_address = $_REQUEST['emergency_address'];
-        if($emergency_address==""){
-        $address=file_get_contents("http://maps.googleapis.com/maps/api/geocode/json?latlng=$user_lat,$user_long&sensor=true");
-        $json_data=json_decode($address);
-        $full_address=$json_data->results[0]->formatted_address;
+    // public function add_emergency_user()
+    // {
+    //    $user_lat  = $_REQUEST['emergency_latitude'];
+    //     $user_long = $_REQUEST['emergency_longitude'];
+    //     $emergency_address = $_REQUEST['emergency_address'];
+    //     //print_r($_REQUEST['emergency_address']);
+    //     $data      = array(
+    //         'user_id' => $_REQUEST['user_id'],
+    //         'emergency_latitude' => $user_lat,
+    //         'emergency_longitude' => $user_long,
+    //         'emergency_address' => $emergency_address,
+    //         'emergency_type' => $_REQUEST['emergency_type'],
+    //         'status' => 1);
+        
+    //     $data = $this->db->insert('tbl_emergency', $data);
+    //     $ids  = $this->db->insert_id();
 
-        $data      = array(
-            'user_id' => $_REQUEST['user_id'],
-            'emergency_latitude' => $user_lat,
-            'emergency_longitude' => $user_long,
-            'emergency_address' => $full_address,
-            'emergency_type' => $_REQUEST['emergency_type'],
-            'status' => 1
-        );
+    //     $sqluser        = "SELECT * FROM tbl_user where user_id='".$_REQUEST['user_id']."'";
+    //     $raduisres      = $this->db->query($sqluser);
+    //     $user_row       = $raduisres->row();
+    //     $radius         = $user_row->radius;
+    //     $emfirst_name   = $user_row->first_name;
+    //     $emlast_name    = $user_row->last_name;
+    //     $user_name      = $emfirst_name . " " . $emlast_name;
+    //     // print_r($notification_device_token);die();
         
-        $data = $this->db->insert('tbl_emergency', $data);
-        $ids  = $this->db->insert_id();
-    }else{
-
-         $data      = array(
-            'user_id' => $_REQUEST['user_id'],
-            'emergency_latitude' => $user_lat,
-            'emergency_longitude' => $user_long,
-            'emergency_address' => $emergency_address,
-            'emergency_type' => $_REQUEST['emergency_type'],
-            'status' => 1
-        );
-        
-        $data = $this->db->insert('tbl_emergency', $data);
-        $ids  = $this->db->insert_id();
-
-    }
-       $sqlradius        = "SELECT radius FROM tbl_user where user_id='".$_REQUEST['user_id']."'";
-        $raduisres        = $this->db->query($sqlradius);
-        $row        = $raduisres->row();
-        $radius   = $row->radius;
-        // echo  $radius;die;
-        $register = $this->send_miles_notification($ids,$user_lat,$user_long,$radius);
-        $temp     = $this->send_notification_emegrency_contact($ids,$user_lat,$user_long);
-        
-        return $temp;
-        return $register;
-
-        
-/*--------------------------------------------------------get user create by----------------------------------------------------------*/
-        
-        $sql        = "SELECT user_id FROM tbl_emergency where emergency_id='$ids'";
-        $res        = $this->db->query($sql);
-        $row        = $res->row();
-        $emuserid   = $row->user_id;
-        $sql        = "SELECT * FROM tbl_user WHERE `user_id`='$emuserid'";
-        $resultdataname = $this->db->query($sql);
-        $resultdataname = $resultdataname->row();
-        $emfirst_name = $resultdataname->first_name;
-        $emlast_name  = $resultdataname->last_name;
-        $user_name  = $emfirst_name . " " . $emlast_name;
-        $fcmtoken = $resultdataname->$notification_device_token;
-     
-        
-        /*-----------------------------------------------------------------------------------------------------------------------------------*/
-        
-        /*-------------------------------start register user notfication ----------------------------------------------- */
-        
-        
-        $results = $this->db->query("SELECT user_id,first_name,user_lat,user_long,
-            3956 * 2 * ASIN(SQRT( POWER(SIN(($user_lat -  tbl_user.user_lat) * pi()/180 / 2), 2) + COS($user_lat * pi()/180) * COS( tbl_user.user_lat * pi()/180) *
-            POWER(SIN(($user_long - tbl_user.user_long) * pi()/180 / 2), 2) )) as
-            distance FROM tbl_user
-             WHERE tbl_user.login_status=1 and tbl_user.user_id NOT IN ('" . $_REQUEST['user_id'] . "')   
-            GROUP BY tbl_user.user_id HAVING distance <= $radius ORDER by distance ASC");
-        
-        
-        
-            $resultdata = $results->result_array();
-            $countvarresult = count($resultdata);
-            $require        = array();
-           $send_date_time=date("Y-m-d h:i:sa");
-            for ($i = 0; $i < $countvarresult; $i++) {
-             
-                $id                        = $resultdata[$i]['user_id'];
+    //     $results        = $this->db->query("SELECT * from tbl_emergency_contact where tap911_user=1 and user_id='".$_REQUEST['user_id']."'");
+    //     $remergencycontact = $results->result_array();
+    //     $countvarresults   = count($remergencycontact);
+    //     if($countvarresults){
+    //         $emergency_contact_user = array();
+    //         for ($j = 0; $j < $countvarresults; $j++) {
+    //             $emergency_contact_user[] =$remergencycontact[$j]['emergency_user_help_id'];
+    //         }
+    //     }
                
-        $SQL = "insert into tbl_emergency_notification(notification_user_id,emergency_id,creator_id) values('$id','$ids','$emuserid')";
-                $res                       = mysql_query($SQL);
-                $emergency_notification_id = $this->db->insert_id();
-                
-                
-                $sql = "SELECT * FROM tbl_user WHERE `user_id` IN ('$id')";
-                $res = $this->db->query($sql);
-                $row = $res->row();
-                if ($row) {
-                    $notification_device_token = $row->notification_device_token;
-                    $first_name                = $row->first_name;
-                    $last_name                 = $row->last_name;
-                    $user_names                = $first_name . " " . $last_name;
-                    $mobile_type               = $row->mobile_type;
-                    $user_id                   = $row->user_id;
-                    $sql        = "SELECT notification_tone,user_id FROM tbl_notification WHERE `user_id`='$user_id'";
-                    $resultdatatone = $this->db->query($sql);
-                    $resultdatatone = $resultdatatone->row();
-                    $notification_tone = $resultdatatone->notification_tone;
-                    $ch                        = curl_init("https://fcm.googleapis.com/fcm/send");
-                     $sound = $notification_tone;
-                     if($sound==""){
-                     $sound="notification01.mp3";
-                     }else{
-                     $sound = $notification_tone;
-                     }
-                    $usertoken    = $notification_device_token;
-                    $title        = "Emergency Request" ;
-                    $body         =  $user_name." "."need your help. Click to help.";
-                    $click_action    = "ALERT";
-                $notification= array(
-                     'title' => $title,
-                     'text' => $body,
-                     'sound'=>$sound,
-                     'click_action'=>$click_action
-                );
-                    $arrayToSend  = array(
-                        'to' => $usertoken,
-                        'notification' => $notification,
-                        'priority' => 'high'
-                    );
-                    
-                    $json      = json_encode($arrayToSend);
-                    $headers   = array();
-                    $headers[] = 'Content-Type: application/json';
-                    if ($mobile_type == 'android') {
-                        $headers[] = 'Authorization: key= AIzaSyC5Z-wS9-IFx4nVCAfMjF9v7MwBQQR_5kw'; // key here
-                    } else {
-                        $headers[] = 'Authorization: key= AIzaSyAkPpQ-GiN4GVSjniMyHuSwXJVekEL7FWk'; // key here
-                    }
-                    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-                    curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
-                    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                     array_push($require, curl_exec($ch));
+    //     $dateValue = date("Y-m-d H:i:s");
+    //     $time      = strtotime($dateValue);
+    //     $month     = date("F", $time);
+    //     $year      = date("Y", $time);
+    //     $table     = "tbl_tracking" . '_' . $month . '_' . $year;
+    //     $emergency_contact_user_string     = implode(',', $emergency_contact_user);
 
-                    $returnresult = array(
-                    'status' => 1,
-                    'data' => $require,
-                    'message' =>'success'
-            
-                );
-          
-                    curl_close($ch);
-                    if ($mobile_type == 'android' || $mobile_type == 'ios') {
-                        
-                    }
-                    
-                } 
-            }
-        
-        /*-------------------------------end 3 miles user notification----------------------------------------------- */
+    //     $result = $this->db->query("SELECT $table.*, $table.add_date as userdate,tbl_user.*,tbl_user.add_date as adate,
+    //         3956 * 2 * ASIN(SQRT( POWER(SIN(($user_lat -  $table.latitude) * pi()/180 / 2), 2) + COS($user_lat * pi()/180) * COS( $table.latitude * pi()/180) *
+    //         POWER(SIN(($user_long -  $table.longitude) * pi()/180 / 2), 2) )) as
+    //         distance FROM $table
+    //         JOIN  tbl_user on tbl_user.user_id =   $table.user_id
+    //         WHERE tbl_user.login_status=1 and $table.gps_status=1 and $table.user_id NOT IN ('$emergency_contact_user_string') and $table.user_id NOT IN ('" . $_REQUEST['user_id'] ."')    
+    //         GROUP BY  $table.tracking_id HAVING distance <= $radius ORDER by distance ASC");
+    //     $datavalue  = $result->result_array();
+    //     $countvars  = count($datavalue);
+       
+    //     for ($i = 0; $i < $countvars; $i++) {
+    //         $uid[]=$datavalue[$i]['user_id'];
+    //     }
+    //     $values=array_merge($emergency_contact_user,$uid);
+    //     $result = $this->db->query("SELECT * FROM tbl_user WHERE user_id IN (".implode(',',$values).")");
+    //     $data   = $result->result_array();
+    //     print_r($data);
+    //     $countvar = count($data);
+    //     $require    = array();
+    //     for ($i = 0; $i < $countvar; $i++) {
+    //         $uids    = $data[$i]['user_id'];
+    //         $SQL = "insert into tbl_emergency_notification(notification_user_id,emergency_id,creator_id)values('$uids','$ids','".$_REQUEST['user_id']."')";
+    //         $res = mysql_query($SQL);
 
-        
-      
-        return $returnresult;
-    }
+
+    //         $notification_device_token = $data[$i]['notification_device_token'];
+    //         $first_names                = $data[$i]['first_name'];
+    //         $last_names                 = $data[$i]['last_name'];
+    //         $helpuser_name                = $first_names . " " . $last_names;
+    //         $mobile_type               = $data[$i]['mobile_type'];
+    //         $user_id               = $data[$i]['user_id'];
+    //         $ch                     = curl_init("https://fcm.googleapis.com/fcm/send");
+    //         $sound="default_ringtone.mp3";
+    //         $usertoken    = $notification_device_token;
+    //         $title        = $_REQUEST['emergency_type']." "."Emergency Request";
+    //         $body         =  $user_name." "."need your help. Click to help.";
+    //         $click_action    = "ALERT";
+    //         $notification= array(
+    //              'title' => $title,
+    //              'text' => $body,
+    //              'sound'=>$sound,
+    //              'click_action'=>$click_action
+    //         );
+    //         $arrayToSend  = array(
+    //             'to' => $usertoken,
+    //             'notification' => $notification,
+    //             'priority' => 'high'
+    //         );
+                
+    //         $json      = json_encode($arrayToSend);
+    //         $headers   = array();
+    //         $headers[] = 'Content-Type: application/json';
+    //         if ($mobile_type == 'android') {
+    //             $headers[] = 'Authorization: key= AIzaSyC5Z-wS9-IFx4nVCAfMjF9v7MwBQQR_5kw'; // key here
+    //         } else {
+    //             $headers[] = 'Authorization: key= AIzaSyAkPpQ-GiN4GVSjniMyHuSwXJVekEL7FWk'; // key here
+    //         }
+    //         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+    //         curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
+    //         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    //         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+    //         array_push($require, curl_exec($ch));
+               
+               
+    //         curl_close($ch);
+    //         if ($mobile_type == 'android' || $mobile_type == 'ios') {
+                    
+    //         }
+
+    //     }
+    //     $returnresult = array(
+    //         'status' => 1,
+    //         'response' => $require,
+    //         'message' => 'success'
+    //     );  
+    //     return $returnresult;
+    // }
     
     /*-------------------------------accept_emergency_request----------------------------------------------- */
     
     
     function accept_emergency_request()
     {
-        $emergency_notification_id = $_REQUEST['emergency_notification_id'];
+         $emergency_notification_id = $_REQUEST['emergency_notification_id'];
+        //$emergency_notification_id = $_REQUEST['emergency_notification_id'];
         $result                    = "SELECT * FROM  tbl_emergency_notification WHERE emergency_notification_id ='" . $_REQUEST['emergency_notification_id'] . "'";
         $res                       = $this->db->query($result);
         $row                       = $res->row();
@@ -1686,7 +1512,7 @@ else{
         for ($i = 0; $i < $countvar; $i++) {
             $value = $data[$i]['total'];
             
-        }
+        }                    
         
         if($value==2) {
             
@@ -1695,15 +1521,10 @@ else{
                 'message' => 'Only two user allow accept request'
             );
 
-      $result = "SELECT emergency_id FROM  tbl_emergency_notification WHERE emergency_id ='" . $emergency_id . "'";
-        $res                       = $this->db->query($result);
-        $row                       = $res->row();
-        $emergency_id              = $row->emergency_id;
-
             $data = array(
-                'emergency_status' => 3, 
+                'emergency_status' => 3
             );
-            $this->db->where('emergency_id', $emergency_id);
+             $this->db->where('emergency_notification_id',$emergency_notification_id);
             $data = $this->db->update('tbl_emergency_notification', $data);
             
          }
@@ -1716,6 +1537,24 @@ else{
             );
             $this->db->where('emergency_notification_id', $emergency_notification_id);
             $data = $this->db->update('tbl_emergency_notification', $data);
+
+     $check    = "SELECT COUNT(1) as totals FROM tbl_emergency_notification WHERE emergency_status = 1 and emergency_id='" . $emergency_id . "'";
+        $res      = $this->db->query($check);
+        $datavalue     = $res->result_array();
+        $countvars = count($datavalue);
+        for ($i = 0; $i < $countvars; $i++) {
+            $toatlvalue = $datavalue[$i]['totals'];
+            
+        } 
+        if($toatlvalue==2){
+          $data = array(
+             'emergency_status' => 3
+                
+            );
+             $this->db->where_not_in('emergency_status', 1);
+             $this->db->where('emergency_id', $emergency_id);
+            $data = $this->db->update('tbl_emergency_notification', $data);
+        }
             
             $emergency_notification_id = $_REQUEST['emergency_notification_id'];
             
@@ -1747,16 +1586,14 @@ else{
                     $resultdatatone = $this->db->query($sql);
                     $resultdatatone = $resultdatatone->row();
                     $notification_tone = $resultdatatone->notification_tone;
-                //  print_r($row);  
-                $ch                        = curl_init("https://fcm.googleapis.com/fcm/send");
-               
-
                     $sound = $notification_tone;
                      if($sound==""){
                      $sound="notification01.mp3";
                      }else{
                      $sound = $notification_tone;
                      }
+
+                $ch  = curl_init("https://fcm.googleapis.com/fcm/send");
                     $usertoken    = $notification_device_token;
                     $title        = "Emergency Request" ;
                     $body         =  $first_name." ".$last_name." ".'has accepted your request.';
@@ -1792,7 +1629,7 @@ else{
                     
                     
                 }
-           // }
+          // }
              $returnresult = array(
             'status' => 1,
             'message' => 'success',
@@ -2088,19 +1925,37 @@ $result  =$this->db->query("SELECT community_communitaction_id,from_user_id,to_u
     function end_emergency_by_helping_user()
     {
          $notification_user_id = $_REQUEST['notification_user_id'];
-        $emergency_id         = $_REQUEST['emergency_id'];
-        $message_data         = $_REQUEST['message_data'];
+         $emergency_id         = $_REQUEST['emergency_id'];
+         $message_data         = $_REQUEST['message_data'];
         
-        
-        
+        $check    = "SELECT COUNT(1) as totalresult FROM tbl_emergency_notification WHERE emergency_status = 1 and emergency_id='" . $emergency_id . "'";
+        $res      = $this->db->query($check);
+        $data     = $res->result_array();
+        $countvar = count($data);
+        for ($i = 0; $i < $countvar; $i++) {
+            $value = $data[$i]['totalresult'];
+             
+             }                 
+        if($value=2) {
+            
         $data = array(
             'emergency_status' => 4
             
         );
-        // $this->db->where('notification_user_id', $notification_user_id);
+        $this->db->where('notification_user_id', $notification_user_id);
         $this->db->where('emergency_id', $emergency_id);
         $data = $this->db->update('tbl_emergency_notification', $data);
-        
+    }
+     elseif($value=1){
+
+       $data = array(
+            'emergency_status' => 4
+            
+        );
+        $this->db->where('emergency_id', $emergency_id);
+        $data = $this->db->update('tbl_emergency_notification', $data);  
+        }
+     
         if ($data) {
             
             $data = array(
@@ -2111,14 +1966,14 @@ $result  =$this->db->query("SELECT community_communitaction_id,from_user_id,to_u
             );
             $data = $this->db->insert('tbl_emergency_communitaction', $data);
             
-     $sql = "SELECT first_name,last_name FROM tbl_user WHERE user_id='$notification_user_id'";
+     $sql = "SELECT first_name,last_name,user_id FROM tbl_user WHERE user_id='$notification_user_id'";
                 $res = $this->db->query($sql);
                 $row = $res->row();
                 $first_names                = $row->first_name;
                 $last_names                 = $row->last_name;
                 $helpuser_name                = $first_names . " " . $last_names;
 
-            $sql = "SELECT notification_user_id FROM tbl_emergency_notification WHERE emergency_id='$emergency_id' and emergency_status=2";
+            $sql = "SELECT notification_user_id FROM tbl_emergency_notification WHERE emergency_id='$emergency_id'";
              $result = $this->db->query($sql);
             $datas = $result->result_array();
             $countvars = count($datas);
@@ -2141,6 +1996,11 @@ $result  =$this->db->query("SELECT community_communitaction_id,from_user_id,to_u
             
                     $ch                        = curl_init("https://fcm.googleapis.com/fcm/send");
                     $sound = $notification_tone;
+                     if($sound==""){
+                     $sound="notification01.mp3";
+                     }else{
+                     $sound = $notification_tone;
+                     }
                     $usertoken    = $notification_device_token;
                     $title        = $helpuser_name." "."End Emergency." ;
                     $body         =  "Thanks for your help!";
@@ -2242,7 +2102,12 @@ $result  =$this->db->query("SELECT community_communitaction_id,from_user_id,to_u
                     $notification_tone = $resultdatatone->notification_tone;
             
                     $ch                        = curl_init("https://fcm.googleapis.com/fcm/send");
-                    $sound = $notification_tone;
+                   $sound = $notification_tone;
+                     if($sound==""){
+                     $sound="notification01.mp3";
+                     }else{
+                     $sound = $notification_tone;
+                     }
                     $usertoken    = $notification_device_token;
                     $title        = $helpuser_name." "."End Emergency." ;
                     $body         =  "Thanks for your help!";
@@ -2306,6 +2171,26 @@ $result  =$this->db->query("SELECT community_communitaction_id,from_user_id,to_u
         // $message_data         = $_REQUEST['message_data'];
         
         
+        $check    = "SELECT COUNT(4) as totalresult FROM tbl_emergency_notification WHERE emergency_status = 4 and emergency_id='" . $emergency_id . "'";
+        $res      = $this->db->query($check);
+        $data     = $res->result_array();
+        $countvar = count($data);
+        for ($i = 0; $i < $countvar; $i++) {
+            $value = $data[$i]['totalresult'];
+             
+             }                 
+    //     if($value>0) {
+            
+    //     $data = array(
+    //         'emergency_status' => 4
+            
+    //     );
+    //     $this->db->where('notification_user_id', $notification_user_id);
+    //     $this->db->where('emergency_id', $emergency_id);
+    //     $data = $this->db->update('tbl_emergency_notification', $data);
+
+    // }else{
+
         
         $data = array(
             'emergency_status' => 2
@@ -2315,6 +2200,7 @@ $result  =$this->db->query("SELECT community_communitaction_id,from_user_id,to_u
         $this->db->where('emergency_id', $emergency_id);
         $data = $this->db->update('tbl_emergency_notification', $data);
         
+        //}
         if ($data) {
             
             $returnresult = array(
@@ -2325,7 +2211,8 @@ $result  =$this->db->query("SELECT community_communitaction_id,from_user_id,to_u
         
         return $returnresult;
         
-    }
+    
+}
 
 
 
@@ -2347,7 +2234,7 @@ function get_emergency_user($time_zone){
            
          // $limit = $index*$end;
 
-$result  =$this->db->query("SELECT `tbl_user`.user_id,`tbl_user`.first_name,`tbl_user`.profile_pic,
+$result  =$this->db->query("SELECT `tbl_user`.user_id,`tbl_user`.first_name,`tbl_user`.profile_pic,`tbl_user`.phone_number_text_msg,
     `tbl_user`.last_name,`tbl_emergency`.user_id,`tbl_emergency`.emergency_id,`tbl_emergency`.emergency_latitude,`tbl_emergency`.emergency_longitude,`tbl_emergency`.emergency_address,`tbl_emergency`.emergency_type,`tbl_emergency`.add_date,`tbl_emergency_notification`.emergency_notification_id,`tbl_emergency_notification`.emergency_status,`tbl_emergency_notification`.send_date_time,`tbl_emergency_notification`.accept_date_time,CONVERT_TZ(`tbl_emergency_notification`.send_date_time, @@session.time_zone, '$time')as senddate
 FROM `tbl_user`
 JOIN `tbl_emergency` ON `tbl_emergency`.`user_id` = `tbl_user`.`user_id`
@@ -2621,5 +2508,449 @@ $check = "SELECT asset_number FROM tbl_user_asset WHERE status=1 and asset_numbe
     //     $res   = $this->db->query($check);
     //     return $res->result(); 
     // }
+
+
+
+
+    // public function send_miles_notifications($ids, $user_lat, $user_long,$radius)
+    // {
+        
+    //     /*-------------------------------register user notfication end start 3 miles user notification----------------------------------------------- */
+        
+    //     $ids       = $ids;
+    //     $user_lat  = $user_lat;
+    //     $user_long = $user_long;
+    //     $radius = $radius;
+        
+    //     $sql        = "SELECT * FROM tbl_emergency where emergency_id='$ids'";
+    //     $res        = $this->db->query($sql);
+    //     $row        = $res->row();
+    //     $emuserid   = $row->user_id;
+    //     $emergency_type   = $row->emergency_type;
+    //     $sql        = "SELECT * FROM tbl_user WHERE `user_id`='$emuserid'";
+    //     $resultdata = $this->db->query($sql);
+    //     $resultdata = $resultdata->row();
+    //     $first_name = $resultdata->first_name;
+    //     $last_name  = $resultdata->last_name;
+    //     $user_name  = $first_name . " " . $last_name;
+        
+
+    // $results = $this->db->query("SELECT * from tbl_emergency_contact where user_id='$emuserid' and tap911_user=1");
+
+    //     $remergencycontact = $results->result_array();
+
+    //     foreach ($remergencycontact as $emresult) {
+            
+    //             $uid = $emresult['emergency_user_help_id']; 
+    //            }
+
+    //     $dateValue = date("Y-m-d H:i:s");
+    //     $time      = strtotime($dateValue);
+    //     $month     = date("F", $time);
+    //     $year      = date("Y", $time);
+    //     $table     = "tbl_tracking" . '_' . $month . '_' . $year;
+        
+    //     $result = $this->db->query("SELECT $table.*, $table.add_date as userdate,tbl_user.*,tbl_user.add_date as adate,
+    //         3956 * 2 * ASIN(SQRT( POWER(SIN(($user_lat -  $table.latitude) * pi()/180 / 2), 2) + COS($user_lat * pi()/180) * COS( $table.latitude * pi()/180) *
+    //         POWER(SIN(($user_long -  $table.longitude) * pi()/180 / 2), 2) )) as
+    //         distance FROM $table
+    //          JOIN  tbl_user on tbl_user.user_id =   $table.user_id
+    //          WHERE tbl_user.login_status=1 and $table.gps_status=1 and $table.user_id NOT IN ('" . $_REQUEST['user_id'] . " ') and NOT IN ('". $uid ."')   
+    //         GROUP BY  $table.tracking_id HAVING distance <= $radius ORDER by distance ASC");
+       
+    //             $dataresult = $result->result_array();
+    //            $countvars = count($datas);
+    //             $require   = array();
+                   
+
+    //            foreach ($dataresult as $result) {
+
+    //            if( $countvars>0){
+                  
+    //                $uid= $result['user_id'];
+    //                }else{
+
+    //                   $uid= $id;
+
+    //                }
+              
+
+    //             $SQL = "insert into tbl_emergency_notification(notification_user_id,emergency_id,creator_id)values('$uid','$ids','$emuserid')";
+
+    //             $res                       = mysql_query($SQL);
+    //             $emergency_notification_id = $this->db->insert_id();
+          
+    //             $sql = "SELECT * FROM tbl_user WHERE `user_id` IN ('$uid')";
+    //             $res = $this->db->query($sql);
+    //             $row = $res->row();
+
+    //             if ($row) {
+    //                 $notification_device_token = $row->notification_device_token;
+    //                 $first_names                = $row->first_name;
+    //                 $last_names                 = $row->last_name;
+    //                 $helpuser_name                = $first_names . " " . $last_names;
+    //                 $mobile_type               = $row->mobile_type;
+    //                   $user_id               = $row->user_id;
+    //                 $sql        = "SELECT notification_tone,user_id FROM tbl_notification WHERE `user_id`='$user_id'";
+    //                 $resultdatatone = $this->db->query($sql);
+    //                 $resultdatatone = $resultdatatone->row();
+    //                 $notification_tone = $resultdatatone->notification_tone;
+            
+    //                 $ch                        = curl_init("https://fcm.googleapis.com/fcm/send");
+    //                 $sound = $notification_tone;
+    //                  if($sound==""){
+    //                  $sound="notification01.mp3";
+    //                  }else{
+    //                  $sound = $notification_tone;
+    //                  }
+    //                 $usertoken    = $notification_device_token;
+    //                 $title        = "Emergency Request"." ".$emergency_type;
+    //                 $body         =  $user_name." "."need your help. Click to help.";
+    //                $click_action    = "ALERT";
+    //             $notification= array(
+    //                  'title' => $title,
+    //                  'text' => $body,
+    //                  'sound'=>$sound,
+    //                  'click_action'=>$click_action
+    //             );
+    //                 $arrayToSend  = array(
+    //                     'to' => $usertoken,
+    //                     'notification' => $notification,
+    //                     'priority' => 'high'
+    //                 );
+                    
+    //                 $json      = json_encode($arrayToSend);
+    //                 $headers   = array();
+    //                 $headers[] = 'Content-Type: application/json';
+    //                 if ($mobile_type == 'android') {
+    //                     $headers[] = 'Authorization: key= AIzaSyC5Z-wS9-IFx4nVCAfMjF9v7MwBQQR_5kw'; // key here
+    //                 } else {
+    //                     $headers[] = 'Authorization: key= AIzaSyAkPpQ-GiN4GVSjniMyHuSwXJVekEL7FWk'; // key here
+    //                 }
+    //                 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+    //                 curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
+    //                 curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    //                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    
+    //                array_push($require, curl_exec($ch));
+                   
+                   
+    //                curl_close($ch);
+    //                 if ($mobile_type == 'android' || $mobile_type == 'ios') {
+                        
+    //                 }
+                    
+    //             } else {
+    //                 $returnresult = array(
+    //                     'status' => 0,
+    //                     'message' => 'Some data not valid'
+    //                 );
+    //             }
+    //             //}
+    //        }
+       
+        
+        
+    //                       $returnresult = array(
+    //                       'status' => 1,
+    //                        'data' => $require,
+    //                        'message' => 'success'
+            
+    //        );
+    //        if($returnresult){
+    //             $data = json_encode($returnresult);
+    //             print_r($data);
+    //            }
+    //         else{
+    //             $returnresult = die(json_encode(array(
+    //             "status" => 0,
+    //            "message" =>"No user on radius"
+    //                     )));
+    //            }
+    //    return $returnresult;
+        
+    // }
+    
+    /*-------------------------------emergency create by user ----------------------------------------------- */
+    
+    
+    // public function add_emergency_user()
+    // {
+     
+    //     $user_lat  = $_REQUEST['emergency_latitude'];
+    //     $user_long = $_REQUEST['emergency_longitude'];
+    //     $emergency_address = $_REQUEST['emergency_address'];
+  
+    //      $data      = array(
+    //         'user_id' => $_REQUEST['user_id'],
+    //         'emergency_latitude' => $user_lat,
+    //         'emergency_longitude' => $user_long,
+    //         'emergency_address' => $emergency_address,
+    //         'emergency_type' => $_REQUEST['emergency_type'],
+    //         'status' => 1
+    //     );
+        
+    //     $data = $this->db->insert('tbl_emergency', $data);
+    //     $ids  = $this->db->insert_id();
+
+    //    $sqlradius        = "SELECT radius FROM tbl_user where user_id='".$_REQUEST['user_id']."'";
+    //     $raduisres        = $this->db->query($sqlradius);
+    //     $row        = $raduisres->row();
+    //     $radius   = $row->radius;
+    //     $sql        = "SELECT * FROM tbl_emergency where emergency_id='$ids'";
+    //     $res        = $this->db->query($sql);
+    //     $row        = $res->row();
+    //     $emuserid   = $row->user_id;
+    //     $emergency_type   = $row->emergency_type;
+    //     $sql        = "SELECT * FROM tbl_user WHERE `user_id`='$emuserid' and login_status=1";
+    //     $resultdata = $this->db->query($sql);
+    //     $resultdata = $resultdata->row();
+    //     $emfirst_name = $resultdata->first_name;
+    //     $emlast_name  = $resultdata->last_name;
+    //     $user_name = $emfirst_name . " " . $emlast_name;
+    //     // print_r($notification_device_token);die();
+        
+    //     $results           = $this->db->query("SELECT * from tbl_emergency_contact where user_id='$emuserid' and tap911_user=1");
+    //     $remergencycontact = $results->result_array();
+    //     $countvarresults   = count($remergencycontact);
+    //     if($countvarresults){
+    //     $require           = array();
+    //     $tags = array();
+    //     for ($j = 0; $j < $countvarresults; $j++) {
+            
+      
+    //          $tags[] =$remergencycontact[$j]['emergency_user_help_id'];
+      
+    //         }
+
+    //        }
+               
+    //     $dateValue = date("Y-m-d H:i:s");
+    //     $time      = strtotime($dateValue);
+    //     $month     = date("F", $time);
+    //     $year      = date("Y", $time);
+    //     $table     = "tbl_tracking" . '_' . $month . '_' . $year;
+    //     $var=implode(',', $tags);
+        
+    //     $result = $this->db->query("SELECT $table.*, $table.add_date as userdate,tbl_user.*,tbl_user.add_date as adate,
+    //         3956 * 2 * ASIN(SQRT( POWER(SIN(($user_lat -  $table.latitude) * pi()/180 / 2), 2) + COS($user_lat * pi()/180) * COS( $table.latitude * pi()/180) *
+    //         POWER(SIN(($user_long -  $table.longitude) * pi()/180 / 2), 2) )) as
+    //         distance FROM $table
+    //          JOIN  tbl_user on tbl_user.user_id =   $table.user_id
+    //          WHERE tbl_user.login_status=1 and $table.gps_status=1 and $table.user_id NOT IN ('$var') and $table.user_id NOT IN ('" . $_REQUEST['user_id'] ."')    
+    //         GROUP BY  $table.tracking_id HAVING distance <= $radius ORDER by distance ASC");
+       
+    //                $datavalue     = $result->result_array();
+    //                $countvars = count($datavalue);
+    //                $require=array();
+    //           for ($i = 0; $i < $countvars; $i++) {
+     
+    //              $uid= $datavalue[$i]['user_id'];
+
+    //             $SQL = "insert into tbl_emergency_notification(notification_user_id,emergency_id,creator_id)values('$uid','$ids','$emuserid')";
+
+    //             $res                       = mysql_query($SQL);
+    //             $emergency_notification_id = $this->db->insert_id();
+          
+    //             $sql = "SELECT * FROM tbl_user WHERE `user_id` IN ('$uid')";
+    //             $res = $this->db->query($sql);
+    //             $row = $res->row();
+
+    //             if ($row) {
+    //                 $notification_device_token = $row->notification_device_token;
+    //                 $first_names                = $row->first_name;
+    //                 $last_names                 = $row->last_name;
+    //                 $helpuser_name                = $first_names . " " . $last_names;
+    //                 $mobile_type               = $row->mobile_type;
+    //                   $user_id               = $row->user_id;
+    //                 $ch                     = curl_init("https://fcm.googleapis.com/fcm/send");
+    //                  $sound="default_ringtone.mp3";
+    //                 $usertoken    = $notification_device_token;
+    //                 $title        = $emergency_type." "."Emergency Request";
+    //                  $body         =  $user_name." "."need your help. Click to help.";
+    //                $click_action    = "ALERT";
+    //             $notification= array(
+    //                  'title' => $title,
+    //                  'text' => $body,
+    //                  'sound'=>$sound,
+    //                  'click_action'=>$click_action
+    //             );
+    //                 $arrayToSend  = array(
+    //                     'to' => $usertoken,
+    //                     'notification' => $notification,
+    //                     'priority' => 'high'
+    //                 );
+                    
+    //                 $json      = json_encode($arrayToSend);
+    //                 $headers   = array();
+    //                 $headers[] = 'Content-Type: application/json';
+    //                 if ($mobile_type == 'android') {
+    //                     $headers[] = 'Authorization: key= AIzaSyC5Z-wS9-IFx4nVCAfMjF9v7MwBQQR_5kw'; // key here
+    //                 } else {
+    //                     $headers[] = 'Authorization: key= AIzaSyAkPpQ-GiN4GVSjniMyHuSwXJVekEL7FWk'; // key here
+    //                 }
+    //                 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+    //                 curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
+    //                 curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    //                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    
+    //                array_push($require, curl_exec($ch));
+                   
+                   
+    //                curl_close($ch);
+    //                 if ($mobile_type == 'android' || $mobile_type == 'ios') {
+                        
+    //                 }
+                    
+    //             } else {
+    //                 $returnresult = array(
+    //                     'status' => 0,
+    //                     'message' => 'Some data not valid'
+    //                 );
+    //             }
+            
+    //        }
+      
+    //               $returnresult = array(
+    //               'status' => 1,
+    //               'response' => $require,
+    //               'message' => 'success'
+                  
+    //        );
+          
+    //    return $returnresult;
+    // }
+
+
+
+ public function add_emergency_user()
+    {
+        $user_lat  = $_REQUEST['emergency_latitude'];
+        $user_long = $_REQUEST['emergency_longitude'];
+        $emergency_address = $_REQUEST['emergency_address'];
+        $data      = array(
+            'user_id' => $_REQUEST['user_id'],
+            'emergency_latitude' => $user_lat,
+            'emergency_longitude' => $user_long,
+            'emergency_address' => $emergency_address,
+            'emergency_type' => $_REQUEST['emergency_type'],
+            'status' => 1);
+        
+        $data = $this->db->insert('tbl_emergency', $data);
+        $ids  = $this->db->insert_id();
+
+        $sqluser        = "SELECT * FROM tbl_user where user_id='".$_REQUEST['user_id']."'";
+        $raduisres      = $this->db->query($sqluser);
+        $user_row       = $raduisres->row();
+        $radius         = $user_row->radius;
+        $emfirst_name   = $user_row->first_name;
+        $emlast_name    = $user_row->last_name;
+        $user_name      = $emfirst_name . " " . $emlast_name;
+        // print_r($notification_device_token);die();
+        
+        $results        = $this->db->query("SELECT * from tbl_emergency_contact where user_id='".$_REQUEST['user_id']."' and tap911_user=1");
+        $remergencycontact = $results->result_array();
+        $countvarresults   = count($remergencycontact);
+        if($countvarresults){
+            $require    = array();
+            $emergency_contact_user = array();
+            for ($j = 0; $j < $countvarresults; $j++) {
+                $emergency_contact_user[] =$remergencycontact[$j]['emergency_user_help_id'];
+            }
+        }
+               
+        $dateValue = date("Y-m-d H:i:s");
+        $time      = strtotime($dateValue);
+        $month     = date("F", $time);
+        $year      = date("Y", $time);
+        $table     = "tbl_tracking" . '_' . $month . '_' . $year;
+        $emergency_contact_user_string     = implode(',', $emergency_contact_user);
+
+        $result = $this->db->query("SELECT $table.*, $table.add_date as userdate,tbl_user.*,tbl_user.add_date as adate,
+            3956 * 2 * ASIN(SQRT( POWER(SIN(($user_lat -  $table.latitude) * pi()/180 / 2), 2) + COS($user_lat * pi()/180) * COS( $table.latitude * pi()/180) *
+            POWER(SIN(($user_long -  $table.longitude) * pi()/180 / 2), 2) )) as
+            distance FROM $table
+            JOIN  tbl_user on tbl_user.user_id =   $table.user_id
+            WHERE tbl_user.login_status=1 and $table.gps_status=1 and $table.user_id NOT IN ('$emergency_contact_user_string') and $table.user_id NOT IN ('" . $_REQUEST['user_id'] ."')    
+            GROUP BY  $table.tracking_id HAVING distance <= $radius ORDER by distance ASC");
+        $datavalue  = $result->result_array();
+        $countvars  = count($datavalue);
+        $require    = array();
+          $uid = array();
+        for ($i = 0; $i < $countvars; $i++) {
+            $uid[]=$datavalue[$i]['user_id'];
+        }
+        if(count($emergency_contact_user)>0 && count($uid)>0){
+            $values = array_merge($emergency_contact_user,$uid);
+        }elseif(count($emergency_contact_user)>0){
+            $values = $emergency_contact_user;
+        }elseif(count($uid)>0){
+            $values = $uid;
+        }else{
+            return false;
+        }
+        $id =implode(',', $values);
+        $result = $this->db->query("SELECT * FROM tbl_user WHERE user_id IN ($id)");
+        $data1   = $result->result_array();
+        $countvar = count($data1);
+        for ($i = 0; $i < $countvar; $i++) {
+            echo $uids    = $data1[$i]['user_id'];
+            $SQL = "insert into tbl_emergency_notification(notification_user_id,emergency_id,creator_id)values('$uids','$ids','".$_REQUEST['user_id']."')";
+            $res = $this->db->query($SQL);
+
+
+            $notification_device_token = $data1[$i]['notification_device_token'];
+            $first_names                = $data1[$i]['first_name'];
+            $last_names                 = $data1[$i]['last_name'];
+            $helpuser_name                = $first_names . " " . $last_names;
+            $mobile_type               = $data1[$i]['mobile_type'];
+            //$user_id               = $data[$i]['user_id'];
+            $ch                     = curl_init("https://fcm.googleapis.com/fcm/send");
+            $sound="default_ringtone.mp3";
+            $usertoken    = $notification_device_token;
+            $title        = $_REQUEST['emergency_type']." "."Emergency Request";
+            $body         =  $user_name." "."need your help. Click to help.";
+            $click_action    = "ALERT";
+            $notification= array(
+                 'title' => $title,
+                 'text' => $body,
+                 'sound'=>$sound,
+                 'click_action'=>$click_action
+            );
+            $arrayToSend  = array(
+                'to' => $usertoken,
+                'notification' => $notification,
+                'priority' => 'high'
+            );
+                
+            $json      = json_encode($arrayToSend);
+            $headers   = array();
+            $headers[] = 'Content-Type: application/json';
+            if ($mobile_type == 'android') {
+                $headers[] = 'Authorization: key= AIzaSyC5Z-wS9-IFx4nVCAfMjF9v7MwBQQR_5kw'; // key here
+            } else {
+                $headers[] = 'Authorization: key= AIzaSyAkPpQ-GiN4GVSjniMyHuSwXJVekEL7FWk'; // key here
+            }
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+            array_push($require, curl_exec($ch));
+               
+               
+            curl_close($ch);
+            if ($mobile_type == 'android' || $mobile_type == 'ios') {
+                    
+            }
+
+        }
+        $returnresult = array(
+            'status' => 1,
+            'response' => $require,
+            'message' => 'success'
+        );  
+        return $returnresult;
+    }
 
 }
