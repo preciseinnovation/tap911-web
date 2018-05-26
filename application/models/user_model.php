@@ -1955,6 +1955,25 @@ $result  =$this->db->query("SELECT community_communitaction_id,from_user_id,to_u
         $this->db->where('emergency_id', $emergency_id);
         $data = $this->db->update('tbl_emergency_notification', $data);  
         }
+
+        $check    = "SELECT COUNT(2) as totalresults FROM tbl_emergency_notification WHERE emergency_status = 2 and emergency_id='" . $emergency_id . "'";
+        $res      = $this->db->query($check);
+        $data     = $res->result_array();
+        $countvar = count($data);
+        for ($m = 0; $m < $countvar; $m++) {
+            $totalresults = $data[$m]['totalresults'];
+             
+             }  
+
+        if($totalresults=1){
+
+       $data = array(
+            'emergency_status' => 4
+            
+        );
+        $this->db->where('emergency_id', $emergency_id);
+        $data = $this->db->update('tbl_emergency_notification', $data);  
+        }
      
         if ($data) {
             
