@@ -1075,9 +1075,9 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
         $sql = "CREATE TABLE IF NOT EXISTS $table(
      `tracking_id` int(11) NOT NULL AUTO_INCREMENT,
        `user_id` int(11) NOT NULL,
-       `address` varchar(20) NOT NULL,
-      `latitude` varchar(20) NOT NULL,
-       `longitude` varchar(255) NOT NULL,
+       `address` varchar(255) NOT NULL,
+      `latitude` varchar(100) NOT NULL,
+       `longitude` varchar(100) NOT NULL,
        `add_uid` int(11) NOT NULL,
        `add_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
       `del_uid` int(11) NOT NULL,
@@ -1518,7 +1518,7 @@ else{
             
             $returnresult = array(
                 'status' => 0,
-                'message' => 'Only two user allow accept request'
+                'message' => 'This emergency is already accepted by two users.'
             );
 
             $data = array(
@@ -1929,14 +1929,23 @@ $result  =$this->db->query("SELECT community_communitaction_id,from_user_id,to_u
          $message_data         = $_REQUEST['message_data'];
         
         $check    = "SELECT COUNT(1) as totalresult FROM tbl_emergency_notification WHERE emergency_status = 1 and emergency_id='" . $emergency_id . "'";
-        $res      = $this->db->query($check);
-        $data     = $res->result_array();
-        $countvar = count($data);
-        for ($i = 0; $i < $countvar; $i++) {
-            $value = $data[$i]['totalresult'];
+        $resone      = $this->db->query($check);
+        $onedata     = $resone->result_array();
+        $countvarone = count($onedata);
+        for ($i = 0; $i < $countvarone; $i++) {
+            $value = $onedata[$i]['totalresult'];
              
-             }                 
-        if($value=2) {
+             } 
+
+             $checkdata    = "SELECT COUNT(2) as totalresults FROM tbl_emergency_notification WHERE emergency_status = 2 and emergency_id='" . $emergency_id . "'";
+        $restwo      = $this->db->query($checkdata);
+        $datatwo     = $restwo->result_array();
+        $countvartwo = count($datatwo);
+        for ($m = 0; $m < $countvartwo; $m++) {
+            $totalresults = $datatwo[$m]['totalresults'];
+             
+             }                
+        if($value>0 && $totalresults>0) {
             
         $data = array(
             'emergency_status' => 4
@@ -1946,26 +1955,18 @@ $result  =$this->db->query("SELECT community_communitaction_id,from_user_id,to_u
         $this->db->where('emergency_id', $emergency_id);
         $data = $this->db->update('tbl_emergency_notification', $data);
     }
-     elseif($value=1){
-
-       $data = array(
-            'emergency_status' => 4
-            
-        );
-        $this->db->where('emergency_id', $emergency_id);
-        $data = $this->db->update('tbl_emergency_notification', $data);  
-        }
-
-        $check    = "SELECT COUNT(2) as totalresults FROM tbl_emergency_notification WHERE emergency_status = 2 and emergency_id='" . $emergency_id . "'";
+    else{
+    
+        $check    = "SELECT COUNT(4) as totalresultsdata FROM tbl_emergency_notification WHERE emergency_status = 4 and emergency_id='" . $emergency_id . "'";
         $res      = $this->db->query($check);
         $data     = $res->result_array();
         $countvar = count($data);
         for ($m = 0; $m < $countvar; $m++) {
-            $totalresults = $data[$m]['totalresults'];
+            $totalresultsdata = $data[$m]['totalresultsdata'];
              
              }  
 
-        if($totalresults=1){
+        if($totalresultsdata>0 && $totalresults>0){
 
        $data = array(
             'emergency_status' => 4
@@ -1974,7 +1975,18 @@ $result  =$this->db->query("SELECT community_communitaction_id,from_user_id,to_u
         $this->db->where('emergency_id', $emergency_id);
         $data = $this->db->update('tbl_emergency_notification', $data);  
         }
-     
+
+    else if($totalresults>0){ 
+
+   $data = array(
+            'emergency_status' => 4
+            
+        );
+        $this->db->where('emergency_id', $emergency_id);
+        $data = $this->db->update('tbl_emergency_notification', $data); 
+    }
+       
+       }
         if ($data) {
             
             $data = array(
@@ -2883,7 +2895,12 @@ $check = "SELECT asset_number FROM tbl_user_asset WHERE status=1 and asset_numbe
         $month     = date("F", $time);
         $year      = date("Y", $time);
         $table     = "tbl_tracking" . '_' . $month . '_' . $year;
+       
+        if(count($emergency_contact_user)>0){
         $emergency_contact_user_string     = implode(',', $emergency_contact_user);
+    }else{
+        $emergency_contact_user_string="";
+    }
 
         $result = $this->db->query("SELECT $table.*, $table.add_date as userdate,tbl_user.*,tbl_user.add_date as adate,
             3956 * 2 * ASIN(SQRT( POWER(SIN(($user_lat -  $table.latitude) * pi()/180 / 2), 2) + COS($user_lat * pi()/180) * COS( $table.latitude * pi()/180) *
@@ -2913,7 +2930,7 @@ $check = "SELECT asset_number FROM tbl_user_asset WHERE status=1 and asset_numbe
         $data1   = $result->result_array();
         $countvar = count($data1);
         for ($i = 0; $i < $countvar; $i++) {
-            echo $uids    = $data1[$i]['user_id'];
+             $uids    = $data1[$i]['user_id'];
             $SQL = "insert into tbl_emergency_notification(notification_user_id,emergency_id,creator_id)values('$uids','$ids','".$_REQUEST['user_id']."')";
             $res = $this->db->query($SQL);
 
