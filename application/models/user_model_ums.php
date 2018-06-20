@@ -1,5 +1,5 @@
 <?php
-class User_model extends CI_Model
+class User_model_ums extends CI_Model
 {
     
     
@@ -1135,77 +1135,18 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
     }
 	
 	
-	function add_emergency_tracking_latest($token,$data,$user_id)
+	function add_tracking($data_td,$id)
     {
-		if (!ini_get('date.timezone')) {
-            date_default_timezone_set('UTC');
-        }
-        $dateValue = date("Y-m-d H:i:s");
-        $time      = strtotime($dateValue);
-        $month     = date("F", $time);
-        $year      = date("Y", $time);
-        $table     = "tbl_tracking" . '_' . $month . '_' . $year;
-        
-        $sql = "CREATE TABLE IF NOT EXISTS $table(
-     `tracking_id` int(11) NOT NULL AUTO_INCREMENT,
-       `user_id` int(11) NOT NULL,
-       `address` varchar(255) NOT NULL,
-      `latitude` varchar(100) NOT NULL,
-       `longitude` varchar(100) NOT NULL,
-       `add_uid` int(11) NOT NULL,
-       `add_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      `del_uid` int(11) NOT NULL,
-       `del_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-       `status` tinyint(1) NOT NULL,
-       `gps_status` tinyint(1) NOT NULL DEFAULT '1',
-        PRIMARY KEY (tracking_id)
-)";
-        if ($this->db->query($sql)) {
-            
-            $check = "SELECT * FROM  $table WHERE user_id ='" . $user_id . "'";
-            $res   = $this->db->query($check);
-
-            if ($res->num_rows > 0 && $check != "") {
-                $row     = $res->row();
-                $user_id = $row->user_id;
-                $data    = array(
-                    'user_id' => $user_id,
-                    'address' => $data['address'],
-                    'latitude' => $data['latitude'],
-                    'longitude' => $data['longitude'],
-                    'status' => 1
-                );
-                $this->db->where('user_id', $user_id);
-                $data = $this->db->update($table, $data);
-                if ($data) {
-                    $returnresult = array(
-                        'status' => 1,
-                        'message' => 'User emergency tracking update successfully'
-                    );
-                }
-            } else {
-                $data = array(
-                    'user_id' => $user_id,
-                    'address' => $data['address'],
-                    'latitude' => $data['latitude'],
-                    'longitude' => $data['longitude'],
-                    'status' => 1
-                );
-                $data = $this->db->insert($table, $data);
-                if ($data) {
-                    $returnresult = array(
-                        'status' => 1,
-                        'message' => 'User emergency tracking successfully submit'
-                    );
-                } else {
-                    $returnresult = array(
-                        'status' => 0,
-                        'message' => 'Some data not valid'
-                    );
-                }
-            }
-            return $returnresult;
-        }
+		$data = array(
+			'user_id' => $id,
+			'address' => $data_td['address'],
+			'latitude' => $data_td['latitude'],
+			'longitude' => $data_td['longitude'],
+			'add_date' => $data_td['Time'],
+			'status' => 1
+		);
+		$this->db->insert('all_tracking_data', $data);
+		return $this->db->insert_id();
     }
     
     
@@ -1554,8 +1495,6 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
         $row                       = $res->row();
         $emergency_id              = $row->emergency_id;
         $notification_user_id      = $row->notification_user_id;
-        $creator_id      = $row->creator_id;
-		
     
 $enduser = "SELECT COUNT(4) as totalvalue FROM tbl_emergency_notification WHERE emergency_status = 4 and emergency_id='" . $emergency_id . "'";
         $enduserresult  = $this->db->query($enduser);
@@ -1668,11 +1607,12 @@ else{
                      }else{
                      $sound = $notification_tone;
                      }
-				
-				$results        = $this->db->query("SELECT * from tbl_emergency_contact where user_id='".$creator_id."' and tap911_user=1");
+
+				$results        = $this->db->query("SELECT * from tbl_emergency_contact where user_id='".$user_ids."' and tap911_user=1");
 				$remergencycontact = $results->result_array();
 				$countvarresults   = count($remergencycontact);
 				if($countvarresults){
+					$require    = array();
 					$emergency_contact_user = array();
 					for ($j = 0; $j < $countvarresults; $j++) {
 						$emergency_contact_user[] =$remergencycontact[$j]['emergency_user_help_id'];
@@ -1682,14 +1622,13 @@ else{
                 $ch  = curl_init("https://fcm.googleapis.com/fcm/send");
                     $usertoken    = $notification_device_token;
                     $title        = "Emergency Request" ;
-					//print_r($emergency_contact_user);
-					//exit;
-                    if(in_array($user_ids,$emergency_contact_user)){
-						$body =  $first_name." ".$last_name." ".'has accepted your request.';
+					
+					if(in_array($user_ids,$emergency_contact_user)){
+						$body         =  $first_name." ".$last_name." ".'has accepted your request.';
 					}else{
-						$body =  'Someone has accepted your request.';
+						$body         =  'Someone has accepted your request.';
 					}
-					//$body         =  $first_name." ".$last_name." ".'has accepted your request.';
+                    
                     $click_action    = "ALERT";
                 $notification              = array(
                      'title' => $title,
@@ -1725,7 +1664,8 @@ else{
           // }
              $returnresult = array(
             'status' => 1,
-            'message' => 'success'
+            'message' => 'success',
+            'response' => $require
            );
          }
      }
@@ -2239,7 +2179,6 @@ $result  =$this->db->query("SELECT community_communitaction_id,from_user_id,to_u
                         'title' => $title,
                         'text' => $body,
                         'sound' =>$sound,
-						'time_interval'=>'5',
                         'click_action'=>$click_action
                     );
                     $arrayToSend  = array(
@@ -2949,7 +2888,7 @@ $check = "SELECT asset_number FROM tbl_user_asset WHERE status=1 and asset_numbe
 
  public function add_emergency_user()
     {
-        $user_lat  = $_REQUEST['emergency_latitude'];
+		$user_lat  = $_REQUEST['emergency_latitude'];
         $user_long = $_REQUEST['emergency_longitude'];
         $emergency_address = $_REQUEST['emergency_address'];
         $data      = array(
@@ -2960,8 +2899,8 @@ $check = "SELECT asset_number FROM tbl_user_asset WHERE status=1 and asset_numbe
             'emergency_type' => $_REQUEST['emergency_type'],
             'status' => 1);
         
-        $data = $this->db->insert('tbl_emergency', $data);
-        $ids  = $this->db->insert_id();
+       // $data = $this->db->insert('tbl_emergency', $data);
+      //  $ids  = $this->db->insert_id();
 
         $sqluser        = "SELECT * FROM tbl_user where user_id='".$_REQUEST['user_id']."'";
         $raduisres      = $this->db->query($sqluser);
@@ -2994,7 +2933,8 @@ $check = "SELECT asset_number FROM tbl_user_asset WHERE status=1 and asset_numbe
     }else{
         $emergency_contact_user_string="";
     }
-
+//print_r($emergency_contact_user_string);
+		//exit;
         $result = $this->db->query("SELECT $table.*, $table.add_date as userdate,tbl_user.*,tbl_user.add_date as adate,
             3956 * 2 * ASIN(SQRT( POWER(SIN(($user_lat -  $table.latitude) * pi()/180 / 2), 2) + COS($user_lat * pi()/180) * COS( $table.latitude * pi()/180) *
             POWER(SIN(($user_long -  $table.longitude) * pi()/180 / 2), 2) )) as
@@ -3009,21 +2949,24 @@ $check = "SELECT asset_number FROM tbl_user_asset WHERE status=1 and asset_numbe
         for ($i = 0; $i < $countvars; $i++) {
             $uid[]=$datavalue[$i]['user_id'];
         }
-        if(count($emergency_contact_user)>0 && count($uid)>0){
-            $values = array_merge($emergency_contact_user,$uid);
+		
+		if(count($emergency_contact_user)>0 && count($uid)>0){
+			$values = array_merge($emergency_contact_user,$uid);
         }elseif(count($emergency_contact_user)>0){
-            $values = $emergency_contact_user;
+			$values = $emergency_contact_user;
         }elseif(count($uid)>0){
-            $values = $uid;
+			$values = $uid;
         }else{
             return false;
         }
+		
         $id =implode(',', $values);
         $result = $this->db->query("SELECT * FROM tbl_user WHERE user_id IN ($id)");
         $data1   = $result->result_array();
         $countvar = count($data1);
         for ($i = 0; $i < $countvar; $i++) {
-             $uids    = $data1[$i]['user_id'];
+			$uids    = $data1[$i]['user_id'];
+            
             $SQL = "insert into tbl_emergency_notification(notification_user_id,emergency_id,creator_id)values('$uids','$ids','".$_REQUEST['user_id']."')";
             $res = $this->db->query($SQL);
 
@@ -3033,20 +2976,18 @@ $check = "SELECT asset_number FROM tbl_user_asset WHERE status=1 and asset_numbe
             $last_names                 = $data1[$i]['last_name'];
             $helpuser_name                = $first_names . " " . $last_names;
             $mobile_type               = $data1[$i]['mobile_type'];
-            //$user_id               = $data[$i]['user_id'];
+            
             $ch                     = curl_init("https://fcm.googleapis.com/fcm/send");
             $sound="default_ringtone.mp3";
             $usertoken    = $notification_device_token;
             $title        = $_REQUEST['emergency_type']." "."Emergency Request";
-            //$body         =  $user_name." "."need your help. Click to help.";
-			
 			if(in_array($uids,$emergency_contact_user)){
 				$body =  $user_name." "."need your help. Click to help.";
 			}else{
-				$body =  "Someone need your help. Click to help.";
+				$body =  $user_name." "."need your help. Click to help.";
 			}
 			
-            $click_action    = "ALERT";
+			$click_action    = "ALERT";
             $notification= array(
                  'title' => $title,
                  'text' => $body,
@@ -3076,6 +3017,10 @@ $check = "SELECT asset_number FROM tbl_user_asset WHERE status=1 and asset_numbe
                
                
             curl_close($ch);
+            if ($mobile_type == 'android' || $mobile_type == 'ios') {
+                    
+            }
+
         }
         $returnresult = array(
             'status' => 1,
@@ -3083,20 +3028,6 @@ $check = "SELECT asset_number FROM tbl_user_asset WHERE status=1 and asset_numbe
             'message' => 'success'
         );  
         return $returnresult;
-    }
-	
-	function add_tracking($data_td,$id)
-    {
-		$data = array(
-			'user_id' => $id,
-			'address' => $data_td['address'],
-			'latitude' => $data_td['latitude'],
-			'longitude' => $data_td['longitude'],
-			'add_date' => $data_td['Time'],
-			'status' => 1
-		);
-		$this->db->insert('all_tracking_data', $data);
-		return $this->db->insert_id();
     }
 
 }

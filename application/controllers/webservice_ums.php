@@ -2,13 +2,14 @@
 if (!defined('BASEPATH'))
     exit('No direct script access allowed');
 
-class Webservice extends CI_Controller
+class Webservice_ums extends CI_Controller
 {
     public function __construct()
     {
         parent::__construct();
         //load model
         $this->load->model('User_model');
+        $this->load->model('User_model_ums');
     }
     public function index()
     {
@@ -1661,6 +1662,63 @@ class Webservice extends CI_Controller
             
         }
     }
+	
+	function all_tracking()
+    {
+		//error_reporting(E_ALL);
+		$_POST = json_decode(file_get_contents('php://input'), true);
+		$arrInput = $_POST;
+        $arrOutParams = array();
+		// print_r($arrInput);
+		// exit;
+		if (!empty($arrInput)) {
+			if($arrInput['token'] == "" || $arrInput['user_id'] == ""){
+				die(json_encode(array(
+                "status" => 0,
+                "message" => "Input parameters are not found"
+				)));
+			}else{
+				$token   = $arrInput['token'];
+				$user_id = $arrInput['user_id'];
+				$sql     = "SELECT token,user_id FROM tbl_user where token='$token' and user_id=$user_id";
+				$res     = $this->db->query($sql);
+				$row     = $res->row();
+				 $distance=array();
+				if ($row) {
+					foreach ($arrInput['track_data'] as $key => $row) { 
+						$distance[$key] = $row['Time'];
+					}
+					array_multisort($distance, SORT_DESC , $arrInput['track_data']);
+					$track_data = $arrInput['track_data'];
+					$i = "0";
+					foreach($track_data as $td){
+						if($i==0){
+							$this->user_model->add_emergency_tracking_latest($token,$td,$user_id);
+						}
+						$this->user_model->add_tracking($td,$arrInput['user_id']);
+						$i++;
+					}
+					die(json_encode(array(
+						"status" => 1,
+						"message" => "User emergency tracking successfully submit"
+					)));
+				} else {
+					$returnresult = array(
+						'status' => 0,
+						'message' => 'Authentication failed'
+					);
+					$response     = json_encode($returnresult);
+					print_r($response);
+				}
+			}
+		}else{
+			die(json_encode(array(
+                "status" => 0,
+                "message" => "Input parameters are not found"
+            )));
+		}
+    }
+	
     
     /*
     ---------------------------------------------------------------------------------------------------
@@ -1958,8 +2016,7 @@ class Webservice extends CI_Controller
     */
     function add_emergency_user()
     {
-        
-        $token               = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+		$token               = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
         $user_id             = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
         $emergency_latitude  = isset($_REQUEST['emergency_latitude']) ? $_REQUEST['emergency_latitude'] : "";
         $emergency_longitude = isset($_REQUEST['emergency_longitude']) ? $_REQUEST['emergency_longitude'] : "";
@@ -1980,7 +2037,9 @@ class Webservice extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $json_data = $this->user_model->add_emergency_user($token);
+				
+                $json_data = $this->User_model_ums->add_emergency_user($token);
+				exit;
                if($json_data){
                  $response = json_encode($json_data);
                 print_r($response);
@@ -3510,7 +3569,8 @@ class Webservice extends CI_Controller
     user_id:49
     -------------------------------------------------------------------------------------------
     */
-     function gps_setting()
+    
+    function gps_setting()
     {
         $token             = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
         $user_id           = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
@@ -3592,65 +3652,6 @@ class Webservice extends CI_Controller
                 print_r($response);
             }
         }
-    }
-	
-	//Created by Umesh 
-	//ex {"token":"5a18bad4f77b57f1","user_id":"54","track_data":[{"latitude":"21.21225166320801","longitude":"72.83039855957031","Time":"2018-06-07 10:23:34 +0000","address":" Manavdharm Ashram Road, Surat, Surat, Gujarat, 395004,"},{"latitude":"21.21241760253906","longitude":"72.83048248291016","Time":"2018-06-07 10:25:42 +0000","address":" Manavdharm Ashram Road, Surat, Surat, Gujarat, 395004,"},{"latitude":"21.21229362487793","longitude":"72.8304443359375","Time":"2018-06-07 10:37:32 +0000","address":" Manavdharm Ashram Road, Surat, Surat, Gujarat, 395004,"},{"latitude":"21.21235656738281","longitude":"72.83051300048828","Time":"2018-06-07 10:41:15 +0000","address":" Katargam Surat"}]}
-	
-	function all_tracking()
-    {
-		//error_reporting(E_ALL);
-		$_POST = json_decode(file_get_contents('php://input'), true);
-		$arrInput = $_POST;
-        $arrOutParams = array();
-		// print_r($arrInput);
-		// exit;
-		if (!empty($arrInput)) {
-			if($arrInput['token'] == "" || $arrInput['user_id'] == ""){
-				die(json_encode(array(
-                "status" => 0,
-                "message" => "Input parameters are not found"
-				)));
-			}else{
-				$token   = $arrInput['token'];
-				$user_id = $arrInput['user_id'];
-				$sql     = "SELECT token,user_id FROM tbl_user where token='$token' and user_id=$user_id";
-				$res     = $this->db->query($sql);
-				$row     = $res->row();
-				 $distance=array();
-				if ($row) {
-					foreach ($arrInput['track_data'] as $key => $row) { 
-						$distance[$key] = $row['Time'];
-					}
-					array_multisort($distance, SORT_DESC , $arrInput['track_data']);
-					$track_data = $arrInput['track_data'];
-					$i = "0";
-					foreach($track_data as $td){
-						if($i==0){
-							$this->user_model->add_emergency_tracking_latest($token,$td,$user_id);
-						}
-						$this->user_model->add_tracking($td,$arrInput['user_id']);
-						$i++;
-					}
-					die(json_encode(array(
-						"status" => 1,
-						"message" => "User emergency tracking successfully submit"
-					)));
-				} else {
-					$returnresult = array(
-						'status' => 0,
-						'message' => 'Authentication failed'
-					);
-					$response     = json_encode($returnresult);
-					print_r($response);
-				}
-			}
-		}else{
-			die(json_encode(array(
-                "status" => 0,
-                "message" => "Input parameters are not found"
-            )));
-		}
     }
 
 

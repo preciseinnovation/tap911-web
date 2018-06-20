@@ -2,20 +2,76 @@
 if (!defined('BASEPATH'))
     exit('No direct script access allowed');
 
-class Webservice extends CI_Controller
+class Test extends CI_Controller
 {
     public function __construct()
     {
         parent::__construct();
         //load model
-        $this->load->model('User_model');
-    }
-    public function index()
-    {
-        
-        
+        $this->load->model('Test_model');
     }
     /*
+    -----------------------------------------------------------------------------------------------------
+    http://104.237.3.116/tap911/index.php/webservice/add_emergency_user?token=03ed32f30ee37fbb&user_id=77&emergency_latitude=22.719569&geo_long=75.857726&emergency_longitude=1.33356&emergency_address=abc&in_alert=1&emergency_type=1
+    -----------------------------------------------------------------------------------------------------
+    */
+    function add_emergency_user()
+    { 
+        log_message('error', 'testing');
+		// echo 'test';
+        //die;
+
+        $token               = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+        $user_id             = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
+        $emergency_latitude  = isset($_REQUEST['emergency_latitude']) ? $_REQUEST['emergency_latitude'] : "";
+        $emergency_longitude = isset($_REQUEST['emergency_longitude']) ? $_REQUEST['emergency_longitude'] : "";
+        // $emergency_address   = isset($_REQUEST['emergency_address']) ? $_REQUEST['emergency_address'] : "";
+        $emergency_type      = isset($_REQUEST['emergency_type']) ? $_REQUEST['emergency_type'] : "";
+        
+        
+        if ($token == "" or $user_id == '' or $emergency_latitude == "" or $emergency_longitude == "" or $emergency_type == "") {
+            die(json_encode(array(
+                "status" => 0,
+                "message" => "Input parameters are not found"
+            )));
+            
+        } else {
+            $token   = $_REQUEST['token'];
+            $user_id = $_REQUEST['user_id'];
+            $sql     = "SELECT token,user_id FROM tbl_user where token='$token' and user_id='$user_id'";
+            $res     = $this->db->query($sql);
+            $row     = $res->row();
+            if ($row) {
+                $json_data = $this->Test_model->add_emergency_user($token);
+               if($json_data){
+                 $response = json_encode($json_data);
+                print_r($response);
+               }
+               else{
+                $returnresult = die(json_encode(array(
+                "status" => 0,
+               "message" =>"No user on radius"
+                        )));
+               }
+            } else {
+                $json_data = $this->Test_model->add_emergency_user();
+               if($json_data){
+                 $response = json_encode($json_data);
+                print_r($response);
+               }
+			   die;
+                $returnresult = array(
+                    'status' => 0,
+                    'message' => 'Authentication failed'
+                );
+                $response     = json_encode($returnresult);
+                print_r($response);
+            }
+        }
+        
+    }
+
+/*
     ------------------------------------------------------------------------------------------------------
     http://104.237.3.116/tap911/index.php/webservice/checklogin?login=sbsgroup@gmail.com&password=123456
     -----------------------------------------------------------------------------------------------------
@@ -39,7 +95,7 @@ class Webservice extends CI_Controller
             
             $login    = $_REQUEST['login'];
             $password = md5($_REQUEST['password']);
-            $result   = $this->user_model->checklogin($login, $password);
+            $result   = $this->Test_model ->checklogin($login, $password);
             $result   = json_encode($result);
             print_r($result);
         }
@@ -70,7 +126,7 @@ class Webservice extends CI_Controller
         } else {
             
             $login  = $_REQUEST['login'];
-            $result = $this->user_model->facebook_login($login);
+            $result = $this->Test_model ->facebook_login($login);
             $result = json_encode($result);
             print_r($result);
         }
@@ -100,7 +156,7 @@ class Webservice extends CI_Controller
         } else {
             
             $login  = $_REQUEST['login'];
-            $result = $this->user_model->google_login($login);
+            $result = $this->Test_model ->google_login($login);
             $result = json_encode($result);
             print_r($result);
         }
@@ -139,7 +195,7 @@ class Webservice extends CI_Controller
             )));
             
         } else {
-            $response = $this->user_model->user_registration();
+            $response = $this->Test_model ->user_registration();
             $response = json_encode($response);
             print_r($response);
             
@@ -171,8 +227,8 @@ class Webservice extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                 $total_page = $this->user_model->get_page_number_community();
-                  $json_data = $this->user_model->get_community($token); //user_id
+                 $total_page = $this->Test_model ->get_page_number_community();
+                  $json_data = $this->Test_model ->get_community($token); //user_id
                 if ($json_data) {
                     $arr = array();
                     foreach ($json_data as $results) {
@@ -263,7 +319,7 @@ class Webservice extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $response = $this->user_model->user_community_request($token);
+                $response = $this->Test_model ->user_community_request($token);
                 $response = json_encode($response);
                 print_r($response);
             } else {
@@ -300,7 +356,7 @@ class Webservice extends CI_Controller
     //         $res   = $this->db->query($sql);
     //         $row   = $res->row();
     //         if ($row) {
-    //             $response = $this->user_model->get_user_message($token);
+    //             $response = $this->Test_model ->get_user_message($token);
     //             if ($response) {
     
     //                 $returnresult = array(
@@ -487,7 +543,7 @@ class Webservice extends CI_Controller
     //         $res   = $this->db->query($sql);
     //         $row   = $res->row();
     //         if ($row) {
-    //             $response = $this->user_model->user_comment_alertwise($token);
+    //             $response = $this->Test_model ->user_comment_alertwise($token);
     //             $response = json_encode($response);
     //             print_r($response);
     //         } else {
@@ -529,7 +585,7 @@ class Webservice extends CI_Controller
     //         $res   = $this->db->query($sql);
     //         $row   = $res->row();
     //         if ($row) {
-    //             $response = $this->user_model->user_comment_communitywise($token);
+    //             $response = $this->Test_model ->user_comment_communitywise($token);
     
     //               $response     = json_encode($response);
     //             print_r($response);
@@ -569,7 +625,7 @@ class Webservice extends CI_Controller
     //         $res   = $this->db->query($sql);
     //         $row   = $res->row();
     //         if ($row) {
-    //             $response = $this->user_model->get_comment_communitywise($token, $limit);
+    //             $response = $this->Test_model ->get_comment_communitywise($token, $limit);
     //             if ($response) {
     //                 $arr = array();
     //                 foreach ($response as $results) {
@@ -639,7 +695,7 @@ class Webservice extends CI_Controller
     //         $res   = $this->db->query($sql);
     //         $row   = $res->row();
     //         if ($row) {
-    //             $response = $this->user_model->get_comment_alertwise($token, $alert_id);
+    //             $response = $this->Test_model ->get_comment_alertwise($token, $alert_id);
     //             if ($response) {
     //                 $arr = array();
     //                 foreach ($response as $results) {
@@ -703,7 +759,7 @@ class Webservice extends CI_Controller
     //         $res   = $this->db->query($sql);
     //         $row   = $res->row();
     //         if ($row) {
-    //             $response = $this->user_model->get_alert_communitywise($token);
+    //             $response = $this->Test_model ->get_alert_communitywise($token);
     
     //             if ($response) {
     
@@ -791,7 +847,7 @@ class Webservice extends CI_Controller
     //         $res   = $this->db->query($sql);
     //         $row   = $res->row();
     //         if ($row) {
-    //             $response = $this->user_model->get_user_alert($token,$limit);
+    //             $response = $this->Test_model ->get_user_alert($token,$limit);
     
     //             if ($response) {
     
@@ -939,7 +995,7 @@ class Webservice extends CI_Controller
                     
                     $arr1 = array();
                   
-                    $json_data = $this->user_model->get_community_emergency_contact($id);
+                    $json_data = $this->Test_model ->get_community_emergency_contact($id);
                     if ($json_data == '') {
                         $returnresult = array(
                             'status' => 0,
@@ -1028,7 +1084,7 @@ class Webservice extends CI_Controller
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
-                $response = $this->user_model->notification_setting($token);
+                $response = $this->Test_model ->notification_setting($token);
                 $response = json_encode($response);
                 print_r($response);
             } else {
@@ -1065,7 +1121,7 @@ class Webservice extends CI_Controller
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
-                $response = $this->user_model->set_notification_tone($token);
+                $response = $this->Test_model ->set_notification_tone($token);
                 $response = json_encode($response);
                 print_r($response);
             } else {
@@ -1106,7 +1162,7 @@ class Webservice extends CI_Controller
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
-                $json_data = $this->user_model->get_notification_setting($token, $user_id);
+                $json_data = $this->Test_model ->get_notification_setting($token, $user_id);
                 if ($json_data) {
                     $arr = array();
                     foreach ($json_data as $results) {
@@ -1190,7 +1246,7 @@ class Webservice extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $response = $this->user_model->update_profile($token);
+                $response = $this->Test_model ->update_profile($token);
                 $response = json_encode($response);
                 print_r($response);
             } else {
@@ -1221,7 +1277,7 @@ class Webservice extends CI_Controller
         $res     = $this->db->query($sql);
         $row     = $res->row();
         if ($row) {
-            $response = $this->user_model->update_profile_picture($token);
+            $response = $this->Test_model ->update_profile_picture($token);
             $response = json_encode($response);
             print_r($response);
         } else {
@@ -1266,7 +1322,7 @@ class Webservice extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $response = $this->user_model->update_home_address($token);
+                $response = $this->Test_model ->update_home_address($token);
                 $response = json_encode($response);
                 print_r($response);
             } else {
@@ -1307,7 +1363,7 @@ class Webservice extends CI_Controller
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
-                $response = $this->user_model->add_user_emergency_contact($token);
+                $response = $this->Test_model ->add_user_emergency_contact($token);
                 $response = json_encode($response);
                 print_r($response);
             } else {
@@ -1349,7 +1405,7 @@ class Webservice extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $response = $this->user_model->update_user_emergency_contact($token);
+                $response = $this->Test_model ->update_user_emergency_contact($token);
                 $response = json_encode($response);
                 print_r($response);
             } else {
@@ -1389,7 +1445,7 @@ class Webservice extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $json_data = $this->user_model->get_home_address($token, $user_id);
+                $json_data = $this->Test_model ->get_home_address($token, $user_id);
                 if ($json_data) {
                     $arr = array();
                     foreach ($json_data as $results) {
@@ -1461,7 +1517,7 @@ class Webservice extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $json_data = $this->user_model->get_emergency_contact($token, $user_id);
+                $json_data = $this->Test_model ->get_emergency_contact($token, $user_id);
                 
                 if ($json_data) {
                     $arr = array();
@@ -1532,7 +1588,7 @@ class Webservice extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $json_data = $this->user_model->get_country_emergency_number_with_token($token);
+                $json_data = $this->Test_model ->get_country_emergency_number_with_token($token);
                 if ($json_data) {
                     
                     $arr = array();
@@ -1585,7 +1641,7 @@ class Webservice extends CI_Controller
     
     function get_country_emergency_number()
     {
-        $json_data = $this->user_model->get_country_emergency_number();
+        $json_data = $this->Test_model ->get_country_emergency_number();
         
         if ($json_data) {
             
@@ -1647,7 +1703,7 @@ class Webservice extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $response = $this->user_model->add_emergency_tracking($token);
+                $response = $this->Test_model ->add_emergency_tracking($token);
                 $response = json_encode($response);
                 print_r($response);
             } else {
@@ -1686,7 +1742,7 @@ class Webservice extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $json_data = $this->user_model->get_emergency_tracking($token);
+                $json_data = $this->Test_model ->get_emergency_tracking($token);
                 
                 if ($json_data) {
                     $arr = array();
@@ -1758,7 +1814,7 @@ class Webservice extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $json_data = $this->user_model->get_state($token);
+                $json_data = $this->Test_model ->get_state($token);
                 
                 if ($json_data) {
                     
@@ -1827,7 +1883,7 @@ class Webservice extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $json_data = $this->user_model->get_city($token);
+                $json_data = $this->Test_model ->get_city($token);
                 if ($json_data) {
                     $arr = array();
                     foreach ($json_data as $results) {
@@ -1895,7 +1951,7 @@ class Webservice extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $json_data = $this->user_model->delete_user($token);
+                $json_data = $this->Test_model ->delete_user($token);
                 $data      = json_encode($json_data);
                 print_r($data);
             } else {
@@ -1935,7 +1991,7 @@ class Webservice extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $json_data = $this->user_model->delete_emergency_contact($token);
+                $json_data = $this->Test_model ->delete_emergency_contact($token);
                 $data      = json_encode($json_data);
                 print_r($data);
             } else {
@@ -1949,60 +2005,6 @@ class Webservice extends CI_Controller
         }
         
     }
-    
-        
-    /*
-    -----------------------------------------------------------------------------------------------------
-    http://104.237.3.116/tap911/index.php/webservice/add_emergency_user?token=03ed32f30ee37fbb&user_id=77&emergency_latitude=22.719569&geo_long=75.857726&emergency_longitude=1.33356&emergency_address=abc&in_alert=1&emergency_type=1
-    -----------------------------------------------------------------------------------------------------
-    */
-    function add_emergency_user()
-    {
-        
-        $token               = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
-        $user_id             = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
-        $emergency_latitude  = isset($_REQUEST['emergency_latitude']) ? $_REQUEST['emergency_latitude'] : "";
-        $emergency_longitude = isset($_REQUEST['emergency_longitude']) ? $_REQUEST['emergency_longitude'] : "";
-        // $emergency_address   = isset($_REQUEST['emergency_address']) ? $_REQUEST['emergency_address'] : "";
-        $emergency_type      = isset($_REQUEST['emergency_type']) ? $_REQUEST['emergency_type'] : "";
-        
-        
-        if ($token == "" or $user_id == '' or $emergency_latitude == "" or $emergency_longitude == "" or $emergency_type == "") {
-            die(json_encode(array(
-                "status" => 0,
-                "message" => "Input parameters are not found"
-            )));
-            
-        } else {
-            $token   = $_REQUEST['token'];
-            $user_id = $_REQUEST['user_id'];
-            $sql     = "SELECT token,user_id FROM tbl_user where token='$token' and user_id='$user_id'";
-            $res     = $this->db->query($sql);
-            $row     = $res->row();
-            if ($row) {
-                $json_data = $this->user_model->add_emergency_user($token);
-               if($json_data){
-                 $response = json_encode($json_data);
-                print_r($response);
-               }
-               else{
-                $returnresult = die(json_encode(array(
-                "status" => 0,
-               "message" =>"No user on radius"
-                        )));
-               }
-            } else {
-                $returnresult = array(
-                    'status' => 0,
-                    'message' => 'Authentication failed'
-                );
-                $response     = json_encode($returnresult);
-                print_r($response);
-            }
-        }
-        
-    }
-    
     
     /*
     ------------------------------------------------------------------------------------------------------
@@ -2031,9 +2033,9 @@ class Webservice extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $json_data            = $this->user_model->get_user_profiledata($token, $user_id);
-                $json_dataemergency   = $this->user_model->get_emergency_contact($token, $user_id);
-                $json_datahomeaddress = $this->user_model->get_home_address($token, $user_id);
+                $json_data            = $this->Test_model ->get_user_profiledata($token, $user_id);
+                $json_dataemergency   = $this->Test_model ->get_emergency_contact($token, $user_id);
+                $json_datahomeaddress = $this->Test_model ->get_home_address($token, $user_id);
                 
                 if ($json_data) {
                     
@@ -2165,7 +2167,7 @@ class Webservice extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $json_data = $this->user_model->accept_emergency_request($token, $emergency_notification_id);
+                $json_data = $this->Test_model ->accept_emergency_request($token, $emergency_notification_id);
                 $data      = json_encode($json_data);
                 print_r($data);
             } else {
@@ -2206,7 +2208,7 @@ class Webservice extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $json_data = $this->user_model->get_emergency_live_location($token); //user_id
+                $json_data = $this->Test_model ->get_emergency_live_location($token); //user_id
                 if ($json_data) {
                     $arr = array();
                     foreach ($json_data as $results) {
@@ -2258,7 +2260,7 @@ class Webservice extends CI_Controller
     function get_user_type()
     {
         
-        $json_data = $this->user_model->get_user_type();
+        $json_data = $this->Test_model ->get_user_type();
         if ($json_data) {
             $arr = array();
             foreach ($json_data as $results) {
@@ -2320,7 +2322,7 @@ class Webservice extends CI_Controller
             $res          = $this->db->query($sql);
             $row          = $res->row();
             if ($row) {
-                $response = $this->user_model->add_community_communitaction($token);
+                $response = $this->Test_model ->add_community_communitaction($token);
                 $response = json_encode($response);
                 print_r($response);
             } else {
@@ -2360,7 +2362,7 @@ class Webservice extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $response = $this->user_model->add_emergency_communitaction($token);
+                $response = $this->Test_model ->add_emergency_communitaction($token);
                 $response = json_encode($response);
                 print_r($response);
             } else {
@@ -2401,7 +2403,7 @@ class Webservice extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $json_data = $this->user_model->get_emergancy_communication($token); //user_id
+                $json_data = $this->Test_model ->get_emergancy_communication($token); //user_id
                 if ($json_data) {
                     $arr = array();
                     foreach ($json_data as $results) {
@@ -2470,8 +2472,8 @@ class Webservice extends CI_Controller
             $row          = $res->row();
             $time_zone          = $row->time_zone;
             if ($row) {
-                $response = $this->user_model->get_community_communication($time_zone);
-                $totalpage = $this->user_model->total_community_msg();
+                $response = $this->Test_model ->get_community_communication($time_zone);
+                $totalpage = $this->Test_model ->total_community_msg();
                 if ($response) {
                     $arr = array();
                     foreach ($response as $results) {
@@ -2546,7 +2548,7 @@ class Webservice extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $json_data = $this->user_model->get_tap911_user_list($token, $user_id);
+                $json_data = $this->Test_model ->get_tap911_user_list($token, $user_id);
                 if ($json_data) {
                     $arr = array();
                     foreach ($json_data as $results) {
@@ -2617,7 +2619,7 @@ class Webservice extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $json_data = $this->user_model->get_community_contact($token);
+                $json_data = $this->Test_model ->get_community_contact($token);
                 if ($json_data) {
                     $arr = array();
                     foreach ($json_data as $results) {
@@ -2688,7 +2690,7 @@ class Webservice extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $response = $this->user_model->add_other_emergency_contact($token);
+                $response = $this->Test_model ->add_other_emergency_contact($token);
                 $response = json_encode($response);
                 print_r($response);
             } else {
@@ -2889,7 +2891,7 @@ class Webservice extends CI_Controller
             $res                  = $this->db->query($sql);
             $row                  = $res->row();
             if ($row) {
-                $response = $this->user_model->end_emergency_by_helping_user($token);
+                $response = $this->Test_model ->end_emergency_by_helping_user($token);
                 $response = json_encode($response);
                 print_r($response);
             } else {
@@ -2931,7 +2933,7 @@ class Webservice extends CI_Controller
             $res                  = $this->db->query($sql);
             $row                  = $res->row();
             if ($row) {
-                $response = $this->user_model->end_emergency_by_creator($token);
+                $response = $this->Test_model ->end_emergency_by_creator($token);
                 $response = json_encode($response);
                 print_r($response);
             } else {
@@ -2971,7 +2973,7 @@ class Webservice extends CI_Controller
             $res                  = $this->db->query($sql);
             $row                  = $res->row();
             if ($row) {
-                $response = $this->user_model->update_accept_user($token);
+                $response = $this->Test_model ->update_accept_user($token);
                 $response = json_encode($response);
                 print_r($response);
             } else {
@@ -3014,8 +3016,8 @@ class Webservice extends CI_Controller
             $time_zone     = $row->time_zone;
             if ($row) {
 
-                 $json_datatotal = $this->user_model->emergency_create_user();
-                 $json_data = $this->user_model->get_emergency_user($time_zone);
+                 $json_datatotal = $this->Test_model ->emergency_create_user();
+                 $json_data = $this->Test_model ->get_emergency_user($time_zone);
                 
                 if ($json_data) {
                     foreach ($json_data as $results) {
@@ -3151,7 +3153,7 @@ class Webservice extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $response = $this->user_model->add_question_answer($token,$user_id);
+                $response = $this->Test_model ->add_question_answer($token,$user_id);
                 $response = json_encode($response);
                 print_r($response);
             } else {
@@ -3195,7 +3197,7 @@ class Webservice extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $response = $this->user_model->update_question_answer($token,$user_id);
+                $response = $this->Test_model ->update_question_answer($token,$user_id);
                 $response = json_encode($response);
                 print_r($response);
             } else {
@@ -3236,7 +3238,7 @@ class Webservice extends CI_Controller
             $row          = $res->row();
             // $time_zone          = $row->time_zone;
             if ($row) {
-                $response = $this->user_model->get_user_question_answer();
+                $response = $this->Test_model ->get_user_question_answer();
                 if ($response) {
                     $arr = array();
                     foreach ($response as $results) {
@@ -3312,7 +3314,7 @@ class Webservice extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $response = $this->user_model->add_asset($token,$user_id);
+                $response = $this->Test_model ->add_asset($token,$user_id);
                 $response = json_encode($response);
                 print_r($response);
             } else {
@@ -3358,8 +3360,8 @@ class Webservice extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $json_datatotal = $this->user_model->get_total_asset_page();
-                $response = $this->user_model->get_asset($token,$user_id);
+                $json_datatotal = $this->Test_model ->get_total_asset_page();
+                $response = $this->Test_model ->get_asset($token,$user_id);
                   $returnresult = array(
                     'total_page'=> $json_datatotal,
                     'status' => 1,
@@ -3408,7 +3410,7 @@ class Webservice extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $response = $this->user_model->update_asset($token);
+                $response = $this->Test_model ->update_asset($token);
                 $response = json_encode($response);
                 print_r($response);
             } else {
@@ -3447,7 +3449,7 @@ class Webservice extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $json_data = $this->user_model->delete_asset($token);
+                $json_data = $this->Test_model ->delete_asset($token);
                 $data      = json_encode($json_data);
                 print_r($data);
             } else {
@@ -3488,7 +3490,7 @@ class Webservice extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $response = $this->user_model->logout();
+                $response = $this->Test_model ->logout();
                 $response = json_encode($response);
                 print_r($response);
             } else {
@@ -3510,34 +3512,26 @@ class Webservice extends CI_Controller
     user_id:49
     -------------------------------------------------------------------------------------------
     */
-     function gps_setting()
+    
+    function gps_setting()
     {
         $token             = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
         $user_id           = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
-        $status           = isset($_REQUEST['status']) ? $_REQUEST['status'] : "";
-        if ($token == "" or $user_id == "" or $status == "") {
+        if ($token == "" or $user_id == "") {
             die(json_encode(array(
                 "status" => 0,
                 "message" => "Input parameters are not found"
             )));
             
-        }else {
+        } else {
             $token = $_REQUEST['token'];
             $user_id = $_REQUEST['user_id'];
-			$sql   = "SELECT token,user_id FROM tbl_user where token='$token' and user_id=' $user_id'";
+     $sql   = "SELECT token,user_id FROM tbl_user where token='$token' and user_id=' $user_id'";
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
-				$data = array('gps_status' => $status);
-                $this->db->where('user_id', $user_id);
-                $data = $this->db->update('tbl_user', $data);
-                
-				$returnresult = array(
-                    'status' => 1,
-                    'message' => 'Gps setting updated successfully',
-                   'gps_status'=>$status
-                );
-				$response = json_encode($returnresult);
+                $response = $this->Test_model ->gps_setting($token);
+                $response = json_encode($response);
                 print_r($response);
             } else {
                 $returnresult = array(
@@ -3572,17 +3566,28 @@ class Webservice extends CI_Controller
         } else {
             $token = $_REQUEST['token'];
             $user_id = $_REQUEST['user_id'];
-			$sql   = "SELECT token,user_id,gps_status FROM tbl_user where token='$token' and user_id=' $user_id'";
+     $sql   = "SELECT token,user_id FROM tbl_user where token='$token' and user_id=' $user_id'";
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
-				$returnarray = array(
-						'status' => 1,
-						'gps_status' => $row->gps_status
-				
-					);
-				$response = json_encode($returnarray);
-				print_r($response);
+        $dateValue = date("Y-m-d H:i:s");
+        $time      = strtotime($dateValue);
+        $month     = date("F", $time);
+        $year      = date("Y", $time);
+        $table     = "tbl_tracking" . '_' . $month . '_' . $year;
+
+        $check = "SELECT gps_status FROM $table WHERE user_id ='" . $_REQUEST['user_id'] . "'";
+        $res   = $this->db->query($check);
+         $rows                  = $res->row();
+        $gps_status       = $rows->gps_status;
+
+      $returnarray = array(
+                'status' => 1,
+                'gps_status' => $gps_status
+        
+            );
+        $response = json_encode($returnarray);
+         print_r($response);
             } else {
                 $returnresult = array(
                     'status' => 0,
@@ -3593,256 +3598,7 @@ class Webservice extends CI_Controller
             }
         }
     }
-	
-	//Created by Umesh 
-	//ex {"token":"5a18bad4f77b57f1","user_id":"54","track_data":[{"latitude":"21.21225166320801","longitude":"72.83039855957031","Time":"2018-06-07 10:23:34 +0000","address":" Manavdharm Ashram Road, Surat, Surat, Gujarat, 395004,"},{"latitude":"21.21241760253906","longitude":"72.83048248291016","Time":"2018-06-07 10:25:42 +0000","address":" Manavdharm Ashram Road, Surat, Surat, Gujarat, 395004,"},{"latitude":"21.21229362487793","longitude":"72.8304443359375","Time":"2018-06-07 10:37:32 +0000","address":" Manavdharm Ashram Road, Surat, Surat, Gujarat, 395004,"},{"latitude":"21.21235656738281","longitude":"72.83051300048828","Time":"2018-06-07 10:41:15 +0000","address":" Katargam Surat"}]}
-	
-	function all_tracking()
-    {
-		//error_reporting(E_ALL);
-		$_POST = json_decode(file_get_contents('php://input'), true);
-		$arrInput = $_POST;
-        $arrOutParams = array();
-		// print_r($arrInput);
-		// exit;
-		if (!empty($arrInput)) {
-			if($arrInput['token'] == "" || $arrInput['user_id'] == ""){
-				die(json_encode(array(
-                "status" => 0,
-                "message" => "Input parameters are not found"
-				)));
-			}else{
-				$token   = $arrInput['token'];
-				$user_id = $arrInput['user_id'];
-				$sql     = "SELECT token,user_id FROM tbl_user where token='$token' and user_id=$user_id";
-				$res     = $this->db->query($sql);
-				$row     = $res->row();
-				 $distance=array();
-				if ($row) {
-					foreach ($arrInput['track_data'] as $key => $row) { 
-						$distance[$key] = $row['Time'];
-					}
-					array_multisort($distance, SORT_DESC , $arrInput['track_data']);
-					$track_data = $arrInput['track_data'];
-					$i = "0";
-					foreach($track_data as $td){
-						if($i==0){
-							$this->user_model->add_emergency_tracking_latest($token,$td,$user_id);
-						}
-						$this->user_model->add_tracking($td,$arrInput['user_id']);
-						$i++;
-					}
-					die(json_encode(array(
-						"status" => 1,
-						"message" => "User emergency tracking successfully submit"
-					)));
-				} else {
-					$returnresult = array(
-						'status' => 0,
-						'message' => 'Authentication failed'
-					);
-					$response     = json_encode($returnresult);
-					print_r($response);
-				}
-			}
-		}else{
-			die(json_encode(array(
-                "status" => 0,
-                "message" => "Input parameters are not found"
-            )));
-		}
-    }
 
-
-
-  /*-------------------------------gps_setting ----------------------------------------------- */
-    
-    
-  //   function send_notification_tenmintues()
-  //   {
-  //      $check = "SELECT * FROM tbl_emergency
-  //      WHERE add_date >= NOW() - INTERVAL 10 MINUTE";
-  //       $res   = $this->db->query($check); 
-  //        $rows  = $res->row();
-  //        $em_user_id          = $rows->user_id;
-  //         $emergency_id        = $rows->emergency_id;
-  //         $emergency_latitude  = $rows->emergency_latitude;
-  //         $emergency_longitude = $rows->emergency_longitude;
-
-  //   //die;
-  //    $sqlradius= "SELECT radius FROM tbl_user where user_id='". $em_user_id."'";
-  //       $raduisres        = $this->db->query($sqlradius);
-  //        $row        = $raduisres->row();
-  //       $radius   = $row->radius;
-
-  //       $result= "SELECT emergency_id FROM `tbl_emergency_notification` WHERE `emergency_id`='$emergency_id' GROUP BY emergency_id";
-  //         $notification_user = $this->db->query($result); 
-  //           $notiuser = $notification_user->row();
-  //          $emergency_ids = $notiuser->emergency_id;
-
-  //          if($emergency_id!=$emergency_ids){
-
-  // $sql        = "SELECT * FROM tbl_emergency where emergency_id='$emergency_id'";
-  //       $res        = $this->db->query($sql);
-  //       $row        = $res->row();
-  //       $emuserid   = $row->user_id;
-  //       $sql        = "SELECT * FROM tbl_user WHERE `user_id`='$emuserid'";
-  //       $resultdata = $this->db->query($sql);
-  //       $resultdata = $resultdata->row();
-  //       $first_name = $resultdata->first_name;
-  //       $last_name  = $resultdata->last_name;
-  //       echo $user_name  = $first_name . " " . $last_name;
-        
-  //       $dateValue = date("Y-m-d H:i:s");
-  //       $time      = strtotime($dateValue);
-  //       $month     = date("F", $time);
-  //       $year      = date("Y", $time);
-  //       $table     = "tbl_tracking" . '_' . $month . '_' . $year;
-        
-  //       $result = $this->db->query("SELECT $table.*, $table.add_date as userdate,tbl_user.*,tbl_user.add_date as adate,
-  //           3956 * 2 * ASIN(SQRT( POWER(SIN(($emergency_latitude -  $table.latitude) * pi()/180 / 2), 2) + COS($emergency_latitude * pi()/180) * COS( $table.latitude * pi()/180) *
-  //           POWER(SIN(($emergency_longitude -  $table.longitude) * pi()/180 / 2), 2) )) as
-  //           distance FROM $table
-  //            JOIN  tbl_user on tbl_user.user_id =   $table.user_id
-  //            WHERE tbl_user.login_status=1 and $table.gps_status=1 and $table.user_id NOT IN ('" .$em_user_id."')   
-  //           GROUP BY  $table.tracking_id HAVING distance <= $radius ORDER by distance ASC");
-        
-        
-        
-  //            $datas = $result->result_array();
-  //            $countvars = count($datas);
-  //           $require   = array();
-  //            //$send_date_time=date("Y-m-d h:i:sa");
-  //           for ($j = 0; $j < $countvars; $j++) {
-
-  //               $uid = $datas[$j]['user_id'];
-
-  //               $SQL = "insert into tbl_emergency_notification(notification_user_id,emergency_id,creator_id)values('$uid','$emergency_id','$emuserid')";
-
-  //               $res                       = mysql_query($SQL);
-  //               $emergency_notification_id = $this->db->insert_id();
-                
-                
-  //               $sql = "SELECT * FROM tbl_user WHERE `user_id` IN ('$uid')";
-  //               $res = $this->db->query($sql);
-  //               $row = $res->row();
-
-  //               if ($row) {
-  //                   $notification_device_token = $row->notification_device_token;
-  //                   $mobile_type               = $row->mobile_type;
-  //                   $user_id               = $row->user_id;
-  //                   $sql        = "SELECT notification_tone,user_id FROM tbl_notification WHERE `user_id`='$user_id'";
-  //                   $resultdatatone = $this->db->query($sql);
-  //                   $resultdatatone = $resultdatatone->row();
-  //                   $notification_tone = $resultdatatone->notification_tone;
-            
-  //                   $ch                        = curl_init("https://fcm.googleapis.com/fcm/send");
-  //                   $sound = $notification_tone;
-  //                    if($sound==""){
-  //                    $sound="notification01.mp3";
-  //                    }else{
-  //                    $sound = $notification_tone;
-  //                    }
-  //                   $usertoken    = $notification_device_token;
-  //                   $title        = "Emergency Request" ;
-  //                   $body         =  $user_name." "."need your help. Click to help.";
-  //                  $click_action    = "ALERT";
-  //               $notification= array(
-  //                    'title' => $title,
-  //                    'text' => $body,
-  //                    'sound'=>$sound,
-  //                    'click_action'=>$click_action
-  //               );
-  //                   $arrayToSend  = array(
-  //                       'to' => $usertoken,
-  //                       'notification' => $notification,
-  //                       'priority' => 'high'
-  //                   );
-                    
-  //                   $json      = json_encode($arrayToSend);
-  //                   $headers   = array();
-  //                   $headers[] = 'Content-Type: application/json';
-  //                   if ($mobile_type == 'android') {
-  //                       $headers[] = 'Authorization: key= AIzaSyC5Z-wS9-IFx4nVCAfMjF9v7MwBQQR_5kw'; // key here
-  //                   } else {
-  //                       $headers[] = 'Authorization: key= AIzaSyAkPpQ-GiN4GVSjniMyHuSwXJVekEL7FWk'; // key here
-  //                   }
-  //                   curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-  //                   curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
-  //                   curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-  //                   curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    
-  //                  array_push($require, curl_exec($ch));         
-  //                  $returnresult = array(
-  //                         'status' => 1,
-  //                          'data' => $require,
-  //                          'message' => 'success'
-                       
-  //                          );      
-  //                  curl_close($ch);
-                  
-  //               }
-               
-  //           }
-  //      }
-  //             $data = json_encode($returnresult);
-  //               print_r($data);
-  //      //}
-  //   }
-
-
-
-/*
-    -----------------------------------------------------------------------------------------------------
-    http://104.237.3.116/tap911/index.php/webservice/add_emergency_user?token=03ed32f30ee37fbb&user_id=77&emergency_latitude=22.719569&geo_long=75.857726&emergency_longitude=1.33356&emergency_address=abc&in_alert=1&emergency_type=1
-    -----------------------------------------------------------------------------------------------------
-    // */
-    // function add_emergency_users()
-    // {
-        
-    //     $token               = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
-    //     $user_id             = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
-    //     $emergency_latitude  = isset($_REQUEST['emergency_latitude']) ? $_REQUEST['emergency_latitude'] : "";
-    //     $emergency_longitude = isset($_REQUEST['emergency_longitude']) ? $_REQUEST['emergency_longitude'] : "";
-    //     // $emergency_address   = isset($_REQUEST['emergency_address']) ? $_REQUEST['emergency_address'] : "";
-    //     $emergency_type      = isset($_REQUEST['emergency_type']) ? $_REQUEST['emergency_type'] : "";
-        
-        
-    //     if ($token == "" or $user_id == '' or $emergency_latitude == "" or $emergency_longitude == "" or $emergency_type == "") {
-    //         die(json_encode(array(
-    //             "status" => 0,
-    //             "message" => "Input parameters are not found"
-    //         )));
-            
-    //     } else {
-    //         $token   = $_REQUEST['token'];
-    //         $user_id = $_REQUEST['user_id'];
-    //         $sql     = "SELECT token,user_id FROM tbl_user where token='$token' and user_id='$user_id'";
-    //         $res     = $this->db->query($sql);
-    //         $row     = $res->row();
-    //         if ($row) {
-    //             $json_data = $this->user_model->add_emergency_users($token);
-    //            if($json_data){
-    //             $data = json_encode($json_data);
-    //             print_r($data);
-    //            }
-    //            else{
-    //             $returnresult = die(json_encode(array(
-    //             "status" => 0,
-    //            "message" =>"No user on radius"
-    //                     )));
-    //            }
-    //         } else {
-    //             $returnresult = array(
-    //                 'status' => 0,
-    //                 'message' => 'Authentication failed'
-    //             );
-    //             $response     = json_encode($returnresult);
-    //             print_r($response);
-    //         }
-    //     }
-        
-    // }
 
 
 }
