@@ -2998,7 +2998,17 @@ class Webservice extends CI_Controller
         $token   = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
         $user_id = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
         
-        
+        $emergency_contact_user = array();
+		$results1        = $this->db->query("SELECT * from tbl_emergency_contact where user_id='".$user_id."' and tap911_user=1");
+		$remergencycontact = $results1->result_array();
+		$countvarresults   = count($remergencycontact);
+		if($countvarresults){
+			$require    = array();
+			for ($j = 0; $j < $countvarresults; $j++) {
+				$emergency_contact_user[] =$remergencycontact[$j]['emergency_user_help_id'];
+			}
+		}
+		
         if ($token == "" or $user_id == "") {
             die(json_encode(array(
                 "status" => 0,
@@ -3020,18 +3030,35 @@ class Webservice extends CI_Controller
                 if ($json_data) {
                     foreach ($json_data as $results) {
 
-                        $logo = $results->profile_pic;
-                        $path = base_url() . 'uploads/';
-                        if ($logo) {
-                            
-                            $logos = $path . $logo;
-                            
-                        } else {
-                            $logos = $path . '1517561100258.png';
-                        }
-                       $loginuserid =$results->user_id;
+                       $path = base_url() . 'uploads/';
+                        
                         $first_name =$results->first_name;
                         $last_name =$results->last_name;
+						
+						$loginuserid =$results->user_id;
+						$logos = $path . '1517561100258.png';
+						
+						if($user_id == $loginuserid){
+							$user_name = $first_name." ".$last_name;
+							$logo = $results->profile_pic;
+							if ($logo) {
+								$logos = $path . $logo;
+							}
+						}else{
+							if(in_array($loginuserid,$emergency_contact_user)){
+							$logo = $results->profile_pic;
+							if ($logo) {
+								$logos = $path . $logo;
+							} else {
+								$logos = $path . '1517561100258.png';
+							}
+							$user_name = $first_name." ".$last_name;
+							}else{
+								$user_name = "Someone";
+								$logos = $path . '1517561100258.png';
+							}
+						}
+						
                         $senddate =$results->senddate;
                         if(empty($senddate)){
                             $senddate="";
@@ -3053,7 +3080,7 @@ class Webservice extends CI_Controller
                         $notificationuser[] = array(
 
                          'emergency_notification_id' =>"",
-                        'user_name' =>$first_name." ".$last_name,
+                        'user_name' =>$user_name,
                         'phone_number' => $results->phone_number_text_msg,
                         'user_id' => $results->user_id,
                         'emergency_id' => $results->emergency_id,
@@ -3071,7 +3098,7 @@ class Webservice extends CI_Controller
 
                           $notificationuser[] = array(
                         'emergency_notification_id' =>$results->emergency_notification_id,
-                        'user_name' =>$first_name." ".$last_name,
+                        'user_name' =>$user_name,
                         'phone_number' => $results->phone_number_text_msg,
                         'user_id' => $results->user_id,
                         'emergency_id' => $results->emergency_id,
