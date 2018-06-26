@@ -1,7 +1,7 @@
 <?php
 if (!defined('BASEPATH'))
     exit('No direct script access allowed');
-
+error_reporting(0);
 class Webservice extends CI_Controller
 {
     public function __construct()
@@ -9,6 +9,14 @@ class Webservice extends CI_Controller
         parent::__construct();
         //load model
         $this->load->model('User_model');
+		
+		if($_SERVER['REQUEST_URI'] == "/tap911/index.php/webservice/all_tracking"){
+			$_POST = json_decode(file_get_contents('php://input'), true);
+		}
+			file_put_contents(FCPATH . '/logs/date_' . gmdate("d.m.Y") . '.txt', 'Date: '.gmdate("d-m-Y h:i:s") . PHP_EOL, FILE_APPEND);
+			file_put_contents(FCPATH . '/logs/date_' . gmdate("d.m.Y") . '.txt', "URL: "."http://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . PHP_EOL, FILE_APPEND);
+			file_put_contents(FCPATH . '/logs/date_' . gmdate("d.m.Y") . '.txt', "Request: ".json_encode($_POST) . PHP_EOL, FILE_APPEND);
+		
     }
     public function index()
     {

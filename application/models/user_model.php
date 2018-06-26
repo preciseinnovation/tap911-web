@@ -3035,14 +3035,24 @@ $check = "SELECT asset_number FROM tbl_user_asset WHERE status=1 and asset_numbe
     }else{
         $emergency_contact_user_string="";
     }
-
-        $result = $this->db->query("SELECT $table.*, $table.add_date as userdate,tbl_user.*,tbl_user.add_date as adate,
+		if($emergency_contact_user_string == ""){
+			$result = $this->db->query("SELECT $table.*, $table.add_date as userdate,tbl_user.*,tbl_user.add_date as adate,
             3956 * 2 * ASIN(SQRT( POWER(SIN(($user_lat -  $table.latitude) * pi()/180 / 2), 2) + COS($user_lat * pi()/180) * COS( $table.latitude * pi()/180) *
             POWER(SIN(($user_long -  $table.longitude) * pi()/180 / 2), 2) )) as
             distance FROM $table
             JOIN  tbl_user on tbl_user.user_id =   $table.user_id
-            WHERE tbl_user.login_status=1 and tbl_user.gps_status=1 and $table.user_id NOT IN ('$emergency_contact_user_string') and $table.user_id NOT IN (" . $_REQUEST['user_id'] .")    
+            WHERE tbl_user.login_status=1 and tbl_user.gps_status=1 and $table.user_id NOT IN (" . $_REQUEST['user_id'] .")    
             GROUP BY  $table.tracking_id HAVING distance <= $radius ORDER by distance ASC");
+		}else{
+			$result = $this->db->query("SELECT $table.*, $table.add_date as userdate,tbl_user.*,tbl_user.add_date as adate,
+            3956 * 2 * ASIN(SQRT( POWER(SIN(($user_lat -  $table.latitude) * pi()/180 / 2), 2) + COS($user_lat * pi()/180) * COS( $table.latitude * pi()/180) *
+            POWER(SIN(($user_long -  $table.longitude) * pi()/180 / 2), 2) )) as
+            distance FROM $table
+            JOIN  tbl_user on tbl_user.user_id =   $table.user_id
+            WHERE tbl_user.login_status=1 and tbl_user.gps_status=1 and $table.user_id NOT IN ($emergency_contact_user_string) and $table.user_id NOT IN (" . $_REQUEST['user_id'] .")    
+            GROUP BY  $table.tracking_id HAVING distance <= $radius ORDER by distance ASC");
+		}
+        
         $datavalue  = $result->result_array();
         $countvars  = count($datavalue);
         $require    = array();

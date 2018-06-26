@@ -8,8 +8,15 @@ class Webservice_ums extends CI_Controller
     {
         parent::__construct();
         //load model
-        $this->load->model('User_model');
         $this->load->model('User_model_ums');
+		
+		if($_SERVER['REQUEST_URI'] == "/tap911/index.php/webservice/all_tracking"){
+			$_POST = json_decode(file_get_contents('php://input'), true);
+		}
+			file_put_contents(FCPATH . '/logs/date_' . gmdate("d.m.Y") . '.txt', 'Date: '.gmdate("d-m-Y h:i:s") . PHP_EOL, FILE_APPEND);
+			file_put_contents(FCPATH . '/logs/date_' . gmdate("d.m.Y") . '.txt', "URL: "."http://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . PHP_EOL, FILE_APPEND);
+			file_put_contents(FCPATH . '/logs/date_' . gmdate("d.m.Y") . '.txt', "Request: ".json_encode($_POST) . PHP_EOL, FILE_APPEND);
+		
     }
     public function index()
     {
@@ -1662,63 +1669,6 @@ class Webservice_ums extends CI_Controller
             
         }
     }
-	
-	function all_tracking()
-    {
-		//error_reporting(E_ALL);
-		$_POST = json_decode(file_get_contents('php://input'), true);
-		$arrInput = $_POST;
-        $arrOutParams = array();
-		// print_r($arrInput);
-		// exit;
-		if (!empty($arrInput)) {
-			if($arrInput['token'] == "" || $arrInput['user_id'] == ""){
-				die(json_encode(array(
-                "status" => 0,
-                "message" => "Input parameters are not found"
-				)));
-			}else{
-				$token   = $arrInput['token'];
-				$user_id = $arrInput['user_id'];
-				$sql     = "SELECT token,user_id FROM tbl_user where token='$token' and user_id=$user_id";
-				$res     = $this->db->query($sql);
-				$row     = $res->row();
-				 $distance=array();
-				if ($row) {
-					foreach ($arrInput['track_data'] as $key => $row) { 
-						$distance[$key] = $row['Time'];
-					}
-					array_multisort($distance, SORT_DESC , $arrInput['track_data']);
-					$track_data = $arrInput['track_data'];
-					$i = "0";
-					foreach($track_data as $td){
-						if($i==0){
-							$this->user_model->add_emergency_tracking_latest($token,$td,$user_id);
-						}
-						$this->user_model->add_tracking($td,$arrInput['user_id']);
-						$i++;
-					}
-					die(json_encode(array(
-						"status" => 1,
-						"message" => "User emergency tracking successfully submit"
-					)));
-				} else {
-					$returnresult = array(
-						'status' => 0,
-						'message' => 'Authentication failed'
-					);
-					$response     = json_encode($returnresult);
-					print_r($response);
-				}
-			}
-		}else{
-			die(json_encode(array(
-                "status" => 0,
-                "message" => "Input parameters are not found"
-            )));
-		}
-    }
-	
     
     /*
     ---------------------------------------------------------------------------------------------------
@@ -2016,7 +1966,8 @@ class Webservice_ums extends CI_Controller
     */
     function add_emergency_user()
     {
-		$token               = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+        
+        $token               = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
         $user_id             = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
         $emergency_latitude  = isset($_REQUEST['emergency_latitude']) ? $_REQUEST['emergency_latitude'] : "";
         $emergency_longitude = isset($_REQUEST['emergency_longitude']) ? $_REQUEST['emergency_longitude'] : "";
@@ -2037,9 +1988,7 @@ class Webservice_ums extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-				
-                $json_data = $this->User_model_ums->add_emergency_user($token);
-				exit;
+                $json_data = $this->user_model->add_emergency_user($token);
                if($json_data){
                  $response = json_encode($json_data);
                 print_r($response);
@@ -2208,7 +2157,9 @@ class Webservice_ums extends CI_Controller
     {
         $token                     = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
         $emergency_notification_id = isset($_REQUEST['emergency_notification_id']) ? $_REQUEST['emergency_notification_id'] : "";
-		
+        
+        
+        
         if ($token == "" or $emergency_notification_id == "") {
             die(json_encode(array(
                 "status" => 0,
@@ -2946,7 +2897,7 @@ class Webservice_ums extends CI_Controller
             $res                  = $this->db->query($sql);
             $row                  = $res->row();
             if ($row) {
-                $response = $this->User_model_ums->end_emergency_by_helping_user($token);
+                $response = $this->user_model->end_emergency_by_helping_user($token);
                 $response = json_encode($response);
                 print_r($response);
             } else {
@@ -3054,8 +3005,8 @@ class Webservice_ums extends CI_Controller
         
         $token   = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
         $user_id = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
-		
-		$emergency_contact_user = array();
+        
+        $emergency_contact_user = array();
 		$results1        = $this->db->query("SELECT * from tbl_emergency_contact where user_id='".$user_id."' and tap911_user=1");
 		$remergencycontact = $results1->result_array();
 		$countvarresults   = count($remergencycontact);
@@ -3065,8 +3016,8 @@ class Webservice_ums extends CI_Controller
 				$emergency_contact_user[] =$remergencycontact[$j]['emergency_user_help_id'];
 			}
 		}
-        
-		if ($token == "" or $user_id == "") {
+		
+        if ($token == "" or $user_id == "") {
             die(json_encode(array(
                 "status" => 0,
                 "message" => "Input parameters are not found"
@@ -3081,14 +3032,13 @@ class Webservice_ums extends CI_Controller
             $time_zone     = $row->time_zone;
             if ($row) {
 
-                 $json_datatotal = $this->User_model_ums->emergency_create_user();
-                 $json_data = $this->User_model_ums->get_emergency_user($time_zone);
+                 $json_datatotal = $this->user_model->emergency_create_user();
+                 $json_data = $this->user_model->get_emergency_user($time_zone);
                 
                 if ($json_data) {
                     foreach ($json_data as $results) {
 
-                        
-                        $path = base_url() . 'uploads/';
+                       $path = base_url() . 'uploads/';
                         
                         $first_name =$results->first_name;
                         $last_name =$results->last_name;
@@ -3595,8 +3545,7 @@ class Webservice_ums extends CI_Controller
     user_id:49
     -------------------------------------------------------------------------------------------
     */
-    
-    function gps_setting()
+     function gps_setting()
     {
         $token             = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
         $user_id           = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
@@ -3678,6 +3627,65 @@ class Webservice_ums extends CI_Controller
                 print_r($response);
             }
         }
+    }
+	
+	//Created by Umesh 
+	//ex {"token":"5a18bad4f77b57f1","user_id":"54","track_data":[{"latitude":"21.21225166320801","longitude":"72.83039855957031","Time":"2018-06-07 10:23:34 +0000","address":" Manavdharm Ashram Road, Surat, Surat, Gujarat, 395004,"},{"latitude":"21.21241760253906","longitude":"72.83048248291016","Time":"2018-06-07 10:25:42 +0000","address":" Manavdharm Ashram Road, Surat, Surat, Gujarat, 395004,"},{"latitude":"21.21229362487793","longitude":"72.8304443359375","Time":"2018-06-07 10:37:32 +0000","address":" Manavdharm Ashram Road, Surat, Surat, Gujarat, 395004,"},{"latitude":"21.21235656738281","longitude":"72.83051300048828","Time":"2018-06-07 10:41:15 +0000","address":" Katargam Surat"}]}
+	
+	function all_tracking()
+    {
+		//error_reporting(E_ALL);
+		$_POST = json_decode(file_get_contents('php://input'), true);
+		$arrInput = $_POST;
+        $arrOutParams = array();
+		// print_r($arrInput);
+		// exit;
+		if (!empty($arrInput)) {
+			if($arrInput['token'] == "" || $arrInput['user_id'] == ""){
+				die(json_encode(array(
+                "status" => 0,
+                "message" => "Input parameters are not found"
+				)));
+			}else{
+				$token   = $arrInput['token'];
+				$user_id = $arrInput['user_id'];
+				$sql     = "SELECT token,user_id FROM tbl_user where token='$token' and user_id=$user_id";
+				$res     = $this->db->query($sql);
+				$row     = $res->row();
+				 $distance=array();
+				if ($row) {
+					foreach ($arrInput['track_data'] as $key => $row) { 
+						$distance[$key] = $row['Time'];
+					}
+					array_multisort($distance, SORT_DESC , $arrInput['track_data']);
+					$track_data = $arrInput['track_data'];
+					$i = "0";
+					foreach($track_data as $td){
+						if($i==0){
+							$this->user_model->add_emergency_tracking_latest($token,$td,$user_id);
+						}
+						$this->user_model->add_tracking($td,$arrInput['user_id']);
+						$i++;
+					}
+					die(json_encode(array(
+						"status" => 1,
+						"message" => "User emergency tracking successfully submit"
+					)));
+				} else {
+					$returnresult = array(
+						'status' => 0,
+						'message' => 'Authentication failed'
+					);
+					$response     = json_encode($returnresult);
+					print_r($response);
+				}
+			}
+		}else{
+			die(json_encode(array(
+                "status" => 0,
+                "message" => "Input parameters are not found"
+            )));
+		}
     }
 
 
