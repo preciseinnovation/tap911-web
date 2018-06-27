@@ -1,7 +1,7 @@
 <?php
 if (!defined('BASEPATH'))
     exit('No direct script access allowed');
-
+error_reporting(0);
 class Webservice_ums extends CI_Controller
 {
     public function __construct()
@@ -47,7 +47,7 @@ class Webservice_ums extends CI_Controller
             
             $login    = $_REQUEST['login'];
             $password = md5($_REQUEST['password']);
-            $result   = $this->user_model->checklogin($login, $password);
+            $result   = $this->User_model_ums->checklogin($login, $password);
             $result   = json_encode($result);
             print_r($result);
         }
@@ -78,7 +78,7 @@ class Webservice_ums extends CI_Controller
         } else {
             
             $login  = $_REQUEST['login'];
-            $result = $this->user_model->facebook_login($login);
+            $result = $this->User_model_ums->facebook_login($login);
             $result = json_encode($result);
             print_r($result);
         }
@@ -108,7 +108,7 @@ class Webservice_ums extends CI_Controller
         } else {
             
             $login  = $_REQUEST['login'];
-            $result = $this->user_model->google_login($login);
+            $result = $this->User_model_ums->google_login($login);
             $result = json_encode($result);
             print_r($result);
         }
@@ -147,7 +147,7 @@ class Webservice_ums extends CI_Controller
             )));
             
         } else {
-            $response = $this->user_model->user_registration();
+            $response = $this->User_model_ums->user_registration();
             $response = json_encode($response);
             print_r($response);
             
@@ -179,8 +179,8 @@ class Webservice_ums extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                 $total_page = $this->user_model->get_page_number_community();
-                  $json_data = $this->user_model->get_community($token); //user_id
+                 $total_page = $this->User_model_ums->get_page_number_community();
+                  $json_data = $this->User_model_ums->get_community($token); //user_id
                 if ($json_data) {
                     $arr = array();
                     foreach ($json_data as $results) {
@@ -271,7 +271,7 @@ class Webservice_ums extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $response = $this->user_model->user_community_request($token);
+                $response = $this->User_model_ums->user_community_request($token);
                 $response = json_encode($response);
                 print_r($response);
             } else {
@@ -308,7 +308,7 @@ class Webservice_ums extends CI_Controller
     //         $res   = $this->db->query($sql);
     //         $row   = $res->row();
     //         if ($row) {
-    //             $response = $this->user_model->get_user_message($token);
+    //             $response = $this->User_model_ums->get_user_message($token);
     //             if ($response) {
     
     //                 $returnresult = array(
@@ -495,7 +495,7 @@ class Webservice_ums extends CI_Controller
     //         $res   = $this->db->query($sql);
     //         $row   = $res->row();
     //         if ($row) {
-    //             $response = $this->user_model->user_comment_alertwise($token);
+    //             $response = $this->User_model_ums->user_comment_alertwise($token);
     //             $response = json_encode($response);
     //             print_r($response);
     //         } else {
@@ -537,7 +537,7 @@ class Webservice_ums extends CI_Controller
     //         $res   = $this->db->query($sql);
     //         $row   = $res->row();
     //         if ($row) {
-    //             $response = $this->user_model->user_comment_communitywise($token);
+    //             $response = $this->User_model_ums->user_comment_communitywise($token);
     
     //               $response     = json_encode($response);
     //             print_r($response);
@@ -577,7 +577,7 @@ class Webservice_ums extends CI_Controller
     //         $res   = $this->db->query($sql);
     //         $row   = $res->row();
     //         if ($row) {
-    //             $response = $this->user_model->get_comment_communitywise($token, $limit);
+    //             $response = $this->User_model_ums->get_comment_communitywise($token, $limit);
     //             if ($response) {
     //                 $arr = array();
     //                 foreach ($response as $results) {
@@ -647,7 +647,7 @@ class Webservice_ums extends CI_Controller
     //         $res   = $this->db->query($sql);
     //         $row   = $res->row();
     //         if ($row) {
-    //             $response = $this->user_model->get_comment_alertwise($token, $alert_id);
+    //             $response = $this->User_model_ums->get_comment_alertwise($token, $alert_id);
     //             if ($response) {
     //                 $arr = array();
     //                 foreach ($response as $results) {
@@ -711,7 +711,7 @@ class Webservice_ums extends CI_Controller
     //         $res   = $this->db->query($sql);
     //         $row   = $res->row();
     //         if ($row) {
-    //             $response = $this->user_model->get_alert_communitywise($token);
+    //             $response = $this->User_model_ums->get_alert_communitywise($token);
     
     //             if ($response) {
     
@@ -799,7 +799,7 @@ class Webservice_ums extends CI_Controller
     //         $res   = $this->db->query($sql);
     //         $row   = $res->row();
     //         if ($row) {
-    //             $response = $this->user_model->get_user_alert($token,$limit);
+    //             $response = $this->User_model_ums->get_user_alert($token,$limit);
     
     //             if ($response) {
     
@@ -947,7 +947,7 @@ class Webservice_ums extends CI_Controller
                     
                     $arr1 = array();
                   
-                    $json_data = $this->user_model->get_community_emergency_contact($id);
+                    $json_data = $this->User_model_ums->get_community_emergency_contact($id);
                     if ($json_data == '') {
                         $returnresult = array(
                             'status' => 0,
@@ -1036,7 +1036,7 @@ class Webservice_ums extends CI_Controller
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
-                $response = $this->user_model->notification_setting($token);
+                $response = $this->User_model_ums->notification_setting($token);
                 $response = json_encode($response);
                 print_r($response);
             } else {
@@ -1073,7 +1073,7 @@ class Webservice_ums extends CI_Controller
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
-                $response = $this->user_model->set_notification_tone($token);
+                $response = $this->User_model_ums->set_notification_tone($token);
                 $response = json_encode($response);
                 print_r($response);
             } else {
@@ -1114,7 +1114,7 @@ class Webservice_ums extends CI_Controller
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
-                $json_data = $this->user_model->get_notification_setting($token, $user_id);
+                $json_data = $this->User_model_ums->get_notification_setting($token, $user_id);
                 if ($json_data) {
                     $arr = array();
                     foreach ($json_data as $results) {
@@ -1198,7 +1198,7 @@ class Webservice_ums extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $response = $this->user_model->update_profile($token);
+                $response = $this->User_model_ums->update_profile($token);
                 $response = json_encode($response);
                 print_r($response);
             } else {
@@ -1229,7 +1229,7 @@ class Webservice_ums extends CI_Controller
         $res     = $this->db->query($sql);
         $row     = $res->row();
         if ($row) {
-            $response = $this->user_model->update_profile_picture($token);
+            $response = $this->User_model_ums->update_profile_picture($token);
             $response = json_encode($response);
             print_r($response);
         } else {
@@ -1274,7 +1274,7 @@ class Webservice_ums extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $response = $this->user_model->update_home_address($token);
+                $response = $this->User_model_ums->update_home_address($token);
                 $response = json_encode($response);
                 print_r($response);
             } else {
@@ -1315,7 +1315,7 @@ class Webservice_ums extends CI_Controller
             $res   = $this->db->query($sql);
             $row   = $res->row();
             if ($row) {
-                $response = $this->user_model->add_user_emergency_contact($token);
+                $response = $this->User_model_ums->add_user_emergency_contact($token);
                 $response = json_encode($response);
                 print_r($response);
             } else {
@@ -1357,7 +1357,7 @@ class Webservice_ums extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $response = $this->user_model->update_user_emergency_contact($token);
+                $response = $this->User_model_ums->update_user_emergency_contact($token);
                 $response = json_encode($response);
                 print_r($response);
             } else {
@@ -1397,7 +1397,7 @@ class Webservice_ums extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $json_data = $this->user_model->get_home_address($token, $user_id);
+                $json_data = $this->User_model_ums->get_home_address($token, $user_id);
                 if ($json_data) {
                     $arr = array();
                     foreach ($json_data as $results) {
@@ -1469,7 +1469,7 @@ class Webservice_ums extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $json_data = $this->user_model->get_emergency_contact($token, $user_id);
+                $json_data = $this->User_model_ums->get_emergency_contact($token, $user_id);
                 
                 if ($json_data) {
                     $arr = array();
@@ -1540,7 +1540,7 @@ class Webservice_ums extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $json_data = $this->user_model->get_country_emergency_number_with_token($token);
+                $json_data = $this->User_model_ums->get_country_emergency_number_with_token($token);
                 if ($json_data) {
                     
                     $arr = array();
@@ -1593,7 +1593,7 @@ class Webservice_ums extends CI_Controller
     
     function get_country_emergency_number()
     {
-        $json_data = $this->user_model->get_country_emergency_number();
+        $json_data = $this->User_model_ums->get_country_emergency_number();
         
         if ($json_data) {
             
@@ -1655,7 +1655,7 @@ class Webservice_ums extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $response = $this->user_model->add_emergency_tracking($token);
+                $response = $this->User_model_ums->add_emergency_tracking($token);
                 $response = json_encode($response);
                 print_r($response);
             } else {
@@ -1694,7 +1694,7 @@ class Webservice_ums extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $json_data = $this->user_model->get_emergency_tracking($token);
+                $json_data = $this->User_model_ums->get_emergency_tracking($token);
                 
                 if ($json_data) {
                     $arr = array();
@@ -1766,7 +1766,7 @@ class Webservice_ums extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $json_data = $this->user_model->get_state($token);
+                $json_data = $this->User_model_ums->get_state($token);
                 
                 if ($json_data) {
                     
@@ -1835,7 +1835,7 @@ class Webservice_ums extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $json_data = $this->user_model->get_city($token);
+                $json_data = $this->User_model_ums->get_city($token);
                 if ($json_data) {
                     $arr = array();
                     foreach ($json_data as $results) {
@@ -1903,7 +1903,7 @@ class Webservice_ums extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $json_data = $this->user_model->delete_user($token);
+                $json_data = $this->User_model_ums->delete_user($token);
                 $data      = json_encode($json_data);
                 print_r($data);
             } else {
@@ -1943,7 +1943,7 @@ class Webservice_ums extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $json_data = $this->user_model->delete_emergency_contact($token);
+                $json_data = $this->User_model_ums->delete_emergency_contact($token);
                 $data      = json_encode($json_data);
                 print_r($data);
             } else {
@@ -1972,9 +1972,8 @@ class Webservice_ums extends CI_Controller
         $emergency_latitude  = isset($_REQUEST['emergency_latitude']) ? $_REQUEST['emergency_latitude'] : "";
         $emergency_longitude = isset($_REQUEST['emergency_longitude']) ? $_REQUEST['emergency_longitude'] : "";
         // $emergency_address   = isset($_REQUEST['emergency_address']) ? $_REQUEST['emergency_address'] : "";
-        $emergency_type      = isset($_REQUEST['emergency_type']) ? $_REQUEST['emergency_type'] : "";
-        
-        
+		$emergency_type      = isset($_REQUEST['emergency_type']) ? $_REQUEST['emergency_type'] : "";
+		
         if ($token == "" or $user_id == '' or $emergency_latitude == "" or $emergency_longitude == "" or $emergency_type == "") {
             die(json_encode(array(
                 "status" => 0,
@@ -1988,7 +1987,9 @@ class Webservice_ums extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $json_data = $this->user_model->add_emergency_user($token);
+               
+			   
+			   $json_data = $this->User_model_ums->add_emergency_user($token);
                if($json_data){
                  $response = json_encode($json_data);
                 print_r($response);
@@ -2039,9 +2040,9 @@ class Webservice_ums extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $json_data            = $this->user_model->get_user_profiledata($token, $user_id);
-                $json_dataemergency   = $this->user_model->get_emergency_contact($token, $user_id);
-                $json_datahomeaddress = $this->user_model->get_home_address($token, $user_id);
+                $json_data            = $this->User_model_ums->get_user_profiledata($token, $user_id);
+                $json_dataemergency   = $this->User_model_ums->get_emergency_contact($token, $user_id);
+                $json_datahomeaddress = $this->User_model_ums->get_home_address($token, $user_id);
                 
                 if ($json_data) {
                     
@@ -2173,7 +2174,7 @@ class Webservice_ums extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $json_data = $this->user_model->accept_emergency_request($token, $emergency_notification_id);
+                $json_data = $this->User_model_ums->accept_emergency_request($token, $emergency_notification_id);
                 $data      = json_encode($json_data);
                 print_r($data);
             } else {
@@ -2214,7 +2215,7 @@ class Webservice_ums extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $json_data = $this->user_model->get_emergency_live_location($token); //user_id
+                $json_data = $this->User_model_ums->get_emergency_live_location($token); //user_id
                 if ($json_data) {
                     $arr = array();
                     foreach ($json_data as $results) {
@@ -2266,7 +2267,7 @@ class Webservice_ums extends CI_Controller
     function get_user_type()
     {
         
-        $json_data = $this->user_model->get_user_type();
+        $json_data = $this->User_model_ums->get_user_type();
         if ($json_data) {
             $arr = array();
             foreach ($json_data as $results) {
@@ -2328,7 +2329,7 @@ class Webservice_ums extends CI_Controller
             $res          = $this->db->query($sql);
             $row          = $res->row();
             if ($row) {
-                $response = $this->user_model->add_community_communitaction($token);
+                $response = $this->User_model_ums->add_community_communitaction($token);
                 $response = json_encode($response);
                 print_r($response);
             } else {
@@ -2368,7 +2369,7 @@ class Webservice_ums extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $response = $this->user_model->add_emergency_communitaction($token);
+                $response = $this->User_model_ums->add_emergency_communitaction($token);
                 $response = json_encode($response);
                 print_r($response);
             } else {
@@ -2409,7 +2410,7 @@ class Webservice_ums extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $json_data = $this->user_model->get_emergancy_communication($token); //user_id
+                $json_data = $this->User_model_ums->get_emergancy_communication($token); //user_id
                 if ($json_data) {
                     $arr = array();
                     foreach ($json_data as $results) {
@@ -2478,8 +2479,8 @@ class Webservice_ums extends CI_Controller
             $row          = $res->row();
             $time_zone          = $row->time_zone;
             if ($row) {
-                $response = $this->user_model->get_community_communication($time_zone);
-                $totalpage = $this->user_model->total_community_msg();
+                $response = $this->User_model_ums->get_community_communication($time_zone);
+                $totalpage = $this->User_model_ums->total_community_msg();
                 if ($response) {
                     $arr = array();
                     foreach ($response as $results) {
@@ -2554,7 +2555,7 @@ class Webservice_ums extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $json_data = $this->user_model->get_tap911_user_list($token, $user_id);
+                $json_data = $this->User_model_ums->get_tap911_user_list($token, $user_id);
                 if ($json_data) {
                     $arr = array();
                     foreach ($json_data as $results) {
@@ -2625,7 +2626,7 @@ class Webservice_ums extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $json_data = $this->user_model->get_community_contact($token);
+                $json_data = $this->User_model_ums->get_community_contact($token);
                 if ($json_data) {
                     $arr = array();
                     foreach ($json_data as $results) {
@@ -2696,7 +2697,7 @@ class Webservice_ums extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $response = $this->user_model->add_other_emergency_contact($token);
+                $response = $this->User_model_ums->add_other_emergency_contact($token);
                 $response = json_encode($response);
                 print_r($response);
             } else {
@@ -2897,7 +2898,7 @@ class Webservice_ums extends CI_Controller
             $res                  = $this->db->query($sql);
             $row                  = $res->row();
             if ($row) {
-                $response = $this->user_model->end_emergency_by_helping_user($token);
+                $response = $this->User_model_ums->end_emergency_by_helping_user($token);
                 $response = json_encode($response);
                 print_r($response);
             } else {
@@ -2939,7 +2940,7 @@ class Webservice_ums extends CI_Controller
             $res                  = $this->db->query($sql);
             $row                  = $res->row();
             if ($row) {
-                $response = $this->user_model->end_emergency_by_creator($token);
+                $response = $this->User_model_ums->end_emergency_by_creator($token);
                 $response = json_encode($response);
                 print_r($response);
             } else {
@@ -2979,7 +2980,7 @@ class Webservice_ums extends CI_Controller
             $res                  = $this->db->query($sql);
             $row                  = $res->row();
             if ($row) {
-                $response = $this->user_model->update_accept_user($token);
+                $response = $this->User_model_ums->update_accept_user($token);
                 $response = json_encode($response);
                 print_r($response);
             } else {
@@ -3032,8 +3033,8 @@ class Webservice_ums extends CI_Controller
             $time_zone     = $row->time_zone;
             if ($row) {
 
-                 $json_datatotal = $this->user_model->emergency_create_user();
-                 $json_data = $this->user_model->get_emergency_user($time_zone);
+                 $json_datatotal = $this->User_model_ums->emergency_create_user();
+                 $json_data = $this->User_model_ums->get_emergency_user($time_zone);
                 
                 if ($json_data) {
                     foreach ($json_data as $results) {
@@ -3186,7 +3187,7 @@ class Webservice_ums extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $response = $this->user_model->add_question_answer($token,$user_id);
+                $response = $this->User_model_ums->add_question_answer($token,$user_id);
                 $response = json_encode($response);
                 print_r($response);
             } else {
@@ -3230,7 +3231,7 @@ class Webservice_ums extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $response = $this->user_model->update_question_answer($token,$user_id);
+                $response = $this->User_model_ums->update_question_answer($token,$user_id);
                 $response = json_encode($response);
                 print_r($response);
             } else {
@@ -3271,7 +3272,7 @@ class Webservice_ums extends CI_Controller
             $row          = $res->row();
             // $time_zone          = $row->time_zone;
             if ($row) {
-                $response = $this->user_model->get_user_question_answer();
+                $response = $this->User_model_ums->get_user_question_answer();
                 if ($response) {
                     $arr = array();
                     foreach ($response as $results) {
@@ -3347,7 +3348,7 @@ class Webservice_ums extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $response = $this->user_model->add_asset($token,$user_id);
+                $response = $this->User_model_ums->add_asset($token,$user_id);
                 $response = json_encode($response);
                 print_r($response);
             } else {
@@ -3393,8 +3394,8 @@ class Webservice_ums extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $json_datatotal = $this->user_model->get_total_asset_page();
-                $response = $this->user_model->get_asset($token,$user_id);
+                $json_datatotal = $this->User_model_ums->get_total_asset_page();
+                $response = $this->User_model_ums->get_asset($token,$user_id);
                   $returnresult = array(
                     'total_page'=> $json_datatotal,
                     'status' => 1,
@@ -3443,7 +3444,7 @@ class Webservice_ums extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $response = $this->user_model->update_asset($token);
+                $response = $this->User_model_ums->update_asset($token);
                 $response = json_encode($response);
                 print_r($response);
             } else {
@@ -3482,7 +3483,7 @@ class Webservice_ums extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $json_data = $this->user_model->delete_asset($token);
+                $json_data = $this->User_model_ums->delete_asset($token);
                 $data      = json_encode($json_data);
                 print_r($data);
             } else {
@@ -3523,7 +3524,7 @@ class Webservice_ums extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $response = $this->user_model->logout();
+                $response = $this->User_model_ums->logout();
                 $response = json_encode($response);
                 print_r($response);
             } else {
@@ -3662,9 +3663,9 @@ class Webservice_ums extends CI_Controller
 					$i = "0";
 					foreach($track_data as $td){
 						if($i==0){
-							$this->user_model->add_emergency_tracking_latest($token,$td,$user_id);
+							$this->User_model_ums->add_emergency_tracking_latest($token,$td,$user_id);
 						}
-						$this->user_model->add_tracking($td,$arrInput['user_id']);
+						$this->User_model_ums->add_tracking($td,$arrInput['user_id']);
 						$i++;
 					}
 					die(json_encode(array(
@@ -3687,7 +3688,57 @@ class Webservice_ums extends CI_Controller
             )));
 		}
     }
-
+	
+	
+	function valid_emergency(){
+		$token             = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+        $user_id           = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
+        if ($token == "" or $user_id == "") {
+            die(json_encode(array(
+                "status" => 0,
+                "message" => "Input parameters are not found"
+            )));
+            
+        } else {
+            $token = $_REQUEST['token'];
+            $user_id = $_REQUEST['user_id'];
+			$sql   = "SELECT token,user_id,gps_status FROM tbl_user where token='$token' and user_id=' $user_id'";
+            $res   = $this->db->query($sql);
+            $row   = $res->row();
+            if ($row) {
+				$sql     = "SELECT * FROM tbl_emergency_notification where emergency_status !='4' and creator_id='$user_id'";
+				$res     = $this->db->query($sql);
+				$row_creater = $res->result_array();
+				
+				$sql2     = "SELECT * FROM tbl_emergency_notification where emergency_status ='1' and notification_user_id='$user_id'";
+				$res2     = $this->db->query($sql2);
+				$row_accepter = $res2->result_array();
+				
+				if(count($row_creater) == "0" && count($row_accepter) == "0"){
+					$returnresult = array(
+						'status' => 1,
+						'message' => 'You can create new emergency'
+				
+					);
+				}else{
+					$returnresult = array(
+						'status' => 0,
+						'message' => 'You can not create new emergency'
+				
+					);
+				}
+				$response     = json_encode($returnresult);
+				print_r($response);
+            } else {
+                $returnresult = array(
+                    'status' => 0,
+                    'message' => 'Authentication failed'
+                );
+                $response     = json_encode($returnresult);
+                print_r($response);
+            }
+        }
+	}
 
 
   /*-------------------------------gps_setting ----------------------------------------------- */
@@ -3856,7 +3907,7 @@ class Webservice_ums extends CI_Controller
     //         $res     = $this->db->query($sql);
     //         $row     = $res->row();
     //         if ($row) {
-    //             $json_data = $this->user_model->add_emergency_users($token);
+    //             $json_data = $this->User_model_ums->add_emergency_users($token);
     //            if($json_data){
     //             $data = json_encode($json_data);
     //             print_r($data);

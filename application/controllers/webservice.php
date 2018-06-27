@@ -2173,7 +2173,19 @@ class Webservice extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
-                $json_data = $this->user_model->accept_emergency_request($token, $emergency_notification_id);
+				$sql2     = "SELECT * FROM tbl_emergency_notification where emergency_status ='1' and notification_user_id='$user_id'";
+				$res2     = $this->db->query($sql2);
+				$row_accepter = $res2->result_array();
+				
+				if(count($row_accepter) == "0"){
+					$json_data = $this->user_model->accept_emergency_request($token, $emergency_notification_id);
+				}else{
+					$json_data = array(
+						'status' => 0,
+						'message' => 'You can not accept emergency.'
+				
+					);
+				}
                 $data      = json_encode($json_data);
                 print_r($data);
             } else {
@@ -3687,6 +3699,57 @@ class Webservice extends CI_Controller
             )));
 		}
     }
+	
+	
+	function valid_emergency(){
+		$token             = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+        $user_id           = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
+        if ($token == "" or $user_id == "") {
+            die(json_encode(array(
+                "status" => 0,
+                "message" => "Input parameters are not found"
+            )));
+            
+        } else {
+            $token = $_REQUEST['token'];
+            $user_id = $_REQUEST['user_id'];
+			$sql   = "SELECT token,user_id,gps_status FROM tbl_user where token='$token' and user_id=' $user_id'";
+            $res   = $this->db->query($sql);
+            $row   = $res->row();
+            if ($row) {
+				$sql     = "SELECT * FROM tbl_emergency_notification where emergency_status !='4' and creator_id='$user_id'";
+				$res     = $this->db->query($sql);
+				$row_creater = $res->result_array();
+				
+				$sql2     = "SELECT * FROM tbl_emergency_notification where emergency_status ='1' and notification_user_id='$user_id'";
+				$res2     = $this->db->query($sql2);
+				$row_accepter = $res2->result_array();
+				
+				if(count($row_creater) == "0" && count($row_accepter) == "0"){
+					$returnresult = array(
+						'status' => 1,
+						'message' => 'You can create new emergency'
+				
+					);
+				}else{
+					$returnresult = array(
+						'status' => 0,
+						'message' => 'You can not create new emergency'
+				
+					);
+				}
+				$response     = json_encode($returnresult);
+				print_r($response);
+            } else {
+                $returnresult = array(
+                    'status' => 0,
+                    'message' => 'Authentication failed'
+                );
+                $response     = json_encode($returnresult);
+                print_r($response);
+            }
+        }
+	}
 
 
 
