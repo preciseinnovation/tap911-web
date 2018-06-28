@@ -3750,6 +3750,41 @@ class Webservice extends CI_Controller
             }
         }
 	}
+	
+	function check_token()
+    {
+        
+        $token                  = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
+        $user_id                = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
+        if ($token == "" or $user_id == "") {
+            die(json_encode(array(
+                "status" => 0,
+                "message" => "Input parameters are not found"
+            )));
+            
+        } else {
+            $token   = $_REQUEST['token'];
+            $user_id = $_REQUEST['user_id'];
+            $sql     = "SELECT token,user_id FROM tbl_user where token='$token' and user_id='$user_id'";
+            $res     = $this->db->query($sql);
+            $row     = $res->row();
+            if ($row) {
+               $returnresult = array(
+                    'status' => 1,
+                    'message' => 'Authentication success'
+                );
+                $response     = json_encode($returnresult);
+                print_r($response);
+            } else {
+                $returnresult = array(
+                    'status' => 0,
+                    'message' => 'Authentication failed'
+                );
+                $response     = json_encode($returnresult);
+                print_r($response);
+            }
+        }
+    }
 
 
 

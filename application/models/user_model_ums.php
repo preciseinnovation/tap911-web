@@ -767,6 +767,15 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
             );
             $this->db->where('user_id', $user_id);
             $data = $this->db->update('tbl_user', $data);
+			
+			
+			$data_up   = array(
+                'phone_number' => $_REQUEST['phone_number'],
+            );
+            $this->db->where('emergency_user_help_id', $_REQUEST['user_id']);
+            $this->db->update('tbl_emergency_contact', $data_up);
+			
+			
             if ($data) {
                 $returnresult = array(
                     'status' => 1,
