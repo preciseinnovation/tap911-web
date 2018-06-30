@@ -2173,17 +2173,21 @@ class Webservice extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
+				
+				$sql     = "SELECT * FROM tbl_emergency_notification where emergency_status !='4' and creator_id='$user_id'";
+				$res     = $this->db->query($sql);
+				$row_creater = $res->result_array();
+				
 				$sql2     = "SELECT * FROM tbl_emergency_notification where emergency_status ='1' and notification_user_id='$user_id'";
 				$res2     = $this->db->query($sql2);
 				$row_accepter = $res2->result_array();
 				
-				if(count($row_accepter) == "0"){
+				if(count($row_creater) == "0" && count($row_accepter) == "0"){
 					$json_data = $this->user_model->accept_emergency_request($token, $emergency_notification_id);
 				}else{
 					$json_data = array(
 						'status' => 0,
-						'message' => 'You can not accept emergency.'
-				
+						'message' => 'You can not accept this emergency. You may have already created or accepted emergency.'
 					);
 				}
                 $data      = json_encode($json_data);
@@ -3734,7 +3738,7 @@ class Webservice extends CI_Controller
 				}else{
 					$returnresult = array(
 						'status' => 0,
-						'message' => 'You can not create new emergency'
+						'message' => 'You can not create new emergency. You may have already created or accepted emergency.'
 				
 					);
 				}
