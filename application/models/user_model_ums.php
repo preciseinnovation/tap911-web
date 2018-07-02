@@ -2423,16 +2423,25 @@ function get_emergency_user($time_zone){
 }
  function emergency_create_user(){
      $user_id = $_REQUEST['user_id'];
-  $result  =$this->db->query("SELECT `tbl_user`.*,`tbl_emergency`.*
-FROM `tbl_user`
-JOIN `tbl_emergency` ON `tbl_emergency`.`user_id` = `tbl_user`.`user_id`
-JOIN `tbl_emergency_notification` on `tbl_emergency`.`emergency_id` = `tbl_emergency_notification`.`emergency_id`
- WHERE `tbl_emergency_notification`.`notification_user_id`=$user_id and `tbl_emergency_notification`.emergency_status!=2
-UNION SELECT `tbl_user`.*, `tbl_emergency`.*
-FROM `tbl_user`
-JOIN `tbl_emergency` ON `tbl_emergency`.`user_id` = `tbl_user`.`user_id`
-WHERE `tbl_emergency`.`user_id` = $user_id
-");
+  /*$result  =$this->db->query("SELECT `tbl_user`.*,`tbl_emergency`.*
+	FROM `tbl_user`
+	JOIN `tbl_emergency` ON `tbl_emergency`.`user_id` = `tbl_user`.`user_id`
+	JOIN `tbl_emergency_notification` on `tbl_emergency`.`emergency_id` = `tbl_emergency_notification`.`emergency_id`
+	 WHERE `tbl_emergency_notification`.`notification_user_id`=$user_id and `tbl_emergency_notification`.emergency_status IN (0,1,2,3)
+	UNION SELECT `tbl_user`.*, `tbl_emergency`.*
+	FROM `tbl_user`
+	JOIN `tbl_emergency` ON `tbl_emergency`.`user_id` = `tbl_user`.`user_id`
+	WHERE `tbl_emergency`.`user_id` = $user_id
+	");*/
+	
+	$result  =$this->db->query("SELECT `tbl_user`.user_id,`tbl_user`.first_name,`tbl_user`.profile_pic,`tbl_user`.phone_number_text_msg,
+		`tbl_user`.last_name,`tbl_emergency`.user_id,`tbl_emergency`.emergency_id,`tbl_emergency`.emergency_latitude,`tbl_emergency`.emergency_longitude,`tbl_emergency`.emergency_address,`tbl_emergency`.emergency_type,`tbl_emergency`.add_date,`tbl_emergency_notification`.emergency_notification_id,`tbl_emergency_notification`.emergency_status,`tbl_emergency_notification`.send_date_time,`tbl_emergency_notification`.accept_date_time,CONVERT_TZ(`tbl_emergency_notification`.send_date_time, @@session.time_zone, '$time')as senddate
+	FROM `tbl_user`
+	JOIN `tbl_emergency` ON `tbl_emergency`.`user_id` = `tbl_user`.`user_id`
+	JOIN `tbl_emergency_notification` on `tbl_emergency`.`emergency_id` = `tbl_emergency_notification`.`emergency_id`
+	 WHERE(`tbl_emergency_notification`.`notification_user_id`=$user_id or `tbl_emergency`.`user_id` = $user_id ) AND tbl_emergency_notification.emergency_status IN (0,1,2,3) GROUP BY `tbl_emergency`.`emergency_id` ORDER BY `tbl_emergency_notification`.send_date_time");
+	 
+	 
   
   $total = count($result->result());
      

@@ -3018,6 +3018,9 @@ class Webservice_ums extends CI_Controller
 			}
 		}
 		
+		//print_r($emergency_contact_user);
+		//exit;
+		
         if ($token == "" or $user_id == "") {
             die(json_encode(array(
                 "status" => 0,
@@ -3965,6 +3968,50 @@ class Webservice_ums extends CI_Controller
         
     // }
 
+	function testnoti(){
+		$ch  = curl_init("https://fcm.googleapis.com/fcm/send");
+		
+		$notification_device_token = 'dq3AzDiUWDE:APA91bHcS_hLfCOlNGcTy-bFi8Hb9R3WubZfMOyq3yo0Nhtzvu8dVH0t195IfRc3fLvxeSj-nc_E2PaophqQbxR4Vx4XGCGkCH9YnjPph3dlL6bObMZLNg902HFDiHU3AH1Tw22S19gRCruwG6ugLY3BxfV-NIo1nQ';
+		
+		//$notification_device_token = array('dq3AzDiUWDE:APA91bHcS_hLfCOlNGcTy-bFi8Hb9R3WubZfMOyq3yo0Nhtzvu8dVH0t195IfRc3fLvxeSj-nc_E2PaophqQbxR4Vx4XGCGkCH9YnjPph3dlL6bObMZLNg902HFDiHU3AH1Tw22S19gRCruwG6ugLY3BxfV-NIo1nQ','f49rzYPmtxw:APA91bEnj_zEzDn5CmyoyJm-2NsQulu7e9B5MYsgZ0IZiIy5RpVo54hU1xjg6KByk7GKBiVTXmNJ5Djazx84GhX0cLxKIECTfBhCr-M9NTtyD2qcmchU2Qj6FpjF5Y7mC2zt7rSFpfikLI9JDeOYQlryFPWGKA03Lw');
+		$title        = "Emergency Request" ;
+		$sound="notification01.mp3";
+		$body =  'Someone has accepted your request.';
+					
+					//$body         =  $first_name." ".$last_name." ".'has accepted your request.';
+                    $click_action    = "ALERT";
+                $notification              = array(
+                     'title' => $title,
+                     'text' => $body,
+                     'sound'=>$sound,
+                     'click_action'=>$click_action
+                );
+                $arrayToSend               = array(
+                    'to' => $notification_device_token,
+                    'notification' => $notification,
+                    'priority' => 'high'
+                );
+                
+                $json      = json_encode($arrayToSend);
+                $headers   = array();
+                $headers[] = 'Content-Type: application/json';
+               // if ($mobile_type == 'android') {
+                    $headers[] = 'Authorization: key= AIzaSyC5Z-wS9-IFx4nVCAfMjF9v7MwBQQR_5kw'; // key here
+              //  } else {
+               //     $headers[] = 'Authorization: key= AIzaSyAkPpQ-GiN4GVSjniMyHuSwXJVekEL7FWk'; // key here
+              //  }
+                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
+                curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                 $result = "";
+            $result = curl_exec($ch);
+            var_dump($result);
+               // array_push($require, curl_exec($ch));
+                curl_close($ch);
+				
+				print_r($require);
+	}
 
 }
 /* End of file welcome.php */
