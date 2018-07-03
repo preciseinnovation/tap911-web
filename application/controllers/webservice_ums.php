@@ -1974,7 +1974,7 @@ class Webservice_ums extends CI_Controller
         // $emergency_address   = isset($_REQUEST['emergency_address']) ? $_REQUEST['emergency_address'] : "";
 		$emergency_type      = isset($_REQUEST['emergency_type']) ? $_REQUEST['emergency_type'] : "";
 		
-        if ($token == "" or $user_id == '' or $emergency_latitude == "" or $emergency_longitude == "" or $emergency_type == "") {
+		if ($token == "" or $user_id == '' or $emergency_latitude == "" or $emergency_longitude == "" or $emergency_type == "") {
             die(json_encode(array(
                 "status" => 0,
                 "message" => "Input parameters are not found"
@@ -3007,16 +3007,8 @@ class Webservice_ums extends CI_Controller
         $token   = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
         $user_id = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
         
-        $emergency_contact_user = array();
-		$results1        = $this->db->query("SELECT * from tbl_emergency_contact where user_id='".$user_id."' and tap911_user=1");
-		$remergencycontact = $results1->result_array();
-		$countvarresults   = count($remergencycontact);
-		if($countvarresults){
-			$require    = array();
-			for ($j = 0; $j < $countvarresults; $j++) {
-				$emergency_contact_user[] =$remergencycontact[$j]['emergency_user_help_id'];
-			}
-		}
+        $results_eme        = $this->db->query("SELECT GROUP_CONCAT(emergency_user_help_id) as eme_contact from tbl_emergency_contact where user_id='".$user_id."' and tap911_user=1 GROUP BY user_id");
+		$remergencycontact1 = explode(',',$results_eme->row()->eme_contact);
 		
 		//print_r($emergency_contact_user);
 		//exit;
@@ -3041,6 +3033,10 @@ class Webservice_ums extends CI_Controller
                 
                 if ($json_data) {
                     foreach ($json_data as $results) {
+						
+						
+						print_r($results);
+						exit;
 
                        $path = base_url() . 'uploads/';
                         
@@ -3050,7 +3046,7 @@ class Webservice_ums extends CI_Controller
 						$loginuserid =$results->user_id;
 						$logos = $path . '1517561100258.png';
 						
-						if($user_id == $loginuserid){
+						if($user_id == $results->creator_id){
 							$user_name = $first_name." ".$last_name;
 							$logo = $results->profile_pic;
 							if ($logo) {

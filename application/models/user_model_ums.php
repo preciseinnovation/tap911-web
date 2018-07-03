@@ -2409,7 +2409,7 @@ function get_emergency_user($time_zone){
          // $limit = $index*$end;
 
 	$result  =$this->db->query("SELECT `tbl_user`.user_id,`tbl_user`.first_name,`tbl_user`.profile_pic,`tbl_user`.phone_number_text_msg,
-		`tbl_user`.last_name,`tbl_emergency`.user_id,`tbl_emergency`.emergency_id,`tbl_emergency`.emergency_latitude,`tbl_emergency`.emergency_longitude,`tbl_emergency`.emergency_address,`tbl_emergency`.emergency_type,`tbl_emergency`.add_date,`tbl_emergency_notification`.emergency_notification_id,`tbl_emergency_notification`.emergency_status,`tbl_emergency_notification`.send_date_time,`tbl_emergency_notification`.accept_date_time,CONVERT_TZ(`tbl_emergency_notification`.send_date_time, @@session.time_zone, '$time')as senddate
+		`tbl_user`.last_name,`tbl_emergency`.user_id,`tbl_emergency`.emergency_id,`tbl_emergency`.emergency_latitude,`tbl_emergency`.emergency_longitude,`tbl_emergency`.emergency_address,`tbl_emergency`.emergency_type,`tbl_emergency`.add_date,`tbl_emergency_notification`.emergency_notification_id,tbl_emergency_notification.creator_id,`tbl_emergency_notification`.emergency_status,`tbl_emergency_notification`.send_date_time,`tbl_emergency_notification`.accept_date_time,CONVERT_TZ(`tbl_emergency_notification`.send_date_time, @@session.time_zone, '$time')as senddate
 	FROM `tbl_user`
 	JOIN `tbl_emergency` ON `tbl_emergency`.`user_id` = `tbl_user`.`user_id`
 	JOIN `tbl_emergency_notification` on `tbl_emergency`.`emergency_id` = `tbl_emergency_notification`.`emergency_id`
@@ -3050,9 +3050,9 @@ $check = "SELECT asset_number FROM tbl_user_asset WHERE status=1 and asset_numbe
        
         if(count($emergency_contact_user)>0){
         $emergency_contact_user_string     = implode(',', $emergency_contact_user);
-    }else{
-        $emergency_contact_user_string="";
-    }
+		}else{
+			$emergency_contact_user_string="";
+		}
 		if($emergency_contact_user_string == ""){
 			$result = $this->db->query("SELECT $table.*, $table.add_date as userdate,tbl_user.*,tbl_user.add_date as adate,
             3956 * 2 * ASIN(SQRT( POWER(SIN(($user_lat -  $table.latitude) * pi()/180 / 2), 2) + COS($user_lat * pi()/180) * COS( $table.latitude * pi()/180) *

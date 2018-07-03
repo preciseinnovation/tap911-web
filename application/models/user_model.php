@@ -1678,22 +1678,15 @@ else{
                      $sound = $notification_tone;
                      }
 				
-				$results        = $this->db->query("SELECT * from tbl_emergency_contact where user_id='".$creator_id."' and tap911_user=1");
-				$remergencycontact = $results->result_array();
-				$countvarresults   = count($remergencycontact);
-				if($countvarresults){
-					$emergency_contact_user = array();
-					for ($j = 0; $j < $countvarresults; $j++) {
-						$emergency_contact_user[] =$remergencycontact[$j]['emergency_user_help_id'];
-					}
-				}
+				$results_eme        = $this->db->query("SELECT GROUP_CONCAT(emergency_user_help_id) as eme_contact from tbl_emergency_contact where user_id='".$user_id."' and tap911_user=1 GROUP BY user_id");
+				$remergencycontact1 = explode(',',$results_eme->row()->eme_contact);
 				
                 $ch  = curl_init("https://fcm.googleapis.com/fcm/send");
                     $usertoken    = $notification_device_token;
                     $title        = "Emergency Request" ;
 					//print_r($emergency_contact_user);
 					//exit;
-                    if(in_array($user_ids,$emergency_contact_user)){
+                    if(in_array($_REQUEST['user_id'],$remergencycontact1)){
 						$body =  $first_name." ".$last_name." ".'has accepted your request.';
 					}else{
 						$body =  'Someone has accepted your request.';
@@ -2129,16 +2122,8 @@ $result  =$this->db->query("SELECT community_communitaction_id,from_user_id,to_u
                     $mobile_type               = $row->mobile_type;
 					$user_id               = $row->user_id;
 					
-					$emergency_contact_user = array();
-					$results        = $this->db->query("SELECT * from tbl_emergency_contact where user_id='".$user_id."' and tap911_user=1");
-					$remergencycontact = $results->result_array();
-					$countvarresults   = count($remergencycontact);
-					if($countvarresults){
-						$require    = array();
-						for ($o = 0; $o < $countvarresults; $o++) {
-							$emergency_contact_user[] =$remergencycontact[$o]['emergency_user_help_id'];
-						}
-					}
+					$results_eme        = $this->db->query("SELECT GROUP_CONCAT(emergency_user_help_id) as eme_contact from tbl_emergency_contact where user_id='".$user_id."' and tap911_user=1 GROUP BY user_id");
+					$remergencycontact1 = explode(',',$results_eme->row()->eme_contact);
 					
 					$sql        = "SELECT notification_tone,user_id FROM tbl_notification WHERE `user_id`='$user_id'";
 					$resultdatatone = $this->db->query($sql);
@@ -2146,7 +2131,7 @@ $result  =$this->db->query("SELECT community_communitaction_id,from_user_id,to_u
                     $notification_tone = $resultdatatone->notification_tone;
 					
 
-					$ch                        = curl_init("https://fcm.googleapis.com/fcm/send");
+					$ch  = curl_init("https://fcm.googleapis.com/fcm/send");
 					$sound = $notification_tone;
 					 if($sound==""){
 					 $sound="notification01.mp3";
@@ -2155,7 +2140,7 @@ $result  =$this->db->query("SELECT community_communitaction_id,from_user_id,to_u
 					 }
 					$usertoken    = $notification_device_token;
 					
-					if(in_array($close_uid,$emergency_contact_user)){
+					if(in_array($close_uid,$remergencycontact1)){
 						$title        = $helpuser_name." "."End Emergency." ;
 					}else{
 						$title        = "Someone End Emergency." ;
@@ -2275,8 +2260,14 @@ $result  =$this->db->query("SELECT community_communitaction_id,from_user_id,to_u
                      $sound = $notification_tone;
                      }
                     $usertoken    = $notification_device_token;
+					
+					
+					$results_eme        = $this->db->query("SELECT GROUP_CONCAT(emergency_user_help_id) as eme_contact from tbl_emergency_contact where user_id='".$user_id."' and tap911_user=1 GROUP BY user_id");
+					$remergencycontact1 = explode(',',$results_eme->row()->eme_contact);
+					
+					
                     
-					if(in_array($user_id,$emergency_contact_user)){
+					if(in_array($creator_id,$remergencycontact1)){
 						$title        = $helpuser_name." "."End Emergency." ;
 					}else{
 						$title        = "Someone End Emergency." ;
@@ -2409,7 +2400,7 @@ function get_emergency_user($time_zone){
          // $limit = $index*$end;
 
 	$result  =$this->db->query("SELECT `tbl_user`.user_id,`tbl_user`.first_name,`tbl_user`.profile_pic,`tbl_user`.phone_number_text_msg,
-		`tbl_user`.last_name,`tbl_emergency`.user_id,`tbl_emergency`.emergency_id,`tbl_emergency`.emergency_latitude,`tbl_emergency`.emergency_longitude,`tbl_emergency`.emergency_address,`tbl_emergency`.emergency_type,`tbl_emergency`.add_date,`tbl_emergency_notification`.emergency_notification_id,`tbl_emergency_notification`.emergency_status,`tbl_emergency_notification`.send_date_time,`tbl_emergency_notification`.accept_date_time,CONVERT_TZ(`tbl_emergency_notification`.send_date_time, @@session.time_zone, '$time')as senddate
+		`tbl_user`.last_name,`tbl_emergency`.user_id,`tbl_emergency`.emergency_id,`tbl_emergency`.emergency_latitude,`tbl_emergency`.emergency_longitude,`tbl_emergency`.emergency_address,`tbl_emergency`.emergency_type,`tbl_emergency`.add_date,`tbl_emergency_notification`.emergency_notification_id,tbl_emergency_notification.creator_id,`tbl_emergency_notification`.emergency_status,`tbl_emergency_notification`.send_date_time,`tbl_emergency_notification`.accept_date_time,CONVERT_TZ(`tbl_emergency_notification`.send_date_time, @@session.time_zone, '$time')as senddate
 	FROM `tbl_user`
 	JOIN `tbl_emergency` ON `tbl_emergency`.`user_id` = `tbl_user`.`user_id`
 	JOIN `tbl_emergency_notification` on `tbl_emergency`.`emergency_id` = `tbl_emergency_notification`.`emergency_id`
@@ -3090,7 +3081,7 @@ $check = "SELECT asset_number FROM tbl_user_asset WHERE status=1 and asset_numbe
         $data1   = $result->result_array();
         $countvar = count($data1);
         for ($i = 0; $i < $countvar; $i++) {
-             $uids    = $data1[$i]['user_id'];
+            $uids    = $data1[$i]['user_id'];
             $SQL = "insert into tbl_emergency_notification(notification_user_id,emergency_id,creator_id)values('$uids','$ids','".$_REQUEST['user_id']."')";
             $res = $this->db->query($SQL);
 
@@ -3107,11 +3098,17 @@ $check = "SELECT asset_number FROM tbl_user_asset WHERE status=1 and asset_numbe
             $title        = $_REQUEST['emergency_type']." "."Emergency Request";
             //$body         =  $user_name." "."need your help. Click to help.";
 			
-			if(in_array($uids,$emergency_contact_user)){
+			$results_eme        = $this->db->query("SELECT GROUP_CONCAT(emergency_user_help_id) as eme_contact from tbl_emergency_contact where user_id='".$uids."' and tap911_user=1 GROUP BY user_id");
+			$remergencycontact = explode(',',$results_eme->row()->eme_contact);
+		
+			
+			if(in_array($_REQUEST['user_id'],$remergencycontact)){
 				$body =  $user_name." "."need your help. Click to help.";
 			}else{
 				$body =  "Someone need your help. Click to help.";
 			}
+			
+			//$body =  $user_name." "."need your help. Click to help.";
 			
             $click_action    = "ALERT";
             $notification= array(

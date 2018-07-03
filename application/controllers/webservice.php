@@ -3022,16 +3022,8 @@ class Webservice extends CI_Controller
         $token   = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
         $user_id = isset($_REQUEST['user_id']) ? $_REQUEST['user_id'] : "";
         
-        $emergency_contact_user = array();
-		$results1        = $this->db->query("SELECT * from tbl_emergency_contact where user_id='".$user_id."' and tap911_user=1");
-		$remergencycontact = $results1->result_array();
-		$countvarresults   = count($remergencycontact);
-		if($countvarresults){
-			$require    = array();
-			for ($j = 0; $j < $countvarresults; $j++) {
-				$emergency_contact_user[] =$remergencycontact[$j]['emergency_user_help_id'];
-			}
-		}
+        $results_eme        = $this->db->query("SELECT GROUP_CONCAT(emergency_user_help_id) as eme_contact from tbl_emergency_contact where user_id='".$user_id."' and tap911_user=1 GROUP BY user_id");
+		$remergencycontact1 = explode(',',$results_eme->row()->eme_contact);
 		
         if ($token == "" or $user_id == "") {
             die(json_encode(array(
@@ -3062,14 +3054,14 @@ class Webservice extends CI_Controller
 						$loginuserid =$results->user_id;
 						$logos = $path . '1517561100258.png';
 						
-						if($user_id == $loginuserid){
+						if($user_id == $results->creator_id){
 							$user_name = $first_name." ".$last_name;
 							$logo = $results->profile_pic;
 							if ($logo) {
 								$logos = $path . $logo;
 							}
 						}else{
-							if(in_array($loginuserid,$emergency_contact_user)){
+							if(in_array($results->creator_id,$remergencycontact1)){
 							$logo = $results->profile_pic;
 							if ($logo) {
 								$logos = $path . $logo;
@@ -3789,6 +3781,54 @@ class Webservice extends CI_Controller
             }
         }
     }
+	
+	function send_notification(){
+		//$notification_device_token = 'fCahfshJkIw:APA91bEc732uuNyetHBkK3WKMqvIUUHaT5k479wvRAGrDWOTsQfCCnUGVHo7vPXPlcWGik1ym7sECopMITAdSf9HQjgFdL6E4vUvhpuz4Tcc0mLZFmD1nbkVI2R7M_nqEQAmXuB-mo_pKwgUniDhMmI2mT2R47NbRQ';
+		$notification_device_token = 'fe4wawqEfW0:APA91bHxm6slLB39hWRK7Oypeq4bO564RL9lu9adDiwkpex4ln-dnpdu5RiqCgBmLAXAWgj1Ex30rE-JFLWGbCLUlqch_Vo1gNxuxWMjFbgAsWAbJ5v2AXa0esCnPNdBmSR-L8nf1YbdkCLTycd2pvwdJ2WVUoZGjw';
+		
+		$sound="notification01.mp3";
+		$mobile_type               = 'android';
+	   
+		$ch                        = curl_init("https://fcm.googleapis.com/fcm/send");
+	   
+		$usertoken    = $notification_device_token;
+					
+					
+					
+                    $title        = "Umesh Testing notification test 2" ;
+					$body         =  "Thanks for your help!";
+                     $click_action    = "ALERT";
+                    $notification = array(
+                        'title' => $title,
+                        'text' => $body,
+                        'sound' =>$sound,
+						'time_interval'=>'5',
+                        'click_action'=>$click_action
+                    );
+                    $arrayToSend  = array(
+                        'to' => $usertoken,
+                        'data' => $notification,
+                        'priority' => 'high'
+                    );
+                    
+                    $json      = json_encode($arrayToSend);
+                    $headers   = array();
+                    $headers[] = 'Content-Type: application/json';
+                    if ($mobile_type == 'android') {
+                        $headers[] = 'Authorization: key= AIzaSyC5Z-wS9-IFx4nVCAfMjF9v7MwBQQR_5kw'; // key here
+                    } else {
+                        $headers[] = 'Authorization: key= AIzaSyAkPpQ-GiN4GVSjniMyHuSwXJVekEL7FWk'; // key here
+                    }
+                    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                    array_push($require, curl_exec($ch));
+                    curl_close($ch);
+                    if ($mobile_type == 'android' || $mobile_type == 'ios') {
+                        
+                    }
+	}
 
 
 
