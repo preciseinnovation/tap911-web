@@ -2900,6 +2900,7 @@ class Webservice extends CI_Controller
         $notification_user_id = isset($_REQUEST['notification_user_id']) ? $_REQUEST['notification_user_id'] : "";
         $emergency_id         = isset($_REQUEST['emergency_id']) ? $_REQUEST['emergency_id'] : "";
         $message_data         = isset($_REQUEST['message_data']) ? $_REQUEST['message_data'] : "";
+		
         if ($token == "" or $notification_user_id == "" or $emergency_id == "" or $message_data == "") {
             die(json_encode(array(
                 "status" => 0,
@@ -3765,8 +3766,23 @@ class Webservice extends CI_Controller
             $res     = $this->db->query($sql);
             $row     = $res->row();
             if ($row) {
+				
+				$sql     = "SELECT * FROM tbl_emergency_notification where emergency_status !='4' and creator_id='$user_id'";
+				$res     = $this->db->query($sql);
+				$row_creater = $res->result_array();
+				
+				$sql2     = "SELECT * FROM tbl_emergency_notification where emergency_status ='1' and notification_user_id='$user_id'";
+				$res2     = $this->db->query($sql2);
+				$row_accepter = $res2->result_array();
+				
+				if(count($row_creater) == "0" && count($row_accepter) == "0"){
+					$time_interval = '5';
+				}else{
+					$time_interval = "1";
+				}	
                $returnresult = array(
                     'status' => 1,
+                    'time_interval' => $time_interval,
                     'message' => 'Authentication success'
                 );
                 $response     = json_encode($returnresult);

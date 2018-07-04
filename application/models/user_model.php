@@ -285,7 +285,9 @@ class User_model extends CI_Model
                     
                     $data = array(
                         'user_id' => $id,
-                        'status' => 1
+                        'status' => 1,
+                        'notification_tone' => 'notification01.mp3',
+						
                     );
                     $data = $this->db->insert('tbl_notification', $data);
                     $dateValue = date("Y-m-d H:i:s");
@@ -1699,11 +1701,21 @@ else{
                      'sound'=>$sound,
                      'click_action'=>$click_action
                 );
-                $arrayToSend               = array(
+				
+				if ($mobile_type == 'android') {
+					$arrayToSend               = array(
+                    'to' => $notification_device_token,
+                    'data' => $notification,
+                    'priority' => 'high'
+                );
+				}else{
+					$arrayToSend               = array(
                     'to' => $notification_device_token,
                     'notification' => $notification,
                     'priority' => 'high'
                 );
+				}
+                
                 
                 $json      = json_encode($arrayToSend);
                 $headers   = array();
@@ -2023,6 +2035,9 @@ $result  =$this->db->query("SELECT community_communitaction_id,from_user_id,to_u
          $message_data         = $_REQUEST['message_data'];
 		 $close_uid         = $_REQUEST['notification_user_id'];
 		 
+		$sql_eme_count = $this->db->query("SELECT COUNT(*) as accepter FROM tbl_emergency_notification WHERE emergency_status IN (1,2) and emergency_id='$emergency_id'");
+		$accepter_count = $sql_eme_count->row()->accepter;
+		
 		$sql_eme = "SELECT user_id FROM tbl_emergency WHERE emergency_id='$emergency_id'";
 		$result_eme = $this->db->query($sql_eme);
 		$datas_eme = $result_eme->row();
@@ -2035,9 +2050,9 @@ $result  =$this->db->query("SELECT community_communitaction_id,from_user_id,to_u
         for ($i = 0; $i < $countvarone; $i++) {
             $value = $onedata[$i]['totalresult'];
              
-             } 
+            } 
 
-             $checkdata    = "SELECT COUNT(2) as totalresults FROM tbl_emergency_notification WHERE emergency_status = 2 and emergency_id='" . $emergency_id . "'";
+        $checkdata    = "SELECT COUNT(2) as totalresults FROM tbl_emergency_notification WHERE emergency_status = 2 and emergency_id='" . $emergency_id . "'";
         $restwo      = $this->db->query($checkdata);
         $datatwo     = $restwo->result_array();
         $countvartwo = count($datatwo);
@@ -2111,6 +2126,10 @@ $result  =$this->db->query("SELECT community_communitaction_id,from_user_id,to_u
             $countvars = count($datas);
             $require   = array();
 			
+			$sql_end_count = $this->db->query("SELECT COUNT(*) as end_count FROM tbl_emergency_notification WHERE emergency_status = 4 and emergency_id='$emergency_id'");
+			$end_count = $sql_end_count->row()->end_count;
+			
+			
 			for ($j = 0; $j < $countvars; $j++) {
                 $uid = $datas[$j]['notification_user_id'];              
                 $sql = "SELECT * FROM tbl_user WHERE `user_id` IN ('$uid')";
@@ -2147,18 +2166,49 @@ $result  =$this->db->query("SELECT community_communitaction_id,from_user_id,to_u
 					}
 					
 					$body         =  "Thanks for your help!";
-					 $click_action    = "ALERT";
-					$notification = array(
+					$click_action    = "ALERT";
+					 
+					if($accepter_count == 1){
+						$notification = array(
 						'title' => $title,
 						'text' => $body,
 						'sound' =>$sound,
-						'click_action'=>$click_action
+						'click_action'=>$click_action,
+						'time_interval'=>'5',
+						);
+					}else{
+						if($end_count == 2){
+							$notification = array(
+							'title' => $title,
+							'text' => $body,
+							'sound' =>$sound,
+							'click_action'=>$click_action,
+							'time_interval'=>'5',
+							);
+						}else{
+							$notification = array(
+							'title' => $title,
+							'text' => $body,
+							'sound' =>$sound,
+							'click_action'=>$click_action
+							);
+						}
+					}
+					
+					if ($mobile_type == 'android') {
+						$arrayToSend  = array(
+						'to' => $usertoken,
+						'data' => $notification,
+						'priority' => 'high'
 					);
-					$arrayToSend  = array(
+					}else{
+						$arrayToSend  = array(
 						'to' => $usertoken,
 						'notification' => $notification,
 						'priority' => 'high'
-					);
+						);
+					}
+					
 					
 					$json      = json_encode($arrayToSend);
 					$headers   = array();
@@ -2283,11 +2333,20 @@ $result  =$this->db->query("SELECT community_communitaction_id,from_user_id,to_u
 						'time_interval'=>'5',
                         'click_action'=>$click_action
                     );
-                    $arrayToSend  = array(
-                        'to' => $usertoken,
-                        'notification' => $notification,
-                        'priority' => 'high'
-                    );
+					
+					if ($mobile_type == 'android') {
+						$arrayToSend  = array(
+							'to' => $usertoken,
+							'data' => $notification,
+							'priority' => 'high'
+						);
+					}else{
+						$arrayToSend  = array(
+							'to' => $usertoken,
+							'notification' => $notification,
+							'priority' => 'high'
+						);
+					}
                     
                     $json      = json_encode($arrayToSend);
                     $headers   = array();
@@ -3117,11 +3176,21 @@ $check = "SELECT asset_number FROM tbl_user_asset WHERE status=1 and asset_numbe
                  'sound'=>$sound,
                  'click_action'=>$click_action
             );
-            $arrayToSend  = array(
+			
+			 if ($mobile_type == 'android') {
+				 $arrayToSend  = array(
                 'to' => $usertoken,
-                'notification' => $notification,
+                'data' => $notification,
                 'priority' => 'high'
-            );
+				);
+			}else{
+					 $arrayToSend  = array(
+					'to' => $usertoken,
+					'notification' => $notification,
+					'priority' => 'high'
+				);
+			}
+            
                 
             $json      = json_encode($arrayToSend);
             $headers   = array();
