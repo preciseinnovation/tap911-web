@@ -2730,7 +2730,7 @@ class Webservice extends CI_Controller
     function get_accept_notification_user_list()
     {
         
-        $user_id      = $_REQUEST['user_id'];
+		$user_id      = $_REQUEST['user_id'];
         $emergency_id = $_REQUEST['emergency_id'];
         $token        = $_REQUEST['token'];
         $token        = isset($_REQUEST['token']) ? $_REQUEST['token'] : "";
@@ -2743,12 +2743,16 @@ class Webservice extends CI_Controller
             )));
             
         } else {
+			
+			$results_eme        = $this->db->query("SELECT GROUP_CONCAT(emergency_user_help_id) as eme_contact from tbl_emergency_contact where user_id='".$user_id."' and tap911_user=1 GROUP BY user_id");
+			$remergencycontact1 = explode(',',$results_eme->row()->eme_contact);
+			
+			
             
             $sql = "SELECT token,user_id FROM tbl_user where token='$token' and user_id='$user_id'";
             $res = $this->db->query($sql);
             $row = $res->row();
             if ($row) {
-                
                 $results = $this->db->query("SELECT emergency_id,notification_user_id from tbl_emergency_notification where emergency_status=1 and emergency_id='" . $_REQUEST['emergency_id'] . "'");
                 
                 $resultdata     = $results->result_array();
@@ -2761,7 +2765,7 @@ class Webservice extends CI_Controller
                     $id = $resultdata[$i]['notification_user_id'];
                     // $em_lat = $resultdata[$i]['em_lat'];
                     //$em_long = $resultdata[$i]['em_long'];
-                    
+                  
                     $sql          = "SELECT user_id,phone_number_text_msg,first_name,last_name FROM tbl_user WHERE `user_id` IN('$id')";
                     $res          = $this->db->query($sql);
                     $rows         = $res->row();
@@ -2805,13 +2809,27 @@ class Webservice extends CI_Controller
                      if(empty($longitude)){
                         $longitude=""; 
                      }
-                    $returnresult1[] = array(
+					
+					
+					if(in_array($id,$remergencycontact1)){
+						 $returnresult1[] = array(
                         'user_name' => $user_name,
                         'phone_number' => $phone_number,
                         'user_id' => $user_ids,
                         'latitude' => $latitude,
                         'longitude' => $longitude
-                    );
+						);
+					}else{
+						 $returnresult1[] = array(
+                        'user_name' => 'Someone',
+                        'phone_number' => $phone_number,
+                        'user_id' => $user_ids,
+                        'latitude' => $latitude,
+                        'longitude' => $longitude
+						);
+					}
+				
+                   
                 }
                 
             $sql= "SELECT user_id,emergency_id,emergency_latitude,emergency_longitude FROM tbl_emergency WHERE `emergency_id`='" . $_REQUEST['emergency_id'] . "'";
@@ -2832,7 +2850,10 @@ class Webservice extends CI_Controller
                 $last_name      = $row->last_name;
                 $phone_numbers  = $row->phone_number_text_msg;
                 $user_name      = $first_name . " " . $last_name;
-                $emcreateuser[] = array(
+				
+				
+				if(in_array($em_user_id,$remergencycontact1)){
+					$emcreateuser[] = array(
                     'user_name' => $user_name,
                     'user_id' => $em_user_id,
                     'emergency_id' => $emergency_id,
@@ -2840,7 +2861,19 @@ class Webservice extends CI_Controller
                     'emergency_longitude' => $emergency_longitude,
                     'phone_number' => $phone_numbers
                     
-                );
+					);
+				}else{
+					$emcreateuser[] = array(
+                    'user_name' => 'Someone',
+                    'user_id' => $em_user_id,
+                    'emergency_id' => $emergency_id,
+                    'emergency_latitude' => $emergency_latitude,
+                    'emergency_longitude' => $emergency_longitude,
+                    'phone_number' => $phone_numbers
+                    
+					);
+				}
+                
                 
                 array_push($emcreateusers, $emcreateuser);
                 
