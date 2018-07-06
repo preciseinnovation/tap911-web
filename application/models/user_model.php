@@ -3211,8 +3211,7 @@ $check = "SELECT asset_number FROM tbl_user_asset WHERE status=1 and asset_numbe
             curl_close($ch);
         }
         $returnresult = array(
-            'status' => 1,
-            'response' => $require,
+            'status' => 1
             'message' => 'success'
         );  
         return $returnresult;
