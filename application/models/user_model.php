@@ -955,8 +955,34 @@ FROM `tbl_community` tc WHERE tc.status=1 and del_date='0000-00-00 00:00:00'
         if ($res->num_rows > 0) {
             $row                  = $res->row();
             $emergency_contact_id = $row->emergency_contact_id;
-            
-            $data = array(
+           if($_REQUEST['tap911_user'] == "1" && $_REQUEST['emergency_user_help_id'] != ""){
+			   $checkuser = "SELECT phone_number_text_msg FROM tbl_user WHERE status=1 and user_id='".$_REQUEST['emergency_user_help_id']."'";
+				$res_checkuser     = $this->db->query($checkuser);
+				$row_checkuser     = $res_checkuser->row();
+				//print_r($row_checkuser);
+				//exit;
+			if($row_checkuser->phone_number_text_msg != $_REQUEST['phone_number']){
+				$returnresult = array(
+                    'status' => 0,
+                    'message' => 'You can not edit phone number of Tap911 user.'
+                );
+                die(json_encode($returnresult));
+			}
+		   }else{
+			    $check = "SELECT * FROM tbl_emergency_contact WHERE user_id ='" . $_REQUEST['user_id'] . "' and phone_number ='" . $_REQUEST['phone_number'] . "' and emergency_contact_id!='".$_REQUEST['emergency_contact_id']."'";
+				$rs    = mysql_query($check);
+				$data  = mysql_fetch_array($rs);
+				if ($data[0] > 1) {
+					$returnresult = array(
+						'status' => 0,
+						'message' => 'This contact is already exist'
+					);
+					die(json_encode($returnresult));
+				}
+		   }
+		   
+		  // exit;
+           $data = array(
                 'emergency_contact_id' => $_REQUEST['emergency_contact_id'],
                 'name' => $_REQUEST['name'],
                 'description' => $_REQUEST['description'],
@@ -2060,18 +2086,28 @@ $result  =$this->db->query("SELECT community_communitaction_id,from_user_id,to_u
             $totalresults = $datatwo[$m]['totalresults'];
              
              }                
-        if($value>0 && $totalresults>0) {
-            
+			 
+			 
+	//echo $totalresults;
+	//exit;
+    if(($value>0 && $totalresults>0) || $totalresults == 2) {
         $data = array(
             'emergency_status' => 4
-            
         );
         $this->db->where('notification_user_id', $notification_user_id);
         $this->db->where('emergency_id', $emergency_id);
         $data = $this->db->update('tbl_emergency_notification', $data);
+		if($totalresults == "2"){
+			$data = array(
+                'user_id' => $notification_user_id,
+                'emergency_id' => $emergency_id,
+                'message_data' => $message_data,
+                'status' => 1
+            );
+            $data = $this->db->insert('tbl_emergency_communitaction', $data);
+		}
     }
     else{
-    
         $check    = "SELECT COUNT(4) as totalresultsdata FROM tbl_emergency_notification WHERE emergency_status = 4 and emergency_id='" . $emergency_id . "'";
         $res      = $this->db->query($check);
         $data     = $res->result_array();

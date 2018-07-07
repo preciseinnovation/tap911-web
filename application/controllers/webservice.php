@@ -1476,6 +1476,7 @@ class Webservice extends CI_Controller
                     foreach ($json_data as $results) {
                         $arr[] = array(
                             'emergency_contact_id' => $results->emergency_contact_id,
+                            'emergency_user_help_id' => $results->emergency_user_help_id,
                             'user_id' => $results->user_id,
                             'name' => $results->name,
                             'description' => $results->description,
